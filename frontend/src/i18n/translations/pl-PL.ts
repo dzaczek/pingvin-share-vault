@@ -60,6 +60,8 @@ export default {
   "signup.title": "Utwórz konto",
   "signup.description": "Masz już konto?",
   "signup.button.signin": "Zaloguj się",
+  "signup.input.displayName": "Nazwa wyświetlana",
+  "signup.input.displayName.placeholder": "Twoja nazwa wyświetlana",
   "signup.input.username": "Nazwa użytkownika",
   "signup.input.username.placeholder": "Twoja nazwa użytkownika",
   "signup.input.email": "Adres e-mail",
@@ -101,6 +103,7 @@ export default {
   // /account
   "account.title": "Moje konto",
   "account.card.info.title": "Informacje o koncie",
+  "account.card.info.displayName": "Nazwa wyświetlana",
   "account.card.info.username": "Nazwa użytkownika",
   "account.card.info.email": "Adres e-mail",
   "account.notify.info.success": "Konto zostało zaktualizowane",
@@ -263,6 +266,7 @@ export default {
 
   // /admin/users
   "admin.users.title": "Zarządzanie użytkownikami",
+  "admin.users.table.displayName": "Nazwa wyświetlana",
   "admin.users.table.username": "Nazwa użytkownika",
   "admin.users.table.email": "Adres e-mail",
   "admin.users.table.admin": "Administrator",
@@ -289,6 +293,7 @@ export default {
     "Czy na pewno chcesz usunąć tego użytkownika i wszystkie jego udostępniania?",
   // showCreateUserModal.tsx
   "admin.users.modal.create.title": "Utwórz użytkownika",
+  "admin.users.modal.create.displayName": "Nazwa wyświetlana",
   "admin.users.modal.create.username": "Nazwa użytkownika",
   "admin.users.modal.create.email": "Adres e-mail",
   "admin.users.modal.create.password": "Hasło",
@@ -894,6 +899,8 @@ export default {
     "Nazwa atrybutu adresu e-mail użytkownika",
   "admin.config.ldap.field-name-email.description":
     "Nazwa atrybutu LDAP dla adresu e-mail użytkownika.",
+  "admin.config.ldap.field-name-display-name": "Nazwa atrybutu wyświetlanej nazwy użytkownika",
+  "admin.config.ldap.field-name-display-name.description": "Nazwa atrybutu LDAP dla wyświetlanej nazwy użytkownika.",
   "admin.config.notify.success":
     "Konfiguracja została pomyślnie zaktualizowana.",
   "admin.config.notify.logo-success":
@@ -1020,6 +1027,7 @@ export default {
   "common.error.exact-length": "Musi mieć dokładnie {length} znaków",
   "common.error.invalid-number": "Musi być liczbą",
   "common.error.field-required": "To pole jest wymagane",
+  "common.error.name.invalid-chars": "Może zawierać tylko litery, spacje, przecinki, kropki, apostrofy lub myślniki",
   "common.error.password.lowercase":
     "Hasło musi zawierać co najmniej jedną małą literę",
   "common.error.password.uppercase":
