@@ -26,4 +26,14 @@ describe("Footer", () => {
     renderInPolish({ "legal.enabled": "true" });
     expect(screen.getByText(/Działa na/)).toBeInTheDocument();
   });
+
+  it.each<Record<string, string>>([{}, { "legal.enabled": "true" }])(
+    "links to this fork's repository %j",
+    (config) => {
+      renderInPolish(config);
+      expect(
+        screen.getByRole("link", { name: "Pingvin Share X" }),
+      ).toHaveAttribute("href", "https://github.com/dzaczek/pingvin-share-x");
+    },
+  );
 });

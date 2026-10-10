@@ -16,6 +16,7 @@ import Meta from "../../components/Meta";
 import useTranslate from "../../hooks/useTranslate.hook";
 import configService from "../../services/config.service";
 import { shortCommit } from "../../utils/buildCommit";
+import { REPOSITORY_URL } from "../../utils/repository.util";
 
 const useStyles = createStyles((theme) => ({
   item: {
@@ -66,7 +67,7 @@ const Admin = () => {
             {
               title: "Update",
               icon: TbRefresh,
-              route: "https://github.com/smp46/pingvin-share-x/releases/latest",
+              route: `${REPOSITORY_URL}/releases/latest`,
             },
           ]);
         }
