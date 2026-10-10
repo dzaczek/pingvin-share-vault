@@ -1,8 +1,5 @@
-import { execFileSync } from "child_process";
 import { createHash, randomBytes } from "crypto";
-import { mkdtempSync, rmSync, writeFileSync } from "fs";
-import { tmpdir } from "os";
-import { join } from "path";
+import { inflateRawSync } from "zlib";
 import {
   RUN_ID,
   api,
@@ -14,6 +11,33 @@ import {
 } from "./helpers/api";
 
 const sha256 = (buf: Buffer) => createHash("sha256").update(buf).digest("hex");
+
+// Unpacks a zip in memory by walking its central directory, so a downloaded
+// archive never has to touch the disk. Handles stored and deflated entries,
+// which is all archiver writes.
+const readZip = (zip: Buffer) => {
+  const end = zip.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
+  const count = zip.readUInt16LE(end + 10);
+  let at = zip.readUInt32LE(end + 16);
+  const entries: Record<string, Buffer> = {};
+  for (let i = 0; i < count; i++) {
+    const method = zip.readUInt16LE(at + 10);
+    const size = zip.readUInt32LE(at + 20);
+    const nameLength = zip.readUInt16LE(at + 28);
+    const extraLength = zip.readUInt16LE(at + 30);
+    const commentLength = zip.readUInt16LE(at + 32);
+    const local = zip.readUInt32LE(at + 42);
+    const name = zip.toString("utf8", at + 46, at + 46 + nameLength);
+
+    const dataAt =
+      local + 30 + zip.readUInt16LE(local + 26) + zip.readUInt16LE(local + 28);
+    const data = zip.subarray(dataAt, dataAt + size);
+    entries[name] = method === 8 ? inflateRawSync(data) : Buffer.from(data);
+
+    at += 46 + nameLength + extraLength + commentLength;
+  }
+  return entries;
+};
 
 describe("uploading and downloading", () => {
   let owner: Awaited<ReturnType<typeof signUp>>;
@@ -148,15 +172,10 @@ describe("uploading and downloading", () => {
     const zip = await api(`/shares/${shareId}/files/zip`);
     expect(zip.status).toBe(200);
 
-    const dir = mkdtempSync(join(tmpdir(), "pingvin-it-zip-"));
-    try {
-      writeFileSync(join(dir, "all.zip"), zip.body);
-      for (const [name, content] of Object.entries(files)) {
-        const unpacked = execFileSync("unzip", ["-p", join(dir, "all.zip"), name]);
-        expect(sha256(unpacked)).toBe(sha256(content));
-      }
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
+    const unpacked = readZip(zip.body);
+    expect(Object.keys(unpacked).sort()).toEqual(Object.keys(files).sort());
+    for (const [name, content] of Object.entries(files)) {
+      expect(sha256(unpacked[name])).toBe(sha256(content));
     }
   }, 60_000);
 
