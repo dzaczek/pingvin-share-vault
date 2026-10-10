@@ -55,12 +55,17 @@ export class UserSevice {
         const user = await tx.user.create({
           data: {
             ...dto,
+            displayName: dto.displayName?.trim() || null,
             password: hash,
           },
         });
 
         if (randomPassword) {
-          await this.emailService.sendInviteEmail(dto.email, randomPassword);
+          await this.emailService.sendInviteEmail(
+            dto.email,
+            randomPassword,
+            user.displayName || user.username,
+          );
         }
 
         return user;
@@ -86,10 +91,17 @@ export class UserSevice {
       }
 
       const hash = user.password && (await argon.hash(user.password));
+      const { displayName, ...rest } = user;
 
       return await this.prisma.user.update({
         where: { id },
-        data: { ...user, password: hash },
+        data: {
+          ...rest,
+          ...(displayName !== undefined && {
+            displayName: displayName?.trim() || null,
+          }),
+          password: hash,
+        },
       });
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
@@ -137,6 +149,9 @@ export class UserSevice {
   ) {
     const fieldNameMemberOf = this.configService.get("ldap.fieldNameMemberOf");
     const fieldNameEmail = this.configService.get("ldap.fieldNameEmail");
+    const fieldNameDisplayName = this.configService.get(
+      "ldap.fieldNameDisplayName",
+    );
 
     let isAdmin = false;
     if (fieldNameMemberOf in ldapEntry) {
@@ -165,6 +180,16 @@ export class UserSevice {
       );
     }
 
+    let userDisplayName: string | null = null;
+    if (fieldNameDisplayName in ldapEntry) {
+      const value = Array.isArray(ldapEntry[fieldNameDisplayName])
+        ? ldapEntry[fieldNameDisplayName][0]
+        : ldapEntry[fieldNameDisplayName];
+      if (value && value.toString().match(/^[\p{L} ,.'-]*$/u)) {
+        userDisplayName = value.toString();
+      }
+    }
+
     if (providedCredentials.email) {
       /* if LDAP does not provides an users email address, take the user provided email address instead */
       userEmail = providedCredentials.email;
@@ -177,6 +202,7 @@ export class UserSevice {
     try {
       const user = await this.prisma.user.upsert({
         create: {
+          displayName: userDisplayName ?? null,
           username: providedCredentials.username ?? placeholderUsername,
           email: userEmail ?? placeholderEMail,
           password: await argon.hash(crypto.randomUUID()),

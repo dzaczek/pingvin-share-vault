@@ -40,6 +40,9 @@ const SignUpForm = () => {
   }
 
   const validationSchema = yup.object().shape({
+    displayName: yup
+      .string()
+      .matches(/^[\p{L} ,.'-]*$/u, t("common.error.name.invalid-chars")),
     email: yup.string().email(t("common.error.invalid-email")).required(),
     username: yup
       .string()
@@ -71,14 +74,20 @@ const SignUpForm = () => {
     initialValues: {
       email: "",
       username: "",
+      displayName: "",
       password: "",
     },
     validate: yupResolver(validationSchema),
   });
 
-  const signUp = async (email: string, username: string, password: string) => {
+  const signUp = async (
+    displayName: string,
+    email: string,
+    username: string,
+    password: string,
+  ) => {
     await authService
-      .signUp(email.trim(), username.trim(), password.trim())
+      .signUp(displayName, email.trim(), username.trim(), password.trim())
       .then(async (response) => {
         if (response.data.verificationRequired) {
           router.replace({
@@ -113,12 +122,23 @@ const SignUpForm = () => {
       <Paper withBorder shadow="md" p={30} mt={30} radius="md">
         <form
           onSubmit={form.onSubmit((values) =>
-            signUp(values.email, values.username, values.password),
+            signUp(
+              values.displayName,
+              values.email,
+              values.username,
+              values.password,
+            ),
           )}
         >
           <TextInput
+            label={t("signup.input.displayName")}
+            placeholder={t("signup.input.displayName.placeholder")}
+            {...form.getInputProps("displayName")}
+          />
+          <TextInput
             label={t("signup.input.username")}
             placeholder={t("signup.input.username.placeholder")}
+            mt="md"
             {...form.getInputProps("username")}
           />
           <TextInput

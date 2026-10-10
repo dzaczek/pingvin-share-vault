@@ -75,4 +75,27 @@ describe("accounts and sign in", () => {
     const res = await api("/users/me");
     expect([401, 403]).toContain(res.status);
   });
+
+  it("stores a display name and lets the user change it", async () => {
+    const set = await api("/users/me", {
+      method: "PATCH",
+      jar: account.jar,
+      body: { displayName: "Łucja O'Neil-Kowalska" },
+    });
+    expect(set.status).toBe(200);
+
+    const me = await api("/users/me", { jar: account.jar });
+    expect(me.data.displayName).toBe("Łucja O'Neil-Kowalska");
+  });
+
+  it("refuses a display name that is not a name", async () => {
+    for (const displayName of ["<b>x</b>", "x".repeat(65)]) {
+      const res = await api("/users/me", {
+        method: "PATCH",
+        jar: account.jar,
+        body: { displayName },
+      });
+      expect(res.status).toBe(400);
+    }
+  });
 });
