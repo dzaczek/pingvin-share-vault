@@ -13,6 +13,7 @@ import * as argon from "argon2";
 import * as crypto from "crypto";
 import * as fs from "fs";
 import * as moment from "moment";
+import { resolve, sep } from "path";
 import { I18nService } from "nestjs-i18n";
 import { ClamScanService } from "src/clamscan/clamscan.service";
 import { ConfigService } from "src/config/config.service";
@@ -206,11 +207,21 @@ export class ShareService {
   // and an unhandled rejection stops the whole process.
   async createZip(shareId: string) {
     if (this.config.get("s3.enabled")) return;
+
+    // the id is validated before it gets here, this keeps it that way should
+    // a new caller forget
+    const shareRoot = resolve(SHARE_DIRECTORY);
+    const path = resolve(shareRoot, shareId);
+    if (!path.startsWith(shareRoot + sep)) {
+      this.logger.error(
+        `Refusing to zip outside the share directory: ${shareId}`,
+      );
+      return;
+    }
+    const zipPath = resolve(path, "archive.zip");
+
     if (this.activeZipBuilds.has(shareId)) return;
     this.activeZipBuilds.add(shareId);
-
-    const path = `${SHARE_DIRECTORY}/${shareId}`;
-    const zipPath = `${path}/archive.zip`;
 
     try {
       const files = await this.prisma.file.findMany({ where: { shareId } });

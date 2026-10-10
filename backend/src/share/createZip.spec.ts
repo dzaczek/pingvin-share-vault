@@ -152,6 +152,23 @@ describe("createZip", () => {
     expect(shareUpdate).not.toHaveBeenCalled();
   });
 
+  it("never writes outside the share directory", async () => {
+    // a real folder next to the share directory, with a file the zip could use
+    const outside = fs.mkdtempSync(path.join(os.tmpdir(), "pingvin-outside-"));
+    fs.writeFileSync(path.join(outside, "id-one"), "a");
+
+    try {
+      await build([{ id: "id-one", name: "a.txt" }]).createZip(
+        path.relative(root, outside),
+      );
+
+      expect(fs.existsSync(path.join(outside, "archive.zip"))).toBe(false);
+      expect(shareUpdate).not.toHaveBeenCalled();
+    } finally {
+      fs.rmSync(outside, { recursive: true, force: true });
+    }
+  });
+
   it("is started again when a share is opened without its zip", async () => {
     const service = construct(
       {
