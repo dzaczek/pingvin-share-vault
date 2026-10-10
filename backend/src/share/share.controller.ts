@@ -25,6 +25,7 @@ import { AdminShareDTO } from "./dto/adminShare.dto";
 import { BlockShareDTO } from "./dto/blockShare.dto";
 import { CreateShareDTO } from "./dto/createShare.dto";
 import { MyShareDTO } from "./dto/myShare.dto";
+import { ReceivedShareDTO } from "./dto/receivedShare.dto";
 import { ShareDTO } from "./dto/share.dto";
 import { ShareMetaDataDTO } from "./dto/shareMetaData.dto";
 import { SharePasswordDto } from "./dto/sharePassword.dto";
@@ -90,7 +91,9 @@ export class ShareController {
   async getReceivedShares(@GetUser() user: User) {
     if (!this.config.get("share.enableUserRecipients"))
       throw new ForbiddenException("User recipients are not enabled");
-    return this.shareService.getReceivedShares(user.id);
+    return new ReceivedShareDTO().fromList(
+      await this.shareService.getReceivedShares(user.id),
+    );
   }
 
   @Get(":id")
