@@ -40,6 +40,21 @@ const useStyles = createStyles((theme) => ({
     position: "absolute",
     bottom: -20,
   },
+
+  // a touch screen gets the tap wording, everything else click and drop
+  mobileDescription: {
+    display: "none",
+    "@media (pointer: coarse)": {
+      display: "inline",
+    },
+  },
+
+  desktopDescription: {
+    display: "inline",
+    "@media (pointer: coarse)": {
+      display: "none",
+    },
+  },
 }));
 
 const traverseDirectory = async (entry: any, path = ""): Promise<File[]> => {
@@ -152,6 +167,8 @@ const Dropzone = ({
     isHydrated &&
     typeof HTMLInputElement !== "undefined" &&
     "webkitdirectory" in HTMLInputElement.prototype;
+  const noFolder = isHydrated && !isFolderUploadSupported;
+  const isMac = isHydrated && /Macintosh|Mac OS X/.test(navigator.userAgent);
 
   const handleFolderSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const filesList = event.target.files;
@@ -226,10 +243,29 @@ const Dropzone = ({
             {title || <FormattedMessage id="upload.dropzone.title" />}
           </Text>
           <Text align="center" size="sm" mt="xs" color="dimmed">
-            <FormattedMessage
-              id="upload.dropzone.description"
-              values={{ maxSize: byteToHumanSizeString(maxShareSize) }}
-            />
+            <span className={classes.mobileDescription}>
+              <FormattedMessage
+                id={
+                  noFolder
+                    ? "upload.dropzone.description.mobile.no-folder"
+                    : "upload.dropzone.description.mobile"
+                }
+                values={{ maxSize: byteToHumanSizeString(maxShareSize) }}
+              />
+            </span>
+            <span className={classes.desktopDescription}>
+              <FormattedMessage
+                id={
+                  noFolder
+                    ? "upload.dropzone.description.desktop.no-folder"
+                    : "upload.dropzone.description.desktop"
+                }
+                values={{
+                  maxSize: byteToHumanSizeString(maxShareSize),
+                  shortcut: isMac ? "⌘+V" : "Ctrl+V",
+                }}
+              />
+            </span>
           </Text>
         </div>
       </MantineDropzone>
