@@ -24,8 +24,16 @@ export class OidcProvider extends GenericOidcProvider {
     );
   }
 
+  // accepts the issuer url as well as the full discovery url, people paste
+  // whichever their identity provider shows them
   protected getDiscoveryUri(): string {
-    return this.config.get("oauth.oidc-discoveryUri");
+    const uri = (this.config.get("oauth.oidc-discoveryUri") || "")
+      .trim()
+      .replace(/\/+$/, "");
+    if (!uri) return "";
+    if (uri.includes("/.well-known/")) return uri;
+    if (uri.endsWith("/.well-known")) return `${uri}/openid-configuration`;
+    return `${uri}/.well-known/openid-configuration`;
   }
 
   getUserInfo(

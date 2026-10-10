@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from "crypto";
+import { inflateRawSync } from "zlib";
 import {
   RUN_ID,
   api,
@@ -10,6 +11,33 @@ import {
 } from "./helpers/api";
 
 const sha256 = (buf: Buffer) => createHash("sha256").update(buf).digest("hex");
+
+// Unpacks a zip in memory by walking its central directory, so a downloaded
+// archive never has to touch the disk. Handles stored and deflated entries,
+// which is all archiver writes.
+const readZip = (zip: Buffer) => {
+  const end = zip.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
+  const count = zip.readUInt16LE(end + 10);
+  let at = zip.readUInt32LE(end + 16);
+  const entries: Record<string, Buffer> = {};
+  for (let i = 0; i < count; i++) {
+    const method = zip.readUInt16LE(at + 10);
+    const size = zip.readUInt32LE(at + 20);
+    const nameLength = zip.readUInt16LE(at + 28);
+    const extraLength = zip.readUInt16LE(at + 30);
+    const commentLength = zip.readUInt16LE(at + 32);
+    const local = zip.readUInt32LE(at + 42);
+    const name = zip.toString("utf8", at + 46, at + 46 + nameLength);
+
+    const dataAt =
+      local + 30 + zip.readUInt16LE(local + 26) + zip.readUInt16LE(local + 28);
+    const data = zip.subarray(dataAt, dataAt + size);
+    entries[name] = method === 8 ? inflateRawSync(data) : Buffer.from(data);
+
+    at += 46 + nameLength + extraLength + commentLength;
+  }
+  return entries;
+};
 
 describe("uploading and downloading", () => {
   let owner: Awaited<ReturnType<typeof signUp>>;
@@ -100,6 +128,55 @@ describe("uploading and downloading", () => {
     const download = await api(`/shares/${shareId}/files/${fileId}`);
     expect(download.status).toBe(200);
     expect(sha256(download.body)).toBe(sha256(content));
+  }, 60_000);
+
+  it("offers a share of several files as one zip", async () => {
+    const shareId = `${RUN_ID}-zip`;
+    createdShares.push(shareId);
+    const files = { "one.txt": randomBytes(1024), "two.txt": randomBytes(2048) };
+
+    await api("/shares", {
+      method: "POST",
+      jar: owner.jar,
+      body: { id: shareId, expiration: "1-days", security: {}, recipients: [] },
+    });
+    for (const [name, content] of Object.entries(files)) {
+      const up = await api(
+        `/shares/${shareId}/files?id=${crypto.randomUUID()}&name=${name}&chunkIndex=0&totalChunks=1`,
+        { method: "POST", jar: owner.jar, raw: content },
+      );
+      expect(up.status).toBe(201);
+    }
+    const done = await api(`/shares/${shareId}/complete`, {
+      method: "POST",
+      jar: owner.jar,
+    });
+    expect(done.status).toBe(202);
+
+    // the zip is built in the background after completing. metaData wants
+    // the share token a visitor gets when opening the share page
+    const visitor = {};
+    await api(`/shares/${shareId}/token`, {
+      method: "POST",
+      jar: visitor,
+      body: {},
+    });
+    let ready = false;
+    for (let i = 0; i < 30 && !ready; i++) {
+      const meta = await api(`/shares/${shareId}/metaData`, { jar: visitor });
+      ready = meta.data?.isZipReady === true;
+      if (!ready) await new Promise((r) => setTimeout(r, 1000));
+    }
+    expect(ready).toBe(true);
+
+    const zip = await api(`/shares/${shareId}/files/zip`);
+    expect(zip.status).toBe(200);
+
+    const unpacked = readZip(zip.body);
+    expect(Object.keys(unpacked).sort()).toEqual(Object.keys(files).sort());
+    for (const [name, content] of Object.entries(files)) {
+      expect(sha256(unpacked[name])).toBe(sha256(content));
+    }
   }, 60_000);
 
   it("reports an unknown share as missing", async () => {

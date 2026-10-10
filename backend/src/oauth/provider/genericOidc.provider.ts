@@ -57,6 +57,12 @@ export abstract class GenericOidcProvider implements OAuthProvider<OidcToken> {
     const configuration = await this.getConfiguration();
     const endpoint = configuration.authorization_endpoint;
 
+    const clientId = this.config.get(`oauth.${this.name}-clientId`);
+    if (!clientId) {
+      this.logger.error(`No client id is set for the ${this.name} provider`);
+      throw new ErrorPageException("oidc_configuration_error");
+    }
+
     const nonce = nanoid();
     await this.cache.set(
       `oauth-${this.name}-nonce-${state}`,
@@ -68,7 +74,7 @@ export abstract class GenericOidcProvider implements OAuthProvider<OidcToken> {
       endpoint +
       "?" +
       new URLSearchParams({
-        client_id: this.config.get(`oauth.${this.name}-clientId`),
+        client_id: clientId,
         response_type: "code",
         scope:
           this.name == "oidc"
@@ -212,14 +218,27 @@ export abstract class GenericOidcProvider implements OAuthProvider<OidcToken> {
   protected abstract getDiscoveryUri(): string;
 
   private async fetchConfiguration(): Promise<void> {
-    const res = await fetch(this.discoveryUri);
-    const expires = res.headers.has("expires")
-      ? new Date(res.headers.get("expires")).getTime()
-      : Date.now() + 1000 * 60 * 60 * 24;
-    this.configuration = {
-      expires,
-      data: (await res.json()) as OidcConfiguration,
-    };
+    try {
+      const res = await fetch(this.discoveryUri);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = (await res.json()) as OidcConfiguration;
+      if (
+        !URL.canParse(data?.authorization_endpoint) ||
+        !URL.canParse(data?.token_endpoint)
+      ) {
+        throw new Error("missing authorization_endpoint or token_endpoint");
+      }
+
+      const expires = res.headers.has("expires")
+        ? new Date(res.headers.get("expires")).getTime()
+        : Date.now() + 1000 * 60 * 60 * 24;
+      this.configuration = { expires, data };
+    } catch (e) {
+      this.logger.error(
+        `Could not load the OIDC configuration from ${this.discoveryUri}: ${e.message}`,
+      );
+      throw new ErrorPageException("oidc_configuration_error");
+    }
   }
 
   private async fetchJwk(): Promise<void> {

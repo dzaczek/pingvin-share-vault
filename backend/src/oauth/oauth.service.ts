@@ -191,7 +191,8 @@ export class OAuthService {
   }
 
   private async updateIsAdmin(userId: string, isAdmin?: boolean) {
-    if (!isAdmin) return;
+    // undefined means no admin role is configured, false means it was taken away
+    if (isAdmin === undefined) return;
     await this.prisma.user.update({
       where: {
         id: userId,

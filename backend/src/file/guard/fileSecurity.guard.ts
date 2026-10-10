@@ -49,6 +49,7 @@ export class FileSecurityGuard extends ShareSecurityGuard {
       where: { id: shareId },
       include: {
         security: true,
+        reverseShare: true,
         userRecipients: { select: { userId: true } },
         recipients: { select: { email: true } },
       },
@@ -81,6 +82,20 @@ export class FileSecurityGuard extends ShareSecurityGuard {
           !moment(share.expiration).isSame(0))
       ) {
         throw new NotFoundException(this._i18n.t("file.notFound"));
+      }
+
+      // same rule as ShareSecurityGuard, a direct file link must not get
+      // around it
+      if (share.reverseShare && !share.reverseShare.publicAccess) {
+        const user = await this.authenticateUser(context);
+        if (
+          share.creatorId !== user?.id &&
+          share.reverseShare.creatorId !== user?.id
+        )
+          throw new ForbiddenException(
+            this._i18n.t("share.privateShare"),
+            "private_share",
+          );
       }
 
       if (share.security?.restrictToRecipients) {

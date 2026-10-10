@@ -8,9 +8,11 @@ const withPWA = require("next-pwa")({
   // Next.js build metadata is not served at /_next/. Precaching it would
   // return 404 and prevent the new service worker from installing.
   buildExcludes: [/^dynamic-css-manifest\.json$/],
+  // the api stays out of the service worker entirely, uploads, downloads and
+  // range requests go straight to the network
   runtimeCaching: [
     {
-      urlPattern: /^https?.*/,
+      urlPattern: /^(?!.*\/api(\/|$)).*/,
       handler: "NetworkOnly",
     },
   ],

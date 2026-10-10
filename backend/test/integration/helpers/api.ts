@@ -134,15 +134,19 @@ export async function createShareWithFile(
   jar: Jar,
   shareId: string,
   content: Buffer,
-  options: { security?: Record<string, unknown>; fileName?: string } = {},
+  options: {
+    security?: Record<string, unknown>;
+    fileName?: string;
+    recipients?: string[];
+  } = {},
 ) {
   const fileId = crypto.randomUUID();
-  const { security = {}, fileName = "payload.bin" } = options;
+  const { security = {}, fileName = "payload.bin", recipients = [] } = options;
 
   const created = await api("/shares", {
     method: "POST",
     jar,
-    body: { id: shareId, expiration: "1-days", security, recipients: [] },
+    body: { id: shareId, expiration: "1-days", security, recipients },
   });
   if (created.status !== 201) {
     throw new Error(

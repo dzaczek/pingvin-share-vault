@@ -12,6 +12,10 @@ export default {
   "navbar.avatar.signout": "Wyloguj się",
   // END navbar
 
+  // Footer
+  "footer.poweredBy": "Działa na",
+  // END footer
+
   // /
   "home.title":
     "<h>Samodzielnie utrzymywana</h> platforma udostępniania plików.",

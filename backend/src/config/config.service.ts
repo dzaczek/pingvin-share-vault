@@ -56,10 +56,18 @@ export class ConfigService extends EventEmitter {
 
       if (this.yamlConfig) {
         for (const configVariable of this.configVariables) {
-          const category = this.yamlConfig[configVariable.category];
-          if (!category) continue;
-          configVariable.value = category[configVariable.name];
-          this.emit("update", configVariable.name, configVariable.value);
+          const value = this.yamlConfig[configVariable.category]?.[
+            configVariable.name
+          ];
+          // a key the file leaves out keeps the value set in the UI
+          if (value === undefined) continue;
+          // yaml hands over real booleans and numbers, get() expects strings
+          configVariable.value = value === null ? null : String(value);
+          this.emit(
+            "update",
+            `${configVariable.category}.${configVariable.name}`,
+            configVariable.value,
+          );
         }
       }
     } catch (e) {
@@ -71,7 +79,7 @@ export class ConfigService extends EventEmitter {
   }
 
   private async migrateInitUser(): Promise<void> {
-    if (!this.yamlConfig.initUser.enabled) return;
+    if (!this.yamlConfig.initUser?.enabled) return;
 
     const userCount = await this.prisma.user.count({
       where: { isAdmin: true },

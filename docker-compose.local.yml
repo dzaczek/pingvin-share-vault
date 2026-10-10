@@ -23,6 +23,14 @@ services:
       - "./data/images:/opt/app/frontend/public/img:rw,z"
 #      - "./config.yaml:/opt/app/config.yaml"
 
+  # catches every mail the instance sends, web ui on http://localhost:8025.
+  # the integration suite uses it as smtp host "mailpit", port 1025.
+  mailpit:
+    container_name: pingvin-share-x-mailpit
+    image: axllent/mailpit:latest
+    ports:
+      - 8025:8025
+
   clamav:
     container_name: pingvin-share-x-clamav
     restart: unless-stopped

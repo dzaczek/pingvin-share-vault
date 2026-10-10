@@ -46,9 +46,14 @@ const construct = (prisma: unknown, config: unknown) => {
   );
 };
 
+const shareUpdate = jest.fn();
+
 const build = (files: { id: string; name: string }[]) =>
   construct(
-    { file: { findMany: async () => files } },
+    {
+      file: { findMany: async () => files },
+      share: { update: shareUpdate },
+    },
     { get: (key: string) => (key === "s3.enabled" ? false : 5) },
   );
 
@@ -62,6 +67,7 @@ const contentsOf = (zip: string, name: string) =>
   execFileSync("unzip", ["-p", zip, name], { encoding: "utf8" });
 
 beforeEach(() => {
+  shareUpdate.mockReset();
   root = fs.mkdtempSync(path.join(os.tmpdir(), "pingvin-zip-"));
   fs.mkdirSync(shareDir());
 });
@@ -117,6 +123,73 @@ describe("createZip", () => {
         stdio: "pipe",
       }),
     ).not.toThrow();
+  });
+
+  it("marks the share ready once the archive is on disk", async () => {
+    writeFile("id-one", "a");
+
+    await build([{ id: "id-one", name: "a.txt" }]).createZip(SHARE_ID);
+
+    expect(shareUpdate).toHaveBeenCalledWith({
+      where: { id: SHARE_ID },
+      data: { isZipReady: true },
+    });
+  });
+
+  // createZip runs in the background after a share is completed. A rejection
+  // there has nobody to catch it and takes the whole process down.
+  it("survives a file that is missing from disk", async () => {
+    writeFile("id-one", "a");
+
+    await expect(
+      build([
+        { id: "id-one", name: "a.txt" },
+        { id: "id-gone", name: "b.txt" },
+      ]).createZip(SHARE_ID),
+    ).resolves.toBeUndefined();
+
+    expect(fs.existsSync(path.join(shareDir(), "archive.zip"))).toBe(false);
+    expect(shareUpdate).not.toHaveBeenCalled();
+  });
+
+  it("never writes outside the share directory", async () => {
+    // a real folder next to the share directory, with a file the zip could use
+    const outside = fs.mkdtempSync(path.join(os.tmpdir(), "pingvin-outside-"));
+    fs.writeFileSync(path.join(outside, "id-one"), "a");
+
+    try {
+      await build([{ id: "id-one", name: "a.txt" }]).createZip(
+        path.relative(root, outside),
+      );
+
+      expect(fs.existsSync(path.join(outside, "archive.zip"))).toBe(false);
+      expect(shareUpdate).not.toHaveBeenCalled();
+    } finally {
+      fs.rmSync(outside, { recursive: true, force: true });
+    }
+  });
+
+  it("is started again when a share is opened without its zip", async () => {
+    const service = construct(
+      {
+        share: {
+          findUnique: async () => ({
+            id: SHARE_ID,
+            uploadLocked: true,
+            isZipReady: false,
+            _count: { files: 2 },
+          }),
+        },
+      },
+      { get: () => false },
+    );
+    const createZip = jest
+      .spyOn(service, "createZip")
+      .mockResolvedValue(undefined);
+
+    await service.getMetaData(SHARE_ID);
+
+    expect(createZip).toHaveBeenCalledWith(SHARE_ID);
   });
 
   it("does nothing when s3 is serving the files", async () => {
