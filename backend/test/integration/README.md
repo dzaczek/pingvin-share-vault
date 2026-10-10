@@ -34,6 +34,14 @@ INTEGRATION_ADMIN_PASSWORD=... \
 npm run test:integration
 ```
 
+## Mail
+
+Completing a share with recipients sends mail, so the received shares case
+switches SMTP on and points it at the `mailpit` container of the local stack.
+Against another instance set `INTEGRATION_SMTP_HOST` and
+`INTEGRATION_SMTP_PORT` to an SMTP server that instance can reach. The
+original settings are put back afterwards.
+
 ## Rate limits
 
 The auth endpoints allow 20 calls per 5 minutes per IP and the suite creates a
