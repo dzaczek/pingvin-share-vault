@@ -207,6 +207,7 @@ export default {
   "account.reverseShares.title.empty": "Tu jest pusto 👀",
   "account.reverseShares.description.empty":
     "Nie masz żadnych udostępnień odwrotnych.",
+  "account.reverseShares.description.not-allowed": "Twoje konto nie ma uprawnień do tworzenia udziałów odwrotnych.",
   // showCreateReverseShareModal.tsx
   "account.reverseShares.modal.title": "Utwórz udostępnianie odwrotne",
   "account.reverseShares.modal.expiration.label": "Wygasanie",
@@ -268,9 +269,19 @@ export default {
   "admin.users.table.admin": "Administrator",
   "admin.users.table.storageQuota": "Limit miejsca na dysku",
   "admin.users.table.maxShareSize": "Maksymalny rozmiar udziału",
+  "admin.users.edit.tabs.general": "Ogólne",
+  "admin.users.edit.tabs.permissions": "Uprawnienia",
   "admin.users.edit.update.title": "Edytuj użytkownika: {username}",
   "admin.users.edit.update.admin-privileges": "Uprawnienia administratora",
   "admin.users.edit.update.email-verified": "Adres e-mail zweryfikowany",
+  "admin.users.edit.permissions.allow-share": "Zezwalaj na tworzenie udziałów",
+  "admin.users.edit.permissions.allow-share.description": "Czy ten użytkownik może przesyłać pliki i tworzyć nowe udziały",
+  "admin.users.edit.permissions.allow-reverse-share": "Zezwalaj na tworzenie udziałów odwrotnych",
+  "admin.users.edit.permissions.allow-reverse-share.description": "Czy ten użytkownik może generować linki udziałów odwrotnych",
+  "admin.users.edit.permissions.custom-max-shares": "Limit aktywnych udziałów",
+  "admin.users.edit.permissions.custom-max-shares.description": "Ogranicz maksymalną liczbę jednocześnie aktywnych udziałów, jakie może posiadać ten użytkownik",
+  "admin.users.edit.permissions.custom-max-reverse-shares": "Limit aktywnych udziałów odwrotnych",
+  "admin.users.edit.permissions.custom-max-reverse-shares.description": "Ogranicz maksymalną liczbę jednocześnie aktywnych udziałów odwrotnych, jakie może posiadać ten użytkownik",
   "admin.users.edit.update.custom-share-size-limit":
     "Niestandardowy limit rozmiaru udziału",
   "admin.users.edit.update.custom-share-size-limit.description":
@@ -376,11 +387,15 @@ export default {
   "upload.reverse-share.error.invalid.title":
     "Nieprawidłowy link do udostępniania odwrotnego",
   "upload.reverse-share.error.invalid.description":
-    "This reverse share has expired or is invalid.",
+    "Ten link do udostępniania odwrotnego wygasł lub jest nieprawidłowy.",
+  "upload.error.not-allowed.title": "Tworzenie udziałów niedozwolone",
+  "upload.error.not-allowed.description": "Twoje konto nie ma uprawnień do przesyłania plików ani tworzenia udziałów.",
   // Dropzone.tsx
   "upload.dropzone.title": "Prześlij pliki",
-  "upload.dropzone.description":
-    "Przeciągnij i upuść pliki lub foldery tutaj, aby rozpocząć udostępnianie, lub naciśnij 'Ctrl+V', aby przesłać tekst ze schowka. Akceptujemy łącznie pliki o rozmiarze do {maxSize}.",
+  "upload.dropzone.description.mobile": "Dotknij tutaj, aby wybrać pojedyncze pliki, zdjęcia lub wideo. Aby przesłać folder, użyj poniższego przycisku. Maksymalny łączny rozmiar przesyłania: {maxSize}.",
+  "upload.dropzone.description.mobile.no-folder": "Dotknij tutaj, aby wybrać pojedyncze pliki, zdjęcia lub wideo. Maksymalny łączny rozmiar przesyłania: {maxSize}.",
+  "upload.dropzone.description.desktop": "Kliknij tutaj lub przeciągnij i upuść pojedyncze pliki, zdjęcia lub wideo. Użyj poniższego przycisku, aby przesłać folder, lub naciśnij {shortcut}, aby przesłać tekst ze schowka. Maksymalny łączny rozmiar przesyłania: {maxSize}.",
+  "upload.dropzone.description.desktop.no-folder": "Kliknij tutaj lub przeciągnij i upuść pojedyncze pliki, zdjęcia lub wideo albo naciśnij {shortcut}, aby przesłać tekst ze schowka. Maksymalny łączny rozmiar przesyłania: {maxSize}.",
   "upload.dropzone.notify.file-too-big":
     "Twoje pliki przekraczają maksymalny rozmiar {maxSize}.",
   "upload.button.folder": "Prześlij folder",
@@ -532,6 +547,8 @@ export default {
   "admin.config.category.oauth": "Logowanie za pomocą konta społecznościowego",
   "admin.config.general.app-name": "Nazwa aplikacji",
   "admin.config.general.app-name.description": "Nazwa aplikacji",
+  "admin.config.general.show-auth-buttons": "Pokaż przyciski uwierzytelniania",
+  "admin.config.general.show-auth-buttons.description": "Czy wyświetlać przyciski logowania i rejestracji na stronach udziałów i przesyłania.",
   "admin.config.general.default-language": "Język domyślny",
   "admin.config.general.default-language.description":
     "Dotyczy to wszystkich użytkowników, każdy użytkownik może nadal spersonalizować swój język w swoim profilu.",
@@ -847,19 +864,15 @@ export default {
   "admin.config.oauth.oidc-role-path":
     "Ścieżka do ról w tokenie OpenID Connect",
   "admin.config.oauth.oidc-role-path.description":
-    "Musi to być prawidłowa ścieżka JMES wskazująca na tablicę ról. Zarządzanie uprawnieniami za pomocą ról OpenID Connect jest zalecane tylko wtedy, gdy żaden inny dostawca tożsamości nie jest skonfigurowany, a logowanie hasłem jest wyłączone. Pozostaw puste, jeśli nie wiesz, czym jest ta konfiguracja." +
-    "Managing access rights using OpenID Connect roles is only recommended if no other identity provider is configured and password login is disabled. " +
-    "Leave it blank if you don't know what this config is.",
+    "Musi to być prawidłowa ścieżka JMES wskazująca na tablicę ról. Zarządzanie uprawnieniami za pomocą ról OpenID Connect jest zalecane tylko wtedy, gdy żaden inny dostawca tożsamości nie jest skonfigurowany, a logowanie hasłem jest wyłączone. Pozostaw puste, jeśli nie wiesz, czym jest ta konfiguracja.",
   "admin.config.oauth.oidc-role-general-access":
     "Rola OpenID Connect dla dostępu ogólnego",
   "admin.config.oauth.oidc-role-general-access.description":
-    "Rola wymagana do uzyskania ogólnego dostępu. Musi być obecna w rolach użytkownika, aby mógł się zalogować. Pozostaw puste, jeśli nie wiesz, czym jest ta konfiguracja." +
-    "Leave it blank if you don't know what this config is.",
+    "Rola wymagana do uzyskania ogólnego dostępu. Musi być obecna w rolach użytkownika, aby mógł się zalogować. Pozostaw puste, jeśli nie wiesz, czym jest ta konfiguracja.",
   "admin.config.oauth.oidc-role-admin-access":
     "Rola OpenID Connect dla dostępu administratora",
   "admin.config.oauth.oidc-role-admin-access.description":
-    "Rola wymagana do dostępu administracyjnego. Musi być obecna w rolach użytkownika, aby mógł uzyskać dostęp do panelu administracyjnego. Pozostaw puste, jeśli nie wiesz, czym jest ta konfiguracja." +
-    "Leave it blank if you don't know what this config is.",
+    "Rola wymagana do dostępu administracyjnego. Musi być obecna w rolach użytkownika, aby mógł uzyskać dostęp do panelu administracyjnego. Pozostaw puste, jeśli nie wiesz, czym jest ta konfiguracja.",
   "admin.config.oauth.oidc-client-id": "Identyfikator klienta OpenID Connect",
   "admin.config.oauth.oidc-client-id.description":
     "Identyfikator klienta OAuth aplikacji OpenID Connect",
@@ -976,6 +989,7 @@ export default {
   "error.msg.user_not_allowed": "Nie możesz się zalogować.",
   "error.msg.cannot_get_user_info":
     "Nie można pobrać informacji o użytkowniku z tego konta {0}.",
+  "error.msg.oidc_configuration_error": "Nie udało się pobrać konfiguracji OpenID Connect od dostawcy tożsamości.",
   "error.param.provider_github": "GitHub",
   "error.param.provider_google": "Google",
   "error.param.provider_microsoft": "Microsoft",

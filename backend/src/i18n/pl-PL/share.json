@@ -4,6 +4,7 @@
   "alreadyCompleted": "Udostępnianie zostało już zakończone",
   "completionRequiresFile": "Aby zakończyć udostępnianie, potrzebujesz co najmniej jednego pliku.",
   "notFound": "Udostępnienie nie zostało znalezione",
+  "nothingToScan": "W tym udziale nie ma już plików do przeskanowania",
   "anonymousNoDelete": "Nie można usunąć anonimowych udostępnień",
   "anonymousNoExpire": "Nie można zmienić daty wygaśnięcia anonimowych udostępnień",
   "anonymousNoUpdate": "Nie można aktualizować anonimowych udostępnień",
@@ -15,5 +16,7 @@
   "tokenRequired": "Token udostępnienia jest wymagany",
   "privateShare": "Tylko twórca odwrotnego udostępnienia ma dostęp do tego udostępnienia",
   "maxViewsExceeded": "Przekroczono maksymalną liczbę wyświetleń",
-  "restrictedToRecipients": "Ten udział jest ograniczony do określonych odbiorców. Zaloguj się, aby uzyskać dostęp."
+  "restrictedToRecipients": "Ten udział jest ograniczony do określonych odbiorców. Zaloguj się, aby uzyskać dostęp.",
+  "notAllowedToShare": "Nie masz uprawnień do tworzenia udziałów",
+  "maxSharesExceeded": "Osiągnięto maksymalny limit aktywnych udziałów ({max})"
 }
