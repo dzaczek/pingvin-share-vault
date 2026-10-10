@@ -60,6 +60,8 @@ export default {
   "signup.title": "Utwórz konto",
   "signup.description": "Masz już konto?",
   "signup.button.signin": "Zaloguj się",
+  "signup.input.displayName": "Nazwa wyświetlana",
+  "signup.input.displayName.placeholder": "Twoja nazwa wyświetlana",
   "signup.input.username": "Nazwa użytkownika",
   "signup.input.username.placeholder": "Twoja nazwa użytkownika",
   "signup.input.email": "Adres e-mail",
@@ -101,6 +103,7 @@ export default {
   // /account
   "account.title": "Moje konto",
   "account.card.info.title": "Informacje o koncie",
+  "account.card.info.displayName": "Nazwa wyświetlana",
   "account.card.info.username": "Nazwa użytkownika",
   "account.card.info.email": "Adres e-mail",
   "account.notify.info.success": "Konto zostało zaktualizowane",
@@ -264,6 +267,7 @@ export default {
 
   // /admin/users
   "admin.users.title": "Zarządzanie użytkownikami",
+  "admin.users.table.displayName": "Nazwa wyświetlana",
   "admin.users.table.username": "Nazwa użytkownika",
   "admin.users.table.email": "Adres e-mail",
   "admin.users.table.admin": "Administrator",
@@ -300,6 +304,7 @@ export default {
     "Czy na pewno chcesz usunąć tego użytkownika i wszystkie jego udostępniania?",
   // showCreateUserModal.tsx
   "admin.users.modal.create.title": "Utwórz użytkownika",
+  "admin.users.modal.create.displayName": "Nazwa wyświetlana",
   "admin.users.modal.create.username": "Nazwa użytkownika",
   "admin.users.modal.create.email": "Adres e-mail",
   "admin.users.modal.create.password": "Hasło",
@@ -657,29 +662,29 @@ export default {
     "Czy zezwolić na udostępnianie przez e-mail do odbiorców. Można to włączyć tylko wtedy, gdy aktywowany jest SMTP.",
   "admin.config.email.share-recipients-subject": "Temat dla odbiorców udziału",
   "admin.config.email.share-recipients-subject.description":
-    "Temat wiadomości e-mail, która zostanie wysłana do odbiorców udziału.",
+    "Temat wiadomości e-mail wysyłanej do odbiorców udziału. Dostępne zmienne:\n {creator} - Nazwa wyświetlana lub nazwa użytkownika twórcy\n {shareUrl} - Adres URL udziału",
   "admin.config.email.share-recipients-message":
     "Wiadomość dla odbiorców udziału",
   "admin.config.email.share-recipients-message.description":
-    "Wiadomość wysyłana do odbiorców udziału. Dostępne zmienne:\n {creator} - Nazwa użytkownika twórcy udziału\n {creatorEmail} - Adres e-mail twórcy udziału\n {shareUrl} - Adres URL udziału\n {desc} - Opis udziału\n {expires} - Data wygaśnięcia udziału\n Te zmienne zostaną zastąpione rzeczywistymi wartościami.",
+    "Wiadomość wysyłana do odbiorców udziału. Dostępne zmienne:\n {creator} - Nazwa wyświetlana lub nazwa użytkownika twórcy udziału\n {creatorEmail} - Adres e-mail twórcy udziału\n {shareUrl} - Adres URL udziału\n {desc} - Opis udziału\n {expires} - Data wygaśnięcia udziału\n {name} - Nazwa odbiorcy (jeśli ma konto)\n Te zmienne zostaną zastąpione rzeczywistymi wartościami.",
   "admin.config.email.reverse-share-subject": "Temat udziału odwrotnego",
   "admin.config.email.reverse-share-subject.description":
     "Temat wiadomości e-mail wysyłanej, gdy ktoś utworzy udział za pomocą Twojego linku do udziału odwrotnego.",
   "admin.config.email.reverse-share-message": "Wiadomość udziału odwrotnego",
   "admin.config.email.reverse-share-message.description":
-    "Wiadomość, która zostanie wysłana, gdy ktoś utworzy udział za pomocą twojego linku udziału odwrotnego. {shareUrl} zostanie zastąpiony nazwą twórcy i adresem URL udziału.",
+    "Wiadomość wysyłana, gdy ktoś utworzy udział za pomocą twojego linku udziału odwrotnego. Dostępne zmienne:\n {name} - Nazwa wyświetlana lub nazwa użytkownika twórcy udziału odwrotnego\n {shareUrl} - Adres URL udziału",
   "admin.config.email.reset-password-subject": "Temat resetowania hasła",
   "admin.config.email.reset-password-subject.description":
     "Temat wiadomości e-mail wysyłanej, gdy użytkownik poprosi o zresetowanie hasła.",
   "admin.config.email.reset-password-message": "Wiadomość resetowania hasła",
   "admin.config.email.reset-password-message.description":
-    "Wiadomość, która zostanie wysłana, gdy użytkownik zażąda zresetowania hasła. {url} zostanie zastąpiony adresem URL resetowania hasła.",
+    "Wiadomość wysyłana, gdy użytkownik poprosi o zresetowanie hasła. Dostępne zmienne:\n {name} - Nazwa wyświetlana lub nazwa użytkownika\n {url} - Adres URL resetowania hasła",
   "admin.config.email.invite-subject": "Temat zaproszenia",
   "admin.config.email.invite-subject.description":
     "Temat wiadomości e-mail wysyłanej, gdy administrator zaprosi użytkownika.",
   "admin.config.email.invite-message": "Wiadomość zaproszenia",
   "admin.config.email.invite-message.description":
-    "Wiadomość wysyłana, gdy administrator zaprosi użytkownika. {url} zostanie zastąpiony linkiem zaproszenia, {email} adresem e-mail, a {password} hasłem użytkownika.",
+    "Wiadomość wysyłana, gdy administrator zaprosi użytkownika. Dostępne zmienne:\n {name} - Nazwa wyświetlana lub nazwa użytkownika zaproszonej osoby\n {url} - Link zaproszenia\n {email} - Adres e-mail\n {password} - Tymczasowe hasło użytkownika",
   "admin.config.email.share-recipients-reply-to-creator":
     "Ustaw Reply-To na adres e-mail twórcy",
   "admin.config.email.share-recipients-reply-to-creator.description":
@@ -691,11 +696,11 @@ export default {
   "admin.config.email.share-download-notification-subject":
     "Temat powiadomienia o pobraniu",
   "admin.config.email.share-download-notification-subject.description":
-    "Temat wiadomości e-mail wysyłanej do twórcy udziału, gdy odbiorca pobierze plik.",
+    "Temat wiadomości e-mail wysyłanej do twórcy udziału, gdy odbiorca pobierze plik. Dostępne zmienne:\n {fileName} - Nazwa pobranego pliku\n {recipient} - Nazwa lub adres e-mail odbiorcy\n {creator} - Nazwa twórcy\n {shareUrl} - Adres URL udziału",
   "admin.config.email.share-download-notification-message":
     "Treść powiadomienia o pobraniu",
   "admin.config.email.share-download-notification-message.description":
-    "Wiadomość wysyłana do twórcy udziału, gdy odbiorca pobierze plik. Dostępne zmienne:\n {recipientEmail} - Adres e-mail odbiorcy\n {fileName} - Nazwa pobranego pliku\n {shareUrl} - Adres URL udziału",
+    "Wiadomość wysyłana do twórcy udziału, gdy odbiorca pobierze plik. Dostępne zmienne:\n {recipient} - Nazwa i adres e-mail odbiorcy\n {recipientEmail} - Adres e-mail odbiorcy\n {fileName} - Nazwa pobranego pliku\n {creator} - Nazwa twórcy\n {shareUrl} - Adres URL udziału",
   "admin.config.security.enable-email-verification":
     "Włącz weryfikację adresu e-mail",
   "admin.config.security.enable-email-verification.description":
@@ -705,7 +710,7 @@ export default {
     "Temat wiadomości e-mail wysyłanej do użytkownika podczas rejestracji.",
   "admin.config.email.verification-message": "Treść wiadomości weryfikacyjnej",
   "admin.config.email.verification-message.description":
-    "Treść wiadomości wysyłanej do użytkownika podczas rejestracji. {url} zostanie zastąpiony linkiem weryfikacyjnym.",
+    "Wiadomość wysyłana do użytkownika podczas rejestracji. Dostępne zmienne:\n {name} - Nazwa wyświetlana lub nazwa użytkownika\n {url} - Link weryfikacyjny",
   "admin.config.security.allow-registration": "Zezwól na rejestrację",
   "admin.config.security.allow-registration.description":
     "Czy dozwolona jest rejestracja",
@@ -907,6 +912,8 @@ export default {
     "Nazwa atrybutu adresu e-mail użytkownika",
   "admin.config.ldap.field-name-email.description":
     "Nazwa atrybutu LDAP dla adresu e-mail użytkownika.",
+  "admin.config.ldap.field-name-display-name": "Nazwa atrybutu wyświetlanej nazwy użytkownika",
+  "admin.config.ldap.field-name-display-name.description": "Nazwa atrybutu LDAP dla wyświetlanej nazwy użytkownika.",
   "admin.config.notify.success":
     "Konfiguracja została pomyślnie zaktualizowana.",
   "admin.config.notify.logo-success":
@@ -1034,6 +1041,7 @@ export default {
   "common.error.exact-length": "Musi mieć dokładnie {length} znaków",
   "common.error.invalid-number": "Musi być liczbą",
   "common.error.field-required": "To pole jest wymagane",
+  "common.error.name.invalid-chars": "Może zawierać tylko litery, spacje, przecinki, kropki, apostrofy lub myślniki",
   "common.error.password.lowercase":
     "Hasło musi zawierać co najmniej jedną małą literę",
   "common.error.password.uppercase":

@@ -317,8 +317,25 @@ export class ShareService {
     // Asynchronously create a zip of all files
     if (share.files.length > 1) void this.createZip(id);
 
+    const recipientEmails = share.recipients.map((r) => r.email);
+    const matchedUsers =
+      recipientEmails.length > 0
+        ? await this.prisma.user.findMany({
+            where: { email: { in: recipientEmails } },
+            select: {
+              id: true,
+              email: true,
+              displayName: true,
+              username: true,
+            },
+          })
+        : [];
+    const userByEmail = new Map(matchedUsers.map((u) => [u.email, u]));
+
     // Send email for each recipient
     for (const recipient of share.recipients) {
+      const userDetails = userByEmail.get(recipient.email);
+
       await this.emailService.sendMailToShareRecipients(
         recipient.email,
         recipient.id,
@@ -326,35 +343,30 @@ export class ShareService {
         share.creator || share.reverseShare?.creator,
         share.description,
         share.expiration,
+        userDetails?.displayName || userDetails?.username,
       );
     }
 
     // Auto-link email recipients who are registered users so the share appears in their dashboard
-    if (this.configService.get("share.enableUserRecipients")) {
-      const emails = share.recipients.map((r) => r.email);
-      if (emails.length > 0) {
-        const matchedUsers = await this.prisma.user.findMany({
-          where: { email: { in: emails } },
-          select: { id: true },
-        });
-        if (matchedUsers.length > 0) {
-          // Batch upserts inside a transaction to improve performance and maintain correctness.
-          // This reduces transaction overhead, although it does not completely eliminate N+1 statements.
-          // A true bulk findMany + createMany would be unsafe here due to potential unique constraint
-          // violations during concurrent requests (as skipDuplicates is not supported by SQLite in Prisma).
-          await this.prisma.$transaction(
-            matchedUsers.map((matchedUser) =>
-              this.prisma.shareUserRecipient.upsert({
-                where: {
-                  userId_shareId: { userId: matchedUser.id, shareId: share.id },
-                },
-                create: { userId: matchedUser.id, shareId: share.id },
-                update: {},
-              }),
-            ),
-          );
-        }
-      }
+    if (
+      this.configService.get("share.enableUserRecipients") &&
+      matchedUsers.length > 0
+    ) {
+      // Batch upserts inside a transaction to improve performance and maintain correctness.
+      // This reduces transaction overhead, although it does not completely eliminate N+1 statements.
+      // A true bulk findMany + createMany would be unsafe here due to potential unique constraint
+      // violations during concurrent requests (as skipDuplicates is not supported by SQLite in Prisma).
+      await this.prisma.$transaction(
+        matchedUsers.map((matchedUser) =>
+          this.prisma.shareUserRecipient.upsert({
+            where: {
+              userId_shareId: { userId: matchedUser.id, shareId: share.id },
+            },
+            create: { userId: matchedUser.id, shareId: share.id },
+            update: {},
+          }),
+        ),
+      );
     }
 
     const notifyReverseShareCreator = share.reverseShare
@@ -366,6 +378,8 @@ export class ShareService {
       await this.emailService.sendMailToReverseShareCreator(
         share.reverseShare.creator.email,
         share.id,
+        share.reverseShare.creator.displayName ||
+          share.reverseShare.creator.username,
       );
     }
 
