@@ -206,8 +206,6 @@ export class ShareService {
   // Runs in the background, so it must never reject: nothing would catch it
   // and an unhandled rejection stops the whole process.
   async createZip(shareId: string) {
-    if (this.config.get("s3.enabled")) return;
-
     // the id is validated before it gets here, this keeps it that way should
     // a new caller forget
     const shareRoot = resolve(SHARE_DIRECTORY);
@@ -224,6 +222,21 @@ export class ShareService {
     this.activeZipBuilds.add(shareId);
 
     try {
+      // each share keeps the storage it was uploaded to. An S3 share is
+      // zipped on the fly while it downloads, there is nothing to build.
+      const share = await this.prisma.share.findUnique({
+        where: { id: shareId },
+        select: { storageProvider: true },
+      });
+      if (!share) return;
+      if (share.storageProvider == "S3") {
+        await this.prisma.share.update({
+          where: { id: shareId },
+          data: { isZipReady: true },
+        });
+        return;
+      }
+
       const files = await this.prisma.file.findMany({ where: { shareId } });
       const archive = archiver("zip", {
         zlib: { level: this.config.get("share.zipCompressionLevel") },

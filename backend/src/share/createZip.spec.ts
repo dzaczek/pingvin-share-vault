@@ -48,13 +48,19 @@ const construct = (prisma: unknown, config: unknown) => {
 
 const shareUpdate = jest.fn();
 
-const build = (files: { id: string; name: string }[]) =>
+const build = (
+  files: { id: string; name: string }[],
+  { storageProvider = "LOCAL", s3Enabled = false } = {},
+) =>
   construct(
     {
       file: { findMany: async () => files },
-      share: { update: shareUpdate },
+      share: {
+        update: shareUpdate,
+        findUnique: async () => ({ storageProvider }),
+      },
     },
-    { get: (key: string) => (key === "s3.enabled" ? false : 5) },
+    { get: (key: string) => (key === "s3.enabled" ? s3Enabled : 5) },
   );
 
 const entriesOf = (zip: string) =>
@@ -192,16 +198,31 @@ describe("createZip", () => {
     expect(createZip).toHaveBeenCalledWith(SHARE_ID);
   });
 
-  it("does nothing when s3 is serving the files", async () => {
-    const service = construct(
-      { file: { findMany: async () => [] } },
-      {
-        get: () => true,
-      },
-    );
-
-    await service.createZip(SHARE_ID);
+  // an S3 share is zipped on the fly while it downloads, so there is nothing
+  // to build and the download all button must not wait for it
+  it("marks an S3 share ready without building anything", async () => {
+    await build([{ id: "id-one", name: "a.txt" }], {
+      storageProvider: "S3",
+      s3Enabled: true,
+    }).createZip(SHARE_ID);
 
     expect(fs.existsSync(path.join(shareDir(), "archive.zip"))).toBe(false);
+    expect(shareUpdate).toHaveBeenCalledWith({
+      where: { id: SHARE_ID },
+      data: { isZipReady: true },
+    });
+  });
+
+  // shares keep the storage they were uploaded to, switching S3 on later
+  // must not leave the older local ones without a zip
+  it("still builds the zip of a local share once S3 is switched on", async () => {
+    writeFile("id-one", "a");
+
+    await build([{ id: "id-one", name: "a.txt" }], {
+      storageProvider: "LOCAL",
+      s3Enabled: true,
+    }).createZip(SHARE_ID);
+
+    expect(fs.existsSync(path.join(shareDir(), "archive.zip"))).toBe(true);
   });
 });
