@@ -44,7 +44,6 @@ export class AuthService {
     isAdmin?: boolean,
     skipVerification?: boolean,
   ) {
-    const isFirstUser = (await this.prisma.user.count()) == 0;
     const enableEmailVerification = this.config.get(
       "security.enableEmailVerification",
     );
@@ -52,10 +51,13 @@ export class AuthService {
 
     const hash = dto.password ? await argon.hash(dto.password) : null;
     try {
-      const needsVerification =
-        !isFirstUser && !skipVerification && enableEmailVerification;
-
       return await this.prisma.$transaction(async (tx) => {
+        // counted inside the transaction, otherwise two sign ups on a fresh
+        // install can both see zero users and both become admin
+        const isFirstUser = (await tx.user.count()) == 0;
+        const needsVerification =
+          !isFirstUser && !skipVerification && enableEmailVerification;
+
         const user = await tx.user.create({
           data: {
             email,
@@ -220,7 +222,7 @@ export class AuthService {
       throw new ForbiddenException(this.i18n.t("auth.passwordSignInDisabled"));
 
     const user = await this.prisma.user.findFirst({
-      where: { resetPasswordToken: { token } },
+      where: { resetPasswordToken: { token, expiresAt: { gt: new Date() } } },
     });
 
     if (!user)
