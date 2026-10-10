@@ -428,8 +428,14 @@ export default {
 
   // Dropzone.tsx
   "upload.dropzone.title": "Upload files",
-  "upload.dropzone.description":
-    "Drag'n'drop files or folders here to start your share or 'Ctrl+V' to upload text content from the clipboard. We only accept files up to {maxSize} in total.",
+  "upload.dropzone.description.mobile":
+    "Tap here to select individual files, photos, or videos. To upload a folder, use the button below. Maximum total upload size: {maxSize}.",
+  "upload.dropzone.description.mobile.no-folder":
+    "Tap here to select individual files, photos, or videos. Maximum total upload size: {maxSize}.",
+  "upload.dropzone.description.desktop":
+    "Click here or drag and drop individual files, photos, or videos. Use the button below to upload a folder, or press {shortcut} to upload text from your clipboard. Maximum total upload size: {maxSize}.",
+  "upload.dropzone.description.desktop.no-folder":
+    "Click here or drag and drop individual files, photos, or videos, or press {shortcut} to upload text from your clipboard. Maximum total upload size: {maxSize}.",
   "upload.dropzone.notify.file-too-big":
     "Your files exceed the maximum share size of {maxSize}.",
   "upload.button.folder": "Upload folder",
@@ -590,6 +596,9 @@ export default {
   "admin.config.category.oauth": "Social Login",
   "admin.config.general.app-name": "App name",
   "admin.config.general.app-name.description": "Name of the application",
+  "admin.config.general.show-auth-buttons": "Show auth buttons",
+  "admin.config.general.show-auth-buttons.description":
+    "Whether to show sign-in and sign-up buttons on share and upload pages.",
   "admin.config.general.default-language": "Default Language",
   "admin.config.general.default-language.description":
     "This applies to all users, each user can still personalise their language in their profile.",

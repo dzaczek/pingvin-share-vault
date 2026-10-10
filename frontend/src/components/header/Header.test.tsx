@@ -46,3 +46,45 @@ describe("Header", () => {
     expect(back).not.toBe(away);
   });
 });
+
+// Recipients of a share or an upload link are often outside the company and
+// have no account to sign in with. An admin can hide the buttons there.
+describe("Header auth buttons for guests", () => {
+  const authLinks = (route: string, config: Record<string, string>) => {
+    pathname = route;
+    const { unmount } = renderWithProviders(<Header />, {
+      user: null,
+      config: { "security.allowRegistration": "true", ...config },
+    });
+    const names = ["Sign in", "Sign up"].filter(
+      (name) => screen.queryAllByRole("link", { name }).length > 0,
+    );
+    unmount();
+    return names;
+  };
+
+  it("shows them by default", () => {
+    expect(authLinks("/share/[shareId]", {})).toEqual(["Sign in", "Sign up"]);
+  });
+
+  it("hides them on a share page when switched off", () => {
+    expect(
+      authLinks("/share/[shareId]", { "general.showAuthButtons": "false" }),
+    ).toEqual([]);
+  });
+
+  it("hides them on a reverse share upload page when switched off", () => {
+    expect(
+      authLinks("/upload/[reverseShareToken]", {
+        "general.showAuthButtons": "false",
+      }),
+    ).toEqual([]);
+  });
+
+  it("keeps them everywhere else", () => {
+    expect(authLinks("/", { "general.showAuthButtons": "false" })).toEqual([
+      "Sign in",
+      "Sign up",
+    ]);
+  });
+});

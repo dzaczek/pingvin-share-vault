@@ -179,12 +179,21 @@ const Header = () => {
     },
   ];
 
-  let unauthenticatedLinks: NavLink[] = [
-    {
-      link: "/auth/signIn",
-      label: t("navbar.signin"),
-    },
-  ];
+  // people opening a share or an upload link often have no account here
+  const hideAuthButtons =
+    !config.get("general.showAuthButtons") &&
+    ["/share/[shareId]", "/upload/[reverseShareToken]"].includes(
+      router.pathname,
+    );
+
+  let unauthenticatedLinks: NavLink[] = hideAuthButtons
+    ? []
+    : [
+        {
+          link: "/auth/signIn",
+          label: t("navbar.signin"),
+        },
+      ];
 
   if (config.get("security.allowUnauthenticatedShares")) {
     unauthenticatedLinks.unshift({
@@ -199,7 +208,7 @@ const Header = () => {
       label: t("navbar.home"),
     });
 
-  if (config.get("security.allowRegistration"))
+  if (config.get("security.allowRegistration") && !hideAuthButtons)
     unauthenticatedLinks.push({
       link: "/auth/signUp",
       label: t("navbar.signup"),
