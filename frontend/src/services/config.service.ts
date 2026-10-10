@@ -3,6 +3,7 @@ import semver from "semver";
 import Config, { AdminConfig, UpdateConfig } from "../types/config.type";
 import api from "./api.service";
 import { stringToTimespan } from "../utils/date.util";
+import { REPOSITORY } from "../utils/repository.util";
 
 const categories = [
   "general",
@@ -79,11 +80,10 @@ const testRedisConnection = async () => {
 
 const isNewReleaseAvailable = async () => {
   const response = (
-    await axios.get(
-      "https://api.github.com/repos/smp46/pingvin-share-x/releases/latest",
-    )
+    await axios.get(`https://api.github.com/repos/${REPOSITORY}/releases/latest`)
   ).data;
-  const latestVersion = response.tag_name.replace("v", "");
+  const latestVersion = semver.valid(response.tag_name.replace("v", ""));
+  if (!latestVersion) return false;
   // != would flag an update on any mismatch, including when we're already
   // ahead on a beta version that just isn't the latest stable tag.
   return semver.gt(latestVersion, process.env.VERSION ?? "0.0.0");

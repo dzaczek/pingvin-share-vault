@@ -2,6 +2,7 @@ import { Anchor, Footer as MFooter, SimpleGrid, Text } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import useConfig from "../../hooks/config.hook";
 import useTranslate from "../../hooks/useTranslate.hook";
+import { REPOSITORY_URL } from "../../utils/repository.util";
 
 const Footer = () => {
   const t = useTranslate();
@@ -30,7 +31,7 @@ const Footer = () => {
           {t("footer.poweredBy")}{" "}
           <Anchor
             size="xs"
-            href="https://github.com/smp46/pingvin-share-x"
+            href={REPOSITORY_URL}
             target="_blank"
           >
             Pingvin Share X
@@ -44,7 +45,7 @@ const Footer = () => {
             {t("footer.poweredBy")}{" "}
             <Anchor
               size="xs"
-              href="https://github.com/smp46/pingvin-share-x"
+              href={REPOSITORY_URL}
               target="_blank"
             >
               Pingvin Share X
