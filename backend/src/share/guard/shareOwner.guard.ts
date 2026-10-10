@@ -67,8 +67,10 @@ export class ShareOwnerGuard extends JwtGuard {
     // If the user is an admin, allow access
     if (this.allowAdmin && user?.isAdmin) return true;
 
-    // If it's a anonymous share, allow access
-    if (!share.creatorId) return true;
+    // An anonymous share has no owner to check, so anyone may work on it, but
+    // only while it is being uploaded. Once done, everyone holding the link
+    // could otherwise reopen it and swap the files.
+    if (!share.creatorId) return !share.uploadLocked;
 
     // If not signed in, deny access
     if (!user) return false;
