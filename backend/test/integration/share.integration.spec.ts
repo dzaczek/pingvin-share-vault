@@ -1,4 +1,8 @@
+import { execFileSync } from "child_process";
 import { createHash, randomBytes } from "crypto";
+import { mkdtempSync, rmSync, writeFileSync } from "fs";
+import { tmpdir } from "os";
+import { join } from "path";
 import {
   RUN_ID,
   api,
@@ -100,6 +104,60 @@ describe("uploading and downloading", () => {
     const download = await api(`/shares/${shareId}/files/${fileId}`);
     expect(download.status).toBe(200);
     expect(sha256(download.body)).toBe(sha256(content));
+  }, 60_000);
+
+  it("offers a share of several files as one zip", async () => {
+    const shareId = `${RUN_ID}-zip`;
+    createdShares.push(shareId);
+    const files = { "one.txt": randomBytes(1024), "two.txt": randomBytes(2048) };
+
+    await api("/shares", {
+      method: "POST",
+      jar: owner.jar,
+      body: { id: shareId, expiration: "1-days", security: {}, recipients: [] },
+    });
+    for (const [name, content] of Object.entries(files)) {
+      const up = await api(
+        `/shares/${shareId}/files?id=${crypto.randomUUID()}&name=${name}&chunkIndex=0&totalChunks=1`,
+        { method: "POST", jar: owner.jar, raw: content },
+      );
+      expect(up.status).toBe(201);
+    }
+    const done = await api(`/shares/${shareId}/complete`, {
+      method: "POST",
+      jar: owner.jar,
+    });
+    expect(done.status).toBe(202);
+
+    // the zip is built in the background after completing. metaData wants
+    // the share token a visitor gets when opening the share page
+    const visitor = {};
+    await api(`/shares/${shareId}/token`, {
+      method: "POST",
+      jar: visitor,
+      body: {},
+    });
+    let ready = false;
+    for (let i = 0; i < 30 && !ready; i++) {
+      const meta = await api(`/shares/${shareId}/metaData`, { jar: visitor });
+      ready = meta.data?.isZipReady === true;
+      if (!ready) await new Promise((r) => setTimeout(r, 1000));
+    }
+    expect(ready).toBe(true);
+
+    const zip = await api(`/shares/${shareId}/files/zip`);
+    expect(zip.status).toBe(200);
+
+    const dir = mkdtempSync(join(tmpdir(), "pingvin-it-zip-"));
+    try {
+      writeFileSync(join(dir, "all.zip"), zip.body);
+      for (const [name, content] of Object.entries(files)) {
+        const unpacked = execFileSync("unzip", ["-p", join(dir, "all.zip"), name]);
+        expect(sha256(unpacked)).toBe(sha256(content));
+      }
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   }, 60_000);
 
   it("reports an unknown share as missing", async () => {
