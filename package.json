@@ -5,7 +5,6 @@
   "scripts": {
     "format": "cd frontend && npm run format && cd ../backend && npm run format",
     "lint": "cd frontend && npm run lint && cd ../backend && npm run lint",
-    "version": "conventional-changelog -p conventionalcommits --skip-unstable -i CHANGELOG.md -o CHANGELOG.md && git add CHANGELOG.md",
     "release": "node scripts/release.mjs",
     "test:release": "node --test scripts/release.test.mjs",
     "deploy:dev": "docker buildx build --push --tag smp46/pingvin-share-x:development --platform linux/amd64,linux/arm64 ."
@@ -13,9 +12,5 @@
   "prettier": {
     "singleQuote": false,
     "trailingComma": "all"
-  },
-  "devDependencies": {
-    "conventional-changelog": "^8.1.3",
-    "conventional-changelog-conventionalcommits": "^10.4.0"
   }
 }
