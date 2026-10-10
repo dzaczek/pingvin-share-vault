@@ -15,12 +15,13 @@
     "postinstall": "prisma generate"
   },
   "overrides": {
-    "handlebars": "^4.7.9",
+    "handlebars": "^4.7.10",
     "path-to-regexp": "^8.4.0",
     "multer": "^2.2.0",
     "js-yaml": "^4.2.0",
     "uuid": "^11.1.1",
-    "deepmerge-ts": "^8.0.2"
+    "deepmerge-ts": "^8.0.2",
+    "mysql2": "^3.22.0"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1115.0",
