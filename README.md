@@ -1,167 +1,178 @@
 <div align="center">
   <img src="https://github.com/user-attachments/assets/b5bc0c1e-5641-4106-b322-a1b0f5448b0f" width="60"/>
-  
+
   <h1>Pingvin Share X</h1>
 
   <p align="center">
 
-![GitHub Release](https://img.shields.io/github/v/release/smp46/pingvin-share-x) [![Crowdin](https://badges.crowdin.net/pingvin-share-x/localized.svg)](https://crowdin.com/project/pingvin-share-x) ![Docker Pulls](https://img.shields.io/docker/pulls/smp46/pingvin-share-x) [![GitHub Sponsors](https://img.shields.io/badge/Sponsor-%40smp46-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/smp46)
+[![GitHub Release](https://img.shields.io/github/v/release/dzaczek/pingvin-share-x)](https://github.com/dzaczek/pingvin-share-x/releases/latest) [![CI](https://github.com/dzaczek/pingvin-share-x/actions/workflows/ci.yml/badge.svg)](https://github.com/dzaczek/pingvin-share-x/actions/workflows/ci.yml)
 
   </p>
 </div>
 
+A self hosted file sharing platform, an alternative to WeTransfer.
 
-This repository is [dzaczek](https://github.com/dzaczek)'s fork of [smp46/pingvin-share-x](https://github.com/smp46/pingvin-share-x). That project is a fork of the original [Pingvin Share](https://github.com/stonith404/pingvin-share), a self-hosted file sharing platform and an alternative to WeTransfer, developed in parallel by a different team. This fork stays fully compatible with smp46/pingvin-share-x, using the same configuration, database schema, and Docker setup. The focus here is making it easier to operate at scale: managing, auditing, and cleaning up large numbers of shares day to day. See [What's different from upstream](#whats-different-from-upstream) below for the full list of additions.
+This repository is [dzaczek](https://github.com/dzaczek)'s fork of [smp46/pingvin-share-x](https://github.com/smp46/pingvin-share-x), which is itself a fork of the original [Pingvin Share](https://github.com/stonith404/pingvin-share). It focuses on running the app for an organisation: managing, auditing and cleaning up many shares every day. It is in sync with upstream 2.0.0, see [What this fork adds](#what-this-fork-adds).
 
 ## Features
 
-- Share files using a link
-- Unlimited file size (restricted only by disk space)
-- Set an expiration date for shares
-- Secure shares with visitor limits and passwords
-- Email recipients
-- Reverse shares
-- OIDC and LDAP authentication
-- Integration with ClamAV for security scans
-- Different file providers: local storage and S3
+- Share files using a link, with no size limit other than your disk
+- Expiration dates, visitor limits and passwords for shares
+- Email recipients and reverse shares (upload links for other people)
+- OIDC, Microsoft Entra ID and LDAP sign in
+- ClamAV virus scanning
+- Local storage or S3
 
-## What's different from upstream
-
-This fork tracks [smp46/pingvin-share-x](https://github.com/smp46/pingvin-share-x) and adds:
+## What this fork adds
 
 **Admin panel**
-- Sortable, searchable share table with checkbox multi-select and bulk delete (partial failures are reported instead of failing silently)
-- Filter shares by creation date, with quick ranges or a custom range
-- Auto refresh with a Grafana style time range picker
-- Batched loading so large share lists stay smooth
-- Per-share ClamAV scan status (pending, clean, infected, failed) shown as an icon
-- Access log per share: who created it and who opened it, grouped by IP with a visit count, each IP links out to ipinfo.io
-- Shows why a share got removed, for example when ClamAV deletes it for containing a malicious file
+- Share table with sorting, search, date filters, multi select and bulk delete
+- Auto refresh with a time range picker, and batched loading for long lists
+- ClamAV scan status per share, with a rescan button
+- Block a share instead of deleting it, so its files stay for an investigation
+- Access log per share: who created and opened it, grouped by IP, with ipinfo.io and VirusTotal lookups
+- VirusTotal lookup of a file by its SHA256
+- Shows why a share was removed, for example by ClamAV
+- Shows the version and the commit the running image was built from, and offers an update when this fork publishes a newer release
+
+**Shares**
+- Optional warning before downloading a share created without an account, with a custom message per language
+- Anonymous shares are locked once uploaded, so nobody holding the link can reopen them or swap the files
 
 **ClamAV**
-- Retries a scan instead of treating a ClamAV hiccup as "file is clean"
-- Keeps retrying the connection instead of giving up on ClamAV forever after one failed attempt
-- Fixed scanning large files: the client library's default timeout was too short for big uploads
+- Retries a scan instead of treating a ClamAV error as "file is clean"
+- Keeps reconnecting instead of giving up after one failed attempt
+- Large files no longer hit a timeout during the scan
 
-**i18n**
-- Falls back to English instead of showing blank text for missing translations
+**Languages**
+- Falls back to English instead of showing blank text
+- Can pick the language from the browser
+- Complete Polish translation
 
-**Uploads**
-- More robust handling of Chromium's own file picker
+## Installation
 
-## Setup
+The app runs as one Docker container. ClamAV and a reverse proxy are optional.
 
-### Installation with Docker (recommended)
+### From a release image
 
-1. Download the `docker-compose.yml` file
-2. Run `docker compose up -d`
+Every release is published to the GitHub Container Registry, starting with 2026.10.1. Create a `docker-compose.yml`:
 
-The website is now listening on `http://localhost:3000`.
+```yaml
+services:
+  pingvin-share-x:
+    image: ghcr.io/dzaczek/pingvin-share-x:latest
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    environment:
+      - TRUST_PROXY=false # true if a reverse proxy is in front of the container
+    volumes:
+      - "./data:/opt/app/backend/data:rw,z"
+      - "./data/images:/opt/app/frontend/public/img:rw,z"
+```
 
-> [!TIP]
-> Checkout [stonith404/Pocket ID](https://github.com/stonith404/pocket-id), a user-friendly OIDC provider that lets you easily log in to services like Pingvin Share X using Passkeys. Made by the original creator of Pingvin Share.
+Then run `docker compose up -d`. The app listens on `http://localhost:3000`, and the first account you create becomes the admin.
 
-### Beta Channel (Testing)
+To stay on one version, use a tag like `ghcr.io/dzaczek/pingvin-share-x:v2026.10.1` instead of `latest`.
 
-Pingvin Share X now has a beta, this is where all (non-time sensitive) bug fixes, features and other updates will go before reaching stable.
+### From source
 
-To use the Beta channel:
-1. Update the container image tag in your `docker-compose.yml` to `:beta`:
-   ```yaml
-   image: smp46/pingvin-share-x:beta
-   # or ghcr.io/smp46/pingvin-share-x:beta
-   ```
-2. Pull the latest beta image and recreate the container:
-   ```bash
-   docker compose pull
-   docker compose up -d
-   ```
+The `docker-compose.yml` in this repository builds the image from the source:
 
-> [!IMPORTANT]
-> If you encounter any bugs, regressions, or have any other feedback while running the beta version, please [open a GitHub Issue](https://github.com/smp46/pingvin-share-x/issues). Please ensure you specify the exact version (including the beta tag).
+```bash
+git clone https://github.com/dzaczek/pingvin-share-x.git
+cd pingvin-share-x
+BUILD_COMMIT=$(git rev-parse HEAD) docker compose up -d --build
+```
 
-### Alternative Deployments
+`BUILD_COMMIT` is optional. It lets the admin page show which commit is running.
 
-Pingvin Share X can also be deployed through other platforms. For more information, see the [documentation](https://smp46.github.io/pingvin-share-x/setup/installation#alternative-deployments).
+### ClamAV
 
-## Documentation
+To scan uploads for malware, add a ClamAV container as described in the [upstream documentation](https://smp46.github.io/pingvin-share-x/setup/integrations/#clamav-docker-only).
 
-For more installation options and advanced configurations, please refer to the [documentation](https://smp46.github.io/pingvin-share-x/).
+## Updating
 
-## Sponsors
+1. Back up the `data` folder. It holds the database and all uploaded files.
+2. Pull the new image (`docker compose pull`) or the new source (`git pull`, then `docker compose build`).
+3. Run `docker compose up -d`. Database migrations run on startup.
 
-If you find Pingvin Share X useful and would like to support its ongoing development and maintenance please consider becoming a sponsor! 
+The admin page shows an Update tile when a newer release exists here. Each release lists its changes in the [changelog](CHANGELOG.md) and on the [releases page](https://github.com/dzaczek/pingvin-share-x/releases).
 
-I would like to host a demo instance online for people to try out Pingvin, your sponsorship would make this possible.
+### Coming from smp46/pingvin-share-x
 
-As a token of appreciation, sponsors can have their profile or company logo displayed right here in this section.
+Point this image at your existing `data` folder. Data from upstream 2.0.0 and older is migrated on startup. This fork adds its own migrations, so going back to the upstream image afterwards is not supported. Keep the backup from step 1.
 
-### Our Awesome Sponsors
+### Version numbers
 
-| <a href="https://github.com/sponsors/smp46"><img src="https://github.com/images/modules/logos_page/GitHub-Mark.png" width="60px;" alt=""/><br /><sub><b>Your Name Here</b></sub></a> |
-| :---: |
+Releases are numbered by date: `2026.10.0` is the first release of October 2026, `2026.10.1` the next one in the same month. Upstream still uses `2.x`, so the numbers never overlap.
 
-💖 Support the project via [GitHub Sponsors](https://github.com/sponsors/smp46)
+## Configuration
+
+Settings live in the admin page under Configuration. You can also set them in a `config.yaml`, see [config.example.yaml](config.example.yaml). Keys left out of the file keep the value set in the admin page.
+
+For details on each setting, OIDC, LDAP, S3 and reverse proxies, see the [upstream documentation](https://smp46.github.io/pingvin-share-x/). Almost all of it applies here. The `docs` folder in this repository is a copy of that site and is not published separately.
+
+## Security
+
+Please do not open a public issue for a vulnerability. Report it privately, see [SECURITY.md](SECURITY.md).
 
 ## Contributing
 
-All contributions are welcome, including issues, feature suggestions, pull requests and *translations*.
+Issues and pull requests are welcome. Please read the [AI Usage Policy](AI_USAGE_POLICY.md) first.
 
-### Translations
+Pull request titles follow [Conventional Commits](https://www.conventionalcommits.org), for example `feat(share): add password protection`. The types used here are `feat`, `fix`, `docs`, `test`, `refactor`, `ci` and `chore`. Only `feat` and `fix` appear in the changelog.
 
-This project supports 32 languages so far (to varying degrees), you can help complete
-those translations or add more at [CrowdIn](https://crowdin.com/project/pingvin-share-x).
+Before you open a pull request, run `npm run format` in the repository root and the tests below.
 
-### AI Usage Policy
+### Development setup
 
-AI is allowed here, and this fork's [AI Usage Policy](AI_USAGE_POLICY.md) differs from upstream's on that point. What it asks for instead is a specific instruction rather than a vague one, a test that fails without your change, and the full suite run before you open the pull request. Please read it before submitting code.
+Backend:
 
-### Getting started
+```bash
+cd backend
+npm install
+npx prisma migrate deploy
+npx prisma db seed
+npm run dev
+```
 
-If you have found a bug, have suggestion or something else, please create an issue.
+Frontend, with the backend running:
 
-### Submit a Pull Request
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-Before you submit the pull request for review please ensure that
+### Tests
 
-- The pull request naming follows the [Conventional Commits specification](https://www.conventionalcommits.org):
+| Command | Where | What it needs |
+|---|---|---|
+| `npm test` | `backend` | nothing, unit tests |
+| `npm run test:db` | `backend` | nothing, builds a throwaway SQLite database from the migrations |
+| `npm run test:integration` | `backend` | a running instance, see [its README](backend/test/integration/README.md) |
+| `npm run test:system` | `backend` | runs the API system tests, as CI does |
+| `npm test` | `frontend` | nothing |
+| `npm run test:release` | root | nothing, checks the release numbering |
 
-  `<type>[optional scope]: <description>`
+### Releasing
 
-  example:
+From an up to date `main` with no local changes:
 
-  ```
-  feat(share): add password protection
-  ```
+```bash
+npm run release   # works out the next number, writes the changelog, commits and tags
+git push origin HEAD
+git push origin v2026.10.1
+gh release create v2026.10.1 --repo dzaczek/pingvin-share-x --generate-notes
+```
 
-  When `TYPE` can be:
-  - **feat** - is a new feature
-  - **doc** - documentation only changes
-  - **fix** - a bug fix
-  - **refactor** - code change that neither fixes a bug nor adds a feature
+`npm run release -- --dry-run` only prints the next number and the changelog. Publishing the GitHub release builds and pushes the Docker image.
 
-- Your pull request has a detailed description
-- You run `npm run format` to format the code
+## Translations
 
-### Setup project
+Translations come from the upstream [Crowdin project](https://crowdin.com/project/pingvin-share-x).
 
-#### Backend
+## Credits
 
-1. Open the `backend` folder
-2. Install the dependencies with `npm install`
-3. Push the database schema to the database by running `npx prisma db push`
-4. Seed the database with `npx prisma db seed`
-5. Start the backend with `npm run dev`
-
-#### Frontend
-
-1. Start the backend first
-2. Open the `frontend` folder
-3. Install the dependencies with `npm install`
-4. Start the frontend with `npm run dev`
-
-You're all set!
-
-#### Testing
-
-At the moment we only have system tests for the backend. To run these tests, run `npm run test:system` in the backend folder.
+Pingvin Share was created by [stonith404](https://github.com/stonith404/pingvin-share). Pingvin Share X is maintained by [smp46](https://github.com/smp46/pingvin-share-x). This fork builds on both.
