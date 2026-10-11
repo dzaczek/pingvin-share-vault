@@ -2,8 +2,12 @@
 
 ## Supported Versions
 
-Older versions of Pingvin Share do not receive security updates. To ensure your system remains secure, we strongly recommend updating Pingvin Share X regularly. You can automate these updates using tools like [Watchtower](https://github.com/containrrr/watchtower).
+Only the latest release gets security fixes. Releases are listed on the [releases page](https://github.com/dzaczek/pingvin-share-x/releases), and the admin page shows an Update tile when a newer one exists.
 
 ## Reporting a Vulnerability
 
-Thank you for taking the time to report a vulnerability. Please DO NOT create an issue on GitHub because the vulnerability could get exploited. Instead please write an email to [me@smp46.me](mailto:me@smp46.me).
+Thank you for taking the time to report a vulnerability. Please do not open a public issue, it could get exploited before a fix is out. Report it privately instead:
+
+[Report a vulnerability](https://github.com/dzaczek/pingvin-share-x/security/advisories/new)
+
+If the problem is also in the original project, [smp46/pingvin-share-x](https://github.com/smp46/pingvin-share-x), please report it there as well, following its own security policy.
