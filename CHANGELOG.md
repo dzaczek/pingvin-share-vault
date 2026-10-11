@@ -1,3 +1,16 @@
+## [2026.10.2](https://github.com/dzaczek/pingvin-share-x/compare/v2026.10.1...v2026.10.2) (2026-10-11)
+
+### Features
+
+* make share UUID a clickable link in admin panel ([d9440de](https://github.com/dzaczek/pingvin-share-x/commit/d9440de28c2c6aebdd943a22d1d27a91d53a2b09))
+
+### Bug Fixes
+
+* **proxy:** name the setting TRUST_PROXY_FROM and never let it stop Caddy ([af9d604](https://github.com/dzaczek/pingvin-share-x/commit/af9d60458e9edbd31b61b3cf9f35fd3fef19c409))
+* **i18n:** only watch the translation files while developing ([136a10a](https://github.com/dzaczek/pingvin-share-x/commit/136a10ae0a6793680b891d5f916698f4bfec0f01))
+* **config:** let initUser start an instance that already has accounts ([a465377](https://github.com/dzaczek/pingvin-share-x/commit/a4653772a7cf7d59cd5f5408dd55ac23a5421a07))
+* **proxy:** only take X-Forwarded-For from private networks by default ([56f1539](https://github.com/dzaczek/pingvin-share-x/commit/56f15394b27a9b355c54d063169a238ec4720c95))
+
 ## [2026.10.1](https://github.com/dzaczek/pingvin-share-x/compare/v2026.10.0...v2026.10.1) (2026-10-11)
 
 ### Bug Fixes
