@@ -40,9 +40,9 @@ Create an account in the browser. The first one becomes the administrator.
 | `npm run test:system` | `backend` | **resets the local database** (`prisma migrate reset`), then starts the backend and runs the API checks |
 | `npm test` | `frontend` | nothing |
 | `npm run build` | `frontend` | nothing, also checks the service worker |
-| `npm run test:release` | repository root | `npm install` in `frontend` first |
+| `npm run test:release` | repository root | `npm install` in the repository root |
 
-CI runs lint, the type check and the unit tests of both parts, the database tests of the backend, and the system tests. It does not build the frontend and does not run the integration tests: run `npm run build` when you change the frontend, and the integration tests when your change touches a request path, an upload or the antivirus scan.
+CI runs lint, the type check and the unit tests of both parts, the database tests of the backend, the frontend build, the release script tests and the system tests. It does not run the integration tests: run them when your change touches a request path, an upload or the antivirus scan.
 
 ## Pull requests
 

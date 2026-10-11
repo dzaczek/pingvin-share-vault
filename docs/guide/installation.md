@@ -99,7 +99,8 @@ On start the container changes the owner of both paths to `PUID:PGID`.
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `TRUST_PROXY` | `false` | Trust the `X-Forwarded-For` header to find the client address. See below. |
+| `TRUST_PROXY` | `false` | Use the `X-Forwarded-For` header to find the client address. See below. |
+| `TRUSTED_PROXIES` | private networks | With `TRUST_PROXY=true`, the senders whose `X-Forwarded-For` is used: addresses or ranges separated by spaces, for example `10.89.2.3/32`. See below. |
 | `PUID`, `PGID` | `1000` | User and group the app runs as, and that own the data paths. |
 | `CADDY_DISABLED` | `false` | Skip the built in Caddy. Your own proxy must then route `/api/*` to port `8080` and everything else to port `3333`, like [reverse-proxy/Caddyfile](../../reverse-proxy/Caddyfile). |
 | `CLAMAV_HOST` | `clamav` in Docker | Host name of the ClamAV daemon. |
@@ -115,7 +116,8 @@ Put Pingvin Share X behind your own proxy (Caddy, nginx, Traefik and so on) to s
 
 - Set `general.appUrl` in the admin page to the public address. Links in mails and the OAuth redirect addresses are built from it.
 - Set `TRUST_PROXY=true`. Without it, the access log records the address of your proxy for every visitor.
-- **Only set `TRUST_PROXY=true` when port `3000` is reachable from your proxy alone.** The built in Caddy then trusts `X-Forwarded-For` from any sender, so a client that reaches the port directly could write any address into the access log.
+- With `TRUST_PROXY=true`, the built in Caddy only uses `X-Forwarded-For` from senders in `TRUSTED_PROXIES`. By default these are the private networks (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, loopback and their IPv6 counterparts), which covers a proxy in the same Docker network or LAN. Requests from any other address are logged with their own address, whatever header they send.
+- If your proxy has a public address, or untrusted clients can reach port `3000` from a private network, set `TRUSTED_PROXIES` to the proxy's own address, for example `TRUSTED_PROXIES=10.89.2.3/32`. An empty value counts as not set.
 - Allow large request bodies and long timeouts on the proxy if you share large files.
 
 ## ClamAV

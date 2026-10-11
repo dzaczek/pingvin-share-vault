@@ -27,7 +27,7 @@ The file is read once at startup. How it is applied:
 - A key in the file overrides the value in the database.
 - A key left out of the file keeps the value stored in the database, from the admin page or the defaults.
 - `true`, `false` and numbers work with or without quotes.
-- `initUser` creates an administrator on startup when `enabled: true`. Turn it off after the first start. It is only skipped when exactly one administrator exists, so with none or with two or more administrators startup tries to create the account again, and stops with an error if that email or username already exists.
+- `initUser` creates an administrator on startup when `enabled: true`, but only while the instance has no administrator and no account uses that email or username. On later starts it does nothing, so an account an admin deleted does not come back.
 
 The log line `Config.yaml is not set. Falling back to UI configuration.` means no file was found, which is normal without one.
 
