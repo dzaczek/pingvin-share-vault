@@ -1,11 +1,16 @@
+# Used when TRUST_PROXY=true. X-Forwarded-For is only taken from senders in
+# TRUSTED_PROXIES, by default the private networks a reverse proxy usually
+# sits in. Anyone else could otherwise write any address into the access log.
+# Set it to the address of your proxy, for example TRUSTED_PROXIES=10.89.2.3/32,
+# or to several ranges separated by spaces.
 :3000 {
 	# Reverse proxy for /api
 	reverse_proxy /api/* http://localhost:{$BACKEND_PORT:8080} {
-		trusted_proxies 0.0.0.0/0
+		trusted_proxies {$TRUSTED_PROXIES:private_ranges}
 	}
 
 	# Reverse proxy for all other requests
 	reverse_proxy /* http://localhost:{$PORT:3333} {
-		trusted_proxies 0.0.0.0/0
+		trusted_proxies {$TRUSTED_PROXIES:private_ranges}
 	}
 }
