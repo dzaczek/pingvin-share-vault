@@ -12,6 +12,10 @@ permissions:
 jobs:
   docker:
     runs-on: ubuntu-latest
+    # Docker Hub is only used when its credentials are set. Without them the
+    # login failed and took the GitHub Container Registry push down with it.
+    env:
+      DOCKERHUB: ${{ secrets.DOCKER_USERNAME != '' }}
     steps:
       - name: checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -22,7 +26,7 @@ jobs:
         with:
           images: |
             ghcr.io/${{ github.repository }}
-            ${{ github.repository }}
+            name=${{ github.repository }},enable=${{ env.DOCKERHUB == 'true' }}
           tags: |
             type=semver,pattern={{version}},prefix=v
             type=semver,pattern={{major}}.{{minor}},prefix=v
@@ -31,6 +35,7 @@ jobs:
             type=raw,value=beta,enable=${{ github.event_name == 'release' && github.event.release.prerelease }}
 
       - name: Login to Docker Hub
+        if: env.DOCKERHUB == 'true'
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
