@@ -1,16 +1,17 @@
 # Used when TRUST_PROXY=true. X-Forwarded-For is only taken from senders in
-# TRUSTED_PROXIES, by default the private networks a reverse proxy usually
+# TRUST_PROXY_FROM, by default the private networks a reverse proxy usually
 # sits in. Anyone else could otherwise write any address into the access log.
-# Set it to the address of your proxy, for example TRUSTED_PROXIES=10.89.2.3/32,
-# or to several ranges separated by spaces.
+# List the proxy right in front of this container, separated by spaces, for
+# example TRUST_PROXY_FROM=10.89.2.3/32. Not a CDN: an outer proxy such as
+# Cloudflare has to be trusted by the proxy in front, not here.
 :3000 {
 	# Reverse proxy for /api
 	reverse_proxy /api/* http://localhost:{$BACKEND_PORT:8080} {
-		trusted_proxies {$TRUSTED_PROXIES:private_ranges}
+		trusted_proxies {$TRUST_PROXY_FROM:private_ranges}
 	}
 
 	# Reverse proxy for all other requests
 	reverse_proxy /* http://localhost:{$PORT:3333} {
-		trusted_proxies {$TRUSTED_PROXIES:private_ranges}
+		trusted_proxies {$TRUST_PROXY_FROM:private_ranges}
 	}
 }
