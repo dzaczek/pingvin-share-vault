@@ -2,6 +2,7 @@
 
 ### Bug Fixes
 
+* **release:** read the changelog without checking for it first
 * **release:** keep the original project out of the changelog ([1021918](https://github.com/dzaczek/pingvin-share-x/commit/1021918ba5c92148514569f9b2755c4d8c22bcde))
 * **deps:** close the medium and low Dependabot alerts that have a fix ([005f6f0](https://github.com/dzaczek/pingvin-share-x/commit/005f6f0273e8ce2227328787b99e0759d60a6a22))
 * **deps:** close the high Dependabot alerts that have a fix ([4dd174d](https://github.com/dzaczek/pingvin-share-x/commit/4dd174d905020dca3fd88f1c93b9713a5326800c))

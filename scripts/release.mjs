@@ -134,9 +134,12 @@ function main() {
       { cwd: dir, stdio: "inherit" },
     );
   }
-  const changelog = fs.existsSync("CHANGELOG.md")
-    ? fs.readFileSync("CHANGELOG.md", "utf8")
-    : "";
+  let changelog = "";
+  try {
+    changelog = fs.readFileSync("CHANGELOG.md", "utf8");
+  } catch (e) {
+    if (e.code !== "ENOENT") throw e;
+  }
   fs.writeFileSync("CHANGELOG.md", `${section}\n${changelog}`);
 
   git(
