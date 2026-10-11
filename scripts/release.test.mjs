@@ -1,7 +1,7 @@
 // node --test scripts/release.test.mjs
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import semver from "../frontend/node_modules/semver/index.js";
+import semver from "semver";
 import { changelogSection, nextVersion, previousRelease } from "./release.mjs";
 
 const october = new Date(2026, 9, 10);
