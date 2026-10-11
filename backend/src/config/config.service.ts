@@ -79,14 +79,28 @@ export class ConfigService extends EventEmitter {
   }
 
   private async migrateInitUser(): Promise<void> {
-    if (!this.yamlConfig.initUser?.enabled) return;
+    const initUser = this.yamlConfig.initUser;
+    if (!initUser?.enabled) return;
 
-    const userCount = await this.prisma.user.count({
+    // this runs on every start, so it may only act on an instance that has
+    // no administrator yet, and never trip over an account that is there
+    const adminCount = await this.prisma.user.count({
       where: { isAdmin: true },
     });
-    if (userCount === 1) {
+    if (adminCount > 0) {
       this.logger.log(
         "Skip initial user creation. Admin user is already existent.",
+      );
+      return;
+    }
+    const existing = await this.prisma.user.findFirst({
+      where: {
+        OR: [{ email: initUser.email }, { username: initUser.username }],
+      },
+    });
+    if (existing) {
+      this.logger.warn(
+        "Skip initial user creation. An account with that email or username exists.",
       );
       return;
     }

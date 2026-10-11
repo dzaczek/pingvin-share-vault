@@ -12,5 +12,8 @@
   "prettier": {
     "singleQuote": false,
     "trailingComma": "all"
+  },
+  "devDependencies": {
+    "semver": "^7.8.5"
   }
 }
