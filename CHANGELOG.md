@@ -2,6 +2,7 @@
 
 ### Bug Fixes
 
+* **ci:** publish release images to ghcr.io even without Docker Hub credentials
 * **release:** read the changelog without checking for it first
 * **release:** keep the original project out of the changelog ([1021918](https://github.com/dzaczek/pingvin-share-x/commit/1021918ba5c92148514569f9b2755c4d8c22bcde))
 * **deps:** close the medium and low Dependabot alerts that have a fix ([005f6f0](https://github.com/dzaczek/pingvin-share-x/commit/005f6f0273e8ce2227328787b99e0759d60a6a22))
