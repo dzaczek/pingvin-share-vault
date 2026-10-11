@@ -1,5 +1,6 @@
 import {
   ActionIcon,
+  Anchor,
   Badge,
   Box,
   Button,
@@ -13,6 +14,7 @@ import {
   ThemeIcon,
 } from "@mantine/core";
 import { useClipboard } from "@mantine/hooks";
+import Link from "next/link";
 import { useModals } from "@mantine/modals";
 import moment from "moment";
 import {
@@ -421,7 +423,15 @@ const ManageShareTable = ({
                       />
                     </td>
                     <td>{moment(share.createdAt).format("LLL")}</td>
-                    <td>{share.id}</td>
+                    <td>
+                      {share.id ? (
+                        <Anchor component={Link} href={"/share/" + share.id}>
+                          {share.id}
+                        </Anchor>
+                      ) : (
+                        <Text color="dimmed">Brak ID</Text>
+                      )}
+                    </td>
                     <td>
                       <ScanStatusIcon
                         status={share.scanStatus ?? "PENDING"}
