@@ -7,6 +7,8 @@ if [ "$CADDY_DISABLED" != "true" ]; then
   # Start Caddy
   echo "Starting Caddy..."
   if [ "$TRUST_PROXY" = "true" ]; then
+    # an empty value would trust nobody instead of the default ranges
+    [ -z "$TRUSTED_PROXIES" ] && unset TRUSTED_PROXIES
     caddy start --adapter caddyfile --config /opt/app/reverse-proxy/Caddyfile.trust-proxy &
   else
     caddy start --adapter caddyfile --config /opt/app/reverse-proxy/Caddyfile &
