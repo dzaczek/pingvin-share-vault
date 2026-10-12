@@ -264,17 +264,11 @@ const AdminConfigInput = ({
             data={[
               {
                 value: "pre-built",
-                label: t(
-                  "admin.config.share.zip-generation.pre-built",
-                  "Pre-build (Background)",
-                ),
+                label: t("admin.config.share.zip-generation.pre-built", { fallback: "Pre-build (Background)" }),
               },
               {
                 value: "on-the-fly",
-                label: t(
-                  "admin.config.share.zip-generation.on-the-fly",
-                  "On-the-fly (Download time)",
-                ),
+                label: t("admin.config.share.zip-generation.on-the-fly", { fallback: "On-the-fly (Download time)" }),
               },
             ]}
             value={form.values.stringValue}
