@@ -246,6 +246,14 @@ export class ConfigService extends EventEmitter {
         ),
       },
       {
+        key: "share.zipGeneration",
+        condition: (value: string | number | boolean) => value === "pre-built" || value === "on-the-fly",
+        message: this.t(
+          "config.zipGenerationValidation",
+          "Zip generation method must be either \"pre-built\" or \"on-the-fly\"",
+        ),
+      },
+      {
         key: "share.zipCompressionLevel",
         condition: (value: number) => value >= 0 && value <= 9,
         message: this.t(

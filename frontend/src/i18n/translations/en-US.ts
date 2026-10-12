@@ -776,6 +776,11 @@ export default {
   "admin.config.share.max-size": "Max size",
   "admin.config.share.max-size.description": "Maximum share size",
   "admin.config.share.zip-compression-level": "Zip compression level",
+  "admin.config.share.zip-generation": "Zip generation method",
+  "admin.config.share.zip-generation.description":
+    "Choose whether to pre-build the Zip file in the background when the share is created (uses more storage), or generate it on-the-fly when downloading (uses more CPU, saves storage).",
+  "admin.config.share.zip-generation.pre-built": "Pre-build (Background)",
+  "admin.config.share.zip-generation.on-the-fly": "On-the-fly (Download time)",
   "admin.config.share.zip-compression-level.description":
     "Adjust the level to balance file size and compression speed. Valid values range from 0 to 9, with 0 being no compression and 9 being maximum compression. ",
   "admin.config.share.chunk-size": "Chunk size",

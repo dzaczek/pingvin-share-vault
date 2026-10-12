@@ -315,7 +315,7 @@ export class ShareService {
     }
 
     // Asynchronously create a zip of all files
-    if (share.files.length > 1) void this.createZip(id);
+    if (share.files.length > 1 && this.config.get("share.zipGeneration") === "pre-built") void this.createZip(id);
 
     const recipientEmails = share.recipients.map((r) => r.email);
     const matchedUsers =
@@ -477,7 +477,7 @@ export class ShareService {
       throw new NotFoundException(this.i18n.t("share.notFound"));
 
     // a zip that failed or was cut short by a restart gets another go
-    if (!share.isZipReady && share._count.files > 1) void this.createZip(id);
+    if (!share.isZipReady && share._count.files > 1 && this.config.get("share.zipGeneration") === "pre-built") void this.createZip(id);
 
     return share;
   }

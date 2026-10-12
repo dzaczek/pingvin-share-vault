@@ -51,6 +51,8 @@ const AdminConfigInput = ({
     configVariable.key === "general.defaultLanguage";
   const isUploadProgressStyleConfig =
     configVariable.key === "appearance.uploadProgressStyle";
+  const isZipGenerationConfig =
+    configVariable.key === "share.zipGeneration";
   const isEmailShareConfig =
     configVariable.key === "share.enableShareEmailRecipients";
   const isEmailVerificationConfig =
@@ -250,6 +252,29 @@ const AdminConfigInput = ({
                   </Center>
                 ),
                 value: "system",
+              },
+            ]}
+            value={form.values.stringValue}
+            onChange={(value) => onValueChange(configVariable, value)}
+          />
+        ) : isZipGenerationConfig ? (
+          <Select
+            style={{ width: "100%" }}
+            disabled={!configVariable.allowEdit}
+            data={[
+              {
+                value: "pre-built",
+                label: t(
+                  "admin.config.share.zip-generation.pre-built",
+                  "Pre-build (Background)",
+                ),
+              },
+              {
+                value: "on-the-fly",
+                label: t(
+                  "admin.config.share.zip-generation.on-the-fly",
+                  "On-the-fly (Download time)",
+                ),
               },
             ]}
             value={form.values.stringValue}

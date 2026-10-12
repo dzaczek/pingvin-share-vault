@@ -217,6 +217,10 @@ export const configVariables = {
       defaultValue: "1000000000",
       secret: false,
     },
+    zipGeneration: {
+      type: "string",
+      defaultValue: "pre-built",
+    },
     zipCompressionLevel: {
       type: "number",
       defaultValue: "9",

@@ -1,3 +1,5 @@
+import * as archiver from "archiver";
+import { Logger } from "@nestjs/common";
 import {
   BadRequestException,
   HttpException,
@@ -251,19 +253,54 @@ export class LocalFileService {
     });
   }
 
+  private readonly logger = new Logger(LocalFileService.name);
+
   async getZip(shareId: string): Promise<Readable> {
-    return new Promise((resolve, reject) => {
-      const zipStream = createReadStream(
-        `${SHARE_DIRECTORY}/${shareId}/archive.zip`,
-      );
+    const zipGeneration = this.config.get("share.zipGeneration");
 
-      zipStream.on("error", (err) => {
-        reject(new InternalServerErrorException(err));
+    if (zipGeneration === "on-the-fly") {
+      const files = await this.prisma.file.findMany({
+        where: { shareId },
       });
 
-      zipStream.on("open", () => {
-        resolve(zipStream);
+      if (files.length === 0) {
+        throw new NotFoundException(`No files found for share ${shareId}`);
+      }
+
+      const compressionLevel = this.config.get("share.zipCompressionLevel");
+
+      const archive = archiver("zip", {
+        zlib: { level: parseInt(compressionLevel) },
       });
-    });
+
+      archive.on("error", (err) => {
+        this.logger.error("Archive error", err);
+      });
+
+      // Append files to the archive
+      for (const file of files) {
+        const filePath = this.getSafeFilePath(shareId, file.id);
+        archive.file(filePath, { name: file.name });
+      }
+
+      // Finalize the archive (this will close the stream when done)
+      archive.finalize();
+
+      return archive;
+    } else {
+      return new Promise((resolve, reject) => {
+        const zipStream = createReadStream(
+          `${SHARE_DIRECTORY}/${shareId}/archive.zip`,
+        );
+
+        zipStream.on("error", (err) => {
+          reject(new InternalServerErrorException(err));
+        });
+
+        zipStream.on("open", () => {
+          resolve(zipStream);
+        });
+      });
+    }
   }
 }

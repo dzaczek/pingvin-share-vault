@@ -187,11 +187,12 @@ describe("createZip", () => {
           }),
         },
       },
-      { get: () => false },
+      { get: (key) => key === "share.zipGeneration" ? "pre-built" : undefined }
     );
+
     const createZip = jest
       .spyOn(service, "createZip")
-      .mockResolvedValue(undefined);
+      .mockImplementation(async () => undefined);
 
     await service.getMetaData(SHARE_ID);
 
