@@ -289,12 +289,9 @@ export class LocalFileService {
       return archive;
     } else {
       return new Promise((resolve, reject) => {
-        if (shareId.includes('/') || shareId.includes('\\') || shareId === '..') {
-          return reject(new BadRequestException("Invalid shareId"));
-        }
-        const zipStream = createReadStream(
-          require("path").resolve(SHARE_DIRECTORY, shareId, "archive.zip"),
-        );
+
+        const filePath = this.getSafeFilePath(shareId, "archive.zip");
+        const zipStream = createReadStream(filePath);
 
         zipStream.on("error", (err) => {
           reject(new InternalServerErrorException(err));
