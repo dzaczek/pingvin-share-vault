@@ -41,7 +41,7 @@ const local = (mode: string, files: { id: string; name: string }[] = []) =>
   );
 
 // getZip reaches prisma, the local service and config, the first, second and
-// fourth of seven constructor arguments
+// fourth of eight constructor arguments
 const service = (mode: string, localService: unknown) => {
   const unused = {} as any;
   return new FileService(
@@ -51,6 +51,7 @@ const service = (mode: string, localService: unknown) => {
     configWith(mode) as any,
     unused,
     { t: (key: string) => key } as any,
+    unused,
     unused,
   );
 };
