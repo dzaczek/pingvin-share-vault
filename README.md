@@ -38,7 +38,7 @@ A public demo runs at **https://pingvin-share-x-demo.fly.dev/**, always on the l
 | `demoadmin` | shown in the banner at the top of every page, new at every reset | look around the whole admin panel |
 | none | | share files without an account |
 
-- Everything is reset every 10 minutes, and when the demo wakes up after being idle. Whatever you upload is gone after that.
+- Everything is reset every 15 minutes, and when the demo wakes up after being idle. Whatever you upload is gone after that.
 - A share can hold at most 1 MB.
 - About 300 shares with lorem ipsum files are already there. A few are protected with the password `demo`.
 - Upload the [EICAR test file](https://www.eicar.org/download-anti-malware-testfile/) to see the virus scan remove a share.
