@@ -101,6 +101,55 @@ export const glassTheme = (glass: GlassSettings): MantineThemeOverride => ({
         placeholder: { background: "transparent" },
       },
     },
+    // cards hold content, so they get a lighter material without the glass
+    // highlights, still see through enough to belong on the background
+    Paper: {
+      styles: (theme) => {
+        const dark = theme.colorScheme === "dark";
+        return {
+          root: {
+            background: dark
+              ? "rgba(37, 38, 43, 0.62)"
+              : "rgba(255, 255, 255, 0.72)",
+            backdropFilter: "blur(12px) saturate(150%)",
+            WebkitBackdropFilter: "blur(12px) saturate(150%)",
+            borderRadius: 20,
+            "&[data-with-border]": {
+              border: `1px solid rgba(255, 255, 255, ${dark ? 0.08 : 0.6})`,
+            },
+            "@media (prefers-reduced-transparency: reduce), (prefers-contrast: more)":
+              {
+                background: dark ? theme.colors.dark[7] : theme.white,
+                backdropFilter: "none",
+                WebkitBackdropFilter: "none",
+              },
+          },
+        };
+      },
+    },
+    // the sidebar and the bar on top of the settings pages are navigation
+    Navbar: {
+      styles: (theme) => ({
+        root: {
+          ...glassSurface(theme, glass, { variant: "regular" }),
+          borderRadius: 0,
+          borderTop: "none",
+          borderBottom: "none",
+          borderLeft: "none",
+        },
+      }),
+    },
+    Header: {
+      styles: (theme) => ({
+        root: {
+          ...glassSurface(theme, glass, { variant: "regular" }),
+          borderRadius: 0,
+          borderTop: "none",
+          borderLeft: "none",
+          borderRight: "none",
+        },
+      }),
+    },
     // the footer sits on the background like the content does
     Footer: {
       styles: { root: { background: "transparent", borderTop: "none" } },
@@ -173,6 +222,13 @@ export const glassTheme = (glass: GlassSettings): MantineThemeOverride => ({
     },
     Switch: {
       styles: {
+        // an iOS gray track, a white one disappears on the background
+        track: {
+          "input:not(:checked) + &": {
+            backgroundColor: "rgba(118, 118, 128, 0.24)",
+            borderColor: "transparent",
+          },
+        },
         thumb: {
           boxShadow:
             "inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 6px rgba(0, 0, 0, 0.25)",
