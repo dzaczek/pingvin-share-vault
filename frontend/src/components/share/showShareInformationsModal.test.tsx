@@ -127,6 +127,32 @@ describe("showShareInformationsModal access log", () => {
     }
   });
 
+  // with ANONYMIZE_IP=mask the log holds 91.*.*.1, which no lookup service
+  // can answer for
+  it("offers no lookup for a masked address", async () => {
+    getAccessLogs.mockResolvedValue({
+      totalEvents: 1,
+      entries: [
+        {
+          event: "VIEWED",
+          ip: "91.*.*.1",
+          count: 1,
+          firstSeen: "2026-01-01T00:00:00.000Z",
+          lastSeen: "2026-01-01T00:00:00.000Z",
+        },
+      ],
+    });
+    renderModal();
+    fireEvent.click(screen.getByText("open"));
+
+    expect(await screen.findByText("91.*.*.1")).toBeInTheDocument();
+    for (const name of [
+      "Look this IP up on ipinfo.io",
+      "Check this IP on VirusTotal",
+    ])
+      expect(screen.queryByRole("link", { name })).not.toBeInTheDocument();
+  });
+
   it("still shows the address itself, not only the icons", async () => {
     renderModal();
     fireEvent.click(screen.getByText("open"));
