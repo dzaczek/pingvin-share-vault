@@ -51,6 +51,7 @@ const AdminConfigInput = ({
     configVariable.key === "general.defaultLanguage";
   const isUploadProgressStyleConfig =
     configVariable.key === "appearance.uploadProgressStyle";
+  const isDownloadAllConfig = configVariable.key === "share.downloadAll";
   const isEmailShareConfig =
     configVariable.key === "share.enableShareEmailRecipients";
   const isEmailVerificationConfig =
@@ -281,6 +282,23 @@ const AdminConfigInput = ({
                 ),
               },
             ]}
+            value={form.values.stringValue}
+            placeholder={configVariable.defaultValue}
+            onChange={(value) => onValueChange(configVariable, value ?? "")}
+            allowDeselect={false}
+          />
+        ) : isDownloadAllConfig ? (
+          <Select
+            style={{
+              width: "100%",
+            }}
+            disabled={!configVariable.allowEdit}
+            data={["disabled", "zip-prebuilt", "zip-on-the-fly", "files"].map(
+              (mode) => ({
+                value: mode,
+                label: t(`admin.config.share.download-all.${mode}`),
+              }),
+            )}
             value={form.values.stringValue}
             placeholder={configVariable.defaultValue}
             onChange={(value) => onValueChange(configVariable, value ?? "")}

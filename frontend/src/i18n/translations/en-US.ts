@@ -289,6 +289,7 @@ export default {
   "admin.button.users": "User management",
   "admin.button.shares": "Share management",
   "admin.button.config": "Configuration",
+  "admin.button.auditLogs": "Audit log",
   "admin.version": "Version",
   // END /admin
 
@@ -356,6 +357,29 @@ export default {
     "If checked, the user will be able to access the admin panel.",
 
   // END /admin/users
+
+  // /admin/auditLogs
+  "admin.auditLogs.title": "Audit log",
+  "admin.auditLogs.tab.timeline": "Timeline",
+  "admin.auditLogs.tab.identity": "User, visitor or IP",
+  "admin.auditLogs.tab.shards": "Shards",
+  "admin.auditLogs.filter.action": "All actions",
+  "admin.auditLogs.filter.identity": "User ID, visitor ID or IP address",
+  "admin.auditLogs.live": "Live",
+  "admin.auditLogs.loadMore": "Load more",
+  "admin.auditLogs.empty": "No entries",
+  "admin.auditLogs.table.time": "Time",
+  "admin.auditLogs.table.action": "Action",
+  "admin.auditLogs.table.user": "User",
+  "admin.auditLogs.table.visitor": "Visitor",
+  "admin.auditLogs.table.ip": "IP",
+  "admin.auditLogs.table.resource": "Resource",
+  "admin.auditLogs.table.details": "Details",
+  "admin.auditLogs.shards.storage": "Storage",
+  "admin.auditLogs.shards.count": "Events",
+  "admin.auditLogs.shards.bytes": "Data",
+  "admin.auditLogs.shards.lastSeen": "Last event",
+  // END /admin/auditLogs
 
   // /admin/shares
   "admin.shares.title": "Share management",
@@ -775,6 +799,13 @@ export default {
     "Default length for the generated ID of a share. This value is also used to generate links for reverse shares. A value below 8 is not considered secure.",
   "admin.config.share.max-size": "Max size",
   "admin.config.share.max-size.description": "Maximum share size",
+  "admin.config.share.download-all": "Download all",
+  "admin.config.share.download-all.description":
+    "How the download all button of a share works. A zip built after upload is ready at once but takes as much space again as the files. A zip built on the fly takes no space but costs CPU on every download and shows no progress. Separate files are downloaded one after another, and the browser asks once whether the site may do that.",
+  "admin.config.share.download-all.disabled": "Off",
+  "admin.config.share.download-all.zip-prebuilt": "Zip built after upload",
+  "admin.config.share.download-all.zip-on-the-fly": "Zip built while downloading",
+  "admin.config.share.download-all.files": "Separate files, one after another",
   "admin.config.share.zip-compression-level": "Zip compression level",
   "admin.config.share.zip-compression-level.description":
     "Adjust the level to balance file size and compression speed. Valid values range from 0 to 9, with 0 being no compression and 9 being maximum compression. ",

@@ -11,10 +11,12 @@ import showAnonymousDownloadWarningModal from "./showAnonymousDownloadWarningMod
 
 const DownloadAllButton = ({
   shareId,
+  files,
   recipientId,
   warnAnonymous,
 }: {
   shareId: string;
+  files: { id: string }[];
   recipientId?: string;
   warnAnonymous?: boolean;
 }) => {
@@ -24,6 +26,8 @@ const DownloadAllButton = ({
   const t = useTranslate();
   const config = useConfig();
   const { locale } = useIntl();
+  // only the prebuilt zip has to be waited for
+  const mode = config.get("share.downloadAll");
 
   const anonymousWarningOverrideKey =
     getAnonymousWarningConfigKeyForLocale(locale);
@@ -32,6 +36,14 @@ const DownloadAllButton = ({
     : "";
 
   const downloadAll = async () => {
+    if (mode === "files") {
+      shareService.downloadFiles(
+        shareId,
+        files.map((file) => file.id),
+        recipientId,
+      );
+      return;
+    }
     setIsLoading(true);
     await shareService
       .downloadFile(shareId, "zip", recipientId)
@@ -39,6 +51,7 @@ const DownloadAllButton = ({
   };
 
   useEffect(() => {
+    if (mode !== "zip-prebuilt") return;
     shareService
       .getMetaData(shareId)
       .then((share) => setIsZipReady(share.isZipReady))
@@ -56,7 +69,9 @@ const DownloadAllButton = ({
     return () => {
       clearInterval(timer);
     };
-  }, []);
+  }, [mode, shareId]);
+
+  if (mode === "disabled") return null;
 
   return (
     <Button
@@ -64,7 +79,7 @@ const DownloadAllButton = ({
       color="cyan"
       loading={isLoading}
       onClick={() => {
-        if (!isZipReady) {
+        if (mode === "zip-prebuilt" && !isZipReady) {
           toast.error(t("share.notify.download-all-preparing"));
         } else if (warnAnonymous) {
           showAnonymousDownloadWarningModal(

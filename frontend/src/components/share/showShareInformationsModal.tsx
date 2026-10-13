@@ -248,44 +248,51 @@ const Body = ({
                   </Badge>
                   <Group spacing={4} noWrap>
                     <Text size="sm">{entry.ip}</Text>
-                    <HoverTip
-                      label={t("account.shares.modal.accessLog.lookup.ipinfo")}
-                    >
-                      <ActionIcon
-                        component="a"
-                        href={`https://ipinfo.io/${entry.ip}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={t(
-                          "account.shares.modal.accessLog.lookup.ipinfo",
-                        )}
-                        color="blue"
-                        variant="light"
-                        size={22}
-                      >
-                        <TbInfoCircle size={14} />
-                      </ActionIcon>
-                    </HoverTip>
-                    <HoverTip
-                      label={t(
-                        "account.shares.modal.accessLog.lookup.virustotal",
-                      )}
-                    >
-                      <ActionIcon
-                        component="a"
-                        href={`https://www.virustotal.com/gui/ip-address/${entry.ip}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={t(
-                          "account.shares.modal.accessLog.lookup.virustotal",
-                        )}
-                        color="orange"
-                        variant="light"
-                        size={22}
-                      >
-                        <TbVirusSearch size={14} />
-                      </ActionIcon>
-                    </HoverTip>
+                    {/* a masked address cannot be looked up */}
+                    {!entry.ip.includes("*") && (
+                      <>
+                        <HoverTip
+                          label={t(
+                            "account.shares.modal.accessLog.lookup.ipinfo",
+                          )}
+                        >
+                          <ActionIcon
+                            component="a"
+                            href={`https://ipinfo.io/${entry.ip}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={t(
+                              "account.shares.modal.accessLog.lookup.ipinfo",
+                            )}
+                            color="blue"
+                            variant="light"
+                            size={22}
+                          >
+                            <TbInfoCircle size={14} />
+                          </ActionIcon>
+                        </HoverTip>
+                        <HoverTip
+                          label={t(
+                            "account.shares.modal.accessLog.lookup.virustotal",
+                          )}
+                        >
+                          <ActionIcon
+                            component="a"
+                            href={`https://www.virustotal.com/gui/ip-address/${entry.ip}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={t(
+                              "account.shares.modal.accessLog.lookup.virustotal",
+                            )}
+                            color="orange"
+                            variant="light"
+                            size={22}
+                          >
+                            <TbVirusSearch size={14} />
+                          </ActionIcon>
+                        </HoverTip>
+                      </>
+                    )}
                   </Group>
                   {entry.count > 1 && (
                     <Badge size="sm" color="grape" variant="outline">

@@ -262,6 +262,7 @@ export default {
   "admin.button.users": "Zarządzanie użytkownikami",
   "admin.button.shares": "Zarządzanie udostępnieniami",
   "admin.button.config": "Konfiguracja",
+  "admin.button.auditLogs": "Dziennik zdarzeń",
   "admin.version": "Wersja",
   // END /admin
 
@@ -323,6 +324,29 @@ export default {
   "admin.users.modal.create.admin.description":
     "Jeśli zaznaczone, użytkownik będzie miał dostęp do panelu administratora.",
   // END /admin/users
+
+  // /admin/auditLogs
+  "admin.auditLogs.title": "Dziennik zdarzeń",
+  "admin.auditLogs.tab.timeline": "Oś czasu",
+  "admin.auditLogs.tab.identity": "Użytkownik, odwiedzający lub IP",
+  "admin.auditLogs.tab.shards": "Shardy",
+  "admin.auditLogs.filter.action": "Wszystkie akcje",
+  "admin.auditLogs.filter.identity": "ID użytkownika, ID odwiedzającego lub adres IP",
+  "admin.auditLogs.live": "Na żywo",
+  "admin.auditLogs.loadMore": "Wczytaj więcej",
+  "admin.auditLogs.empty": "Brak wpisów",
+  "admin.auditLogs.table.time": "Czas",
+  "admin.auditLogs.table.action": "Akcja",
+  "admin.auditLogs.table.user": "Użytkownik",
+  "admin.auditLogs.table.visitor": "Odwiedzający",
+  "admin.auditLogs.table.ip": "IP",
+  "admin.auditLogs.table.resource": "Zasób",
+  "admin.auditLogs.table.details": "Szczegóły",
+  "admin.auditLogs.shards.storage": "Magazyn",
+  "admin.auditLogs.shards.count": "Zdarzenia",
+  "admin.auditLogs.shards.bytes": "Dane",
+  "admin.auditLogs.shards.lastSeen": "Ostatnie zdarzenie",
+  // END /admin/auditLogs
 
   // /admin/shares
   "admin.shares.title": "Zarządzanie udostępnieniami",
@@ -730,6 +754,13 @@ export default {
     "Domyślna długość generowanego identyfikatora udziału. Wartość ta jest również używana do generowania linków dla udziałów odwrotnych. Wartość poniżej 8 nie jest uważana za bezpieczną.",
   "admin.config.share.max-size": "Rozmiar maksymalny",
   "admin.config.share.max-size.description": "Maksymalny rozmiar udziału",
+  "admin.config.share.download-all": "Pobierz wszystko",
+  "admin.config.share.download-all.description":
+    "Jak działa przycisk „Pobierz wszystko” w udostępnieniu. Zip tworzony po przesłaniu jest gotowy od razu, ale zajmuje drugie tyle miejsca co pliki. Zip tworzony w locie nie zajmuje miejsca, ale obciąża procesor przy każdym pobraniu i nie pokazuje postępu. Osobne pliki pobierają się jeden po drugim, a przeglądarka raz zapyta, czy strona może pobrać kilka plików.",
+  "admin.config.share.download-all.disabled": "Wyłączone",
+  "admin.config.share.download-all.zip-prebuilt": "Zip tworzony po przesłaniu",
+  "admin.config.share.download-all.zip-on-the-fly": "Zip tworzony w trakcie pobierania",
+  "admin.config.share.download-all.files": "Osobne pliki, jeden po drugim",
   "admin.config.share.zip-compression-level": "Poziom kompresji Zip",
   "admin.config.share.zip-compression-level.description":
     "Dostosuj poziom do równowagi między rozmiarem pliku a szybkością kompresji. Prawidłowe wartości mieszczą się w zakresie od 0 do 9, przy czym 0 to brak kompresji a 9 maksymalną kompresją. ",

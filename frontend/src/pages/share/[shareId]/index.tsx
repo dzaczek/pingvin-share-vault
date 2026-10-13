@@ -251,6 +251,7 @@ const Share = ({ shareId }: { shareId: string }) => {
           {share?.files.length > 1 && (
             <DownloadAllButton
               shareId={shareId}
+              files={share!.files}
               recipientId={recipientId}
               warnAnonymous={showAnonymousWarning}
             />
