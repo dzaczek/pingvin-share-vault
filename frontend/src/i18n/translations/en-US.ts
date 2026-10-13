@@ -289,6 +289,7 @@ export default {
   "admin.button.users": "User management",
   "admin.button.shares": "Share management",
   "admin.button.config": "Configuration",
+  "admin.button.auditLogs": "Audit log",
   "admin.version": "Version",
   // END /admin
 
@@ -356,6 +357,29 @@ export default {
     "If checked, the user will be able to access the admin panel.",
 
   // END /admin/users
+
+  // /admin/auditLogs
+  "admin.auditLogs.title": "Audit log",
+  "admin.auditLogs.tab.timeline": "Timeline",
+  "admin.auditLogs.tab.identity": "User, visitor or IP",
+  "admin.auditLogs.tab.shards": "Shards",
+  "admin.auditLogs.filter.action": "All actions",
+  "admin.auditLogs.filter.identity": "User ID, visitor ID or IP address",
+  "admin.auditLogs.live": "Live",
+  "admin.auditLogs.loadMore": "Load more",
+  "admin.auditLogs.empty": "No entries",
+  "admin.auditLogs.table.time": "Time",
+  "admin.auditLogs.table.action": "Action",
+  "admin.auditLogs.table.user": "User",
+  "admin.auditLogs.table.visitor": "Visitor",
+  "admin.auditLogs.table.ip": "IP",
+  "admin.auditLogs.table.resource": "Resource",
+  "admin.auditLogs.table.details": "Details",
+  "admin.auditLogs.shards.storage": "Storage",
+  "admin.auditLogs.shards.count": "Events",
+  "admin.auditLogs.shards.bytes": "Data",
+  "admin.auditLogs.shards.lastSeen": "Last event",
+  // END /admin/auditLogs
 
   // /admin/shares
   "admin.shares.title": "Share management",

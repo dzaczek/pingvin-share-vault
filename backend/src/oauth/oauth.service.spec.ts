@@ -12,13 +12,14 @@ const buildService = () => {
       findFirst: jest.fn().mockResolvedValue({ id: "u1" }),
     },
   };
-  const auth = { generateToken: jest.fn().mockResolvedValue({}) };
+  const auth = { generateTokenAndAudit: jest.fn().mockResolvedValue({}) };
   const service = new OAuthService(
     prisma as any,
     {} as any,
     auth as any,
     [],
     {},
+    { log: jest.fn() } as any,
   );
   return { service, prisma };
 };

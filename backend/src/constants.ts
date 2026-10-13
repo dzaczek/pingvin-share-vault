@@ -20,3 +20,10 @@ export const RATE_LIMIT_DISABLED = process.env.DISABLE_RATE_LIMIT === "true";
 export const LOG_LEVEL_AVAILABLE: LogLevel[] = ['verbose', 'debug', 'log', 'warn', 'error', 'fatal'];
 export const LOG_LEVEL_DEFAULT: LogLevel = process.env.NODE_ENV === 'development' ? "verbose" : "log";
 export const LOG_LEVEL_ENV = `${process.env.PV_LOG_LEVEL || ""}`;
+// Which node wrote an audit entry. One instance means one shard, so the
+// default is fine until there is more than one.
+export const SHARD_ID = process.env.SHARD_ID || "main-node";
+// 0 keeps audit entries forever
+export const AUDIT_LOG_RETENTION_DAYS = parseInt(
+  process.env.AUDIT_LOG_RETENTION_DAYS ?? "90",
+);

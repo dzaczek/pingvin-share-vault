@@ -225,3 +225,28 @@ model AdminNoticeDismissal {
   dismissedByUser     User?    @relation(fields: [dismissedByUserId], references: [id], onDelete: SetNull)
 }
 
+
+// Append only. A trigger in the add_audit_log migration rejects updates, the
+// only delete is the retention job. No relation to User on purpose: deleting
+// an account must not take its history with it, userEmail keeps who it was.
+model AuditLog {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  userId       String?
+  userEmail    String?
+  visitorId    String?
+  ipAddress    String
+  userAgent    String
+  shardId      String  @default("main-node")
+  action       String
+  resourceId   String?
+  resourceName String?
+  metadata     Json?
+
+  @@index([createdAt(sort: Desc)])
+  @@index([userId])
+  @@index([visitorId])
+  @@index([ipAddress])
+  @@index([shardId])
+}
