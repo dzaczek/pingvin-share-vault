@@ -66,6 +66,17 @@ not hold:
 
 Dismissed as a false positive.
 
+Later fixed in the code instead. The audit log brought a second alert of the
+same kind, this time on the `access_token` cookie, from a call to
+`generateTokenAndAudit(user, "password")`. The `"password"` there was only the
+login method for the audit entry. Both alerts come from one heuristic: the
+query treats whatever a call returns as a password when the call mentions a
+password, by its name or by an argument. So the tokens are now never returned
+by such a call. `signIn` gets them from `generateToken(user)` and audits the
+login with a separate `auditLogin`, and `updatePassword` returns nothing, the
+controller asks `createRefreshToken` for the new session itself. No behaviour
+changed, `authTokens.spec.ts` pins that down.
+
 The `secureCookies` observation is still worth acting on, it just was not this
 alert. It is at the end of this file on its own.
 

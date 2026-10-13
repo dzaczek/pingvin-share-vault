@@ -72,10 +72,11 @@ export class OAuthService {
         },
       });
       this.logger.log(`Successful login for user ${user.email} from IP ${ip}`);
-      return this.auth.generateTokenAndAudit(updatedUser, "oauth", {
+      const result = await this.auth.generateToken(updatedUser, {
         idToken: user.idToken,
-        provider: user.provider,
       });
+      this.auth.auditLogin(updatedUser, result, "oauth", user.provider);
+      return result;
     }
 
     return this.signUp(user, ip);
