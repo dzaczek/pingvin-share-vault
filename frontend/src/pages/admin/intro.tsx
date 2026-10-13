@@ -27,7 +27,7 @@ const Intro = () => {
             If you enjoy Pingvin Share X please ⭐️ it on{" "}
             <Anchor
               target="_blank"
-              href="https://github.com/smp46/pingvin-share-x"
+              href="https://github.com/dzaczek/pingvin-share-x"
             >
               GitHub
             </Anchor>{" "}
