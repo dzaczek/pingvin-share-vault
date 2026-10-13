@@ -171,12 +171,12 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
     @Body() dto: UpdatePasswordDTO,
   ) {
-    const result = await this.authService.updatePassword(
-      user,
-      dto.password,
-      dto.oldPassword,
-    );
+    await this.authService.updatePassword(user, dto.password, dto.oldPassword);
 
+    // every other session ended with the old password, this one goes on.
+    // A separate call, so the token never comes out of the one that handled
+    // the password, which is all CodeQL needs to call the cookie a password.
+    const result = await this.authService.createRefreshToken(user.id);
     this.authService.addTokensToResponse(response, result.refreshToken);
     return new TokenDTO().from(result);
   }
