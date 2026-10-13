@@ -730,6 +730,13 @@ export default {
     "Domyślna długość generowanego identyfikatora udziału. Wartość ta jest również używana do generowania linków dla udziałów odwrotnych. Wartość poniżej 8 nie jest uważana za bezpieczną.",
   "admin.config.share.max-size": "Rozmiar maksymalny",
   "admin.config.share.max-size.description": "Maksymalny rozmiar udziału",
+  "admin.config.share.download-all": "Pobierz wszystko",
+  "admin.config.share.download-all.description":
+    "Jak działa przycisk „Pobierz wszystko” w udostępnieniu. Zip tworzony po przesłaniu jest gotowy od razu, ale zajmuje drugie tyle miejsca co pliki. Zip tworzony w locie nie zajmuje miejsca, ale obciąża procesor przy każdym pobraniu i nie pokazuje postępu. Osobne pliki pobierają się jeden po drugim, a przeglądarka raz zapyta, czy strona może pobrać kilka plików.",
+  "admin.config.share.download-all.disabled": "Wyłączone",
+  "admin.config.share.download-all.zip-prebuilt": "Zip tworzony po przesłaniu",
+  "admin.config.share.download-all.zip-on-the-fly": "Zip tworzony w trakcie pobierania",
+  "admin.config.share.download-all.files": "Osobne pliki, jeden po drugim",
   "admin.config.share.zip-compression-level": "Poziom kompresji Zip",
   "admin.config.share.zip-compression-level.description":
     "Dostosuj poziom do równowagi między rozmiarem pliku a szybkością kompresji. Prawidłowe wartości mieszczą się w zakresie od 0 do 9, przy czym 0 to brak kompresji a 9 maksymalną kompresją. ",
