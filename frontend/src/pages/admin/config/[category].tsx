@@ -27,6 +27,7 @@ import TestEmailButton from "../../../components/admin/configuration/TestEmailBu
 import TestRedisButton from "../../../components/admin/configuration/TestRedisButton";
 import CenterLoader from "../../../components/core/CenterLoader";
 import useConfig from "../../../hooks/config.hook";
+import useUiStyle from "../../../hooks/uiStyle.hook";
 import useTranslate from "../../../hooks/useTranslate.hook";
 import configService from "../../../services/config.service";
 import { AdminConfig, UpdateConfig } from "../../../types/config.type";
@@ -49,6 +50,7 @@ const categories = [
 
 export default function AppShellDemo() {
   const theme = useMantineTheme();
+  const { glass } = useUiStyle();
   const router = useRouter();
   const t = useTranslate();
 
@@ -187,8 +189,10 @@ export default function AppShellDemo() {
       <AppShell
         styles={{
           main: {
-            background:
-              theme.colorScheme === "dark"
+            // the glass background has to show through
+            background: glass
+              ? "transparent"
+              : theme.colorScheme === "dark"
                 ? theme.colors.dark[8]
                 : theme.colors.gray[0],
           },
