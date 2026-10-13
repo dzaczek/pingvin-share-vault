@@ -5,14 +5,47 @@
 
   <p align="center">
 
-[![GitHub Release](https://img.shields.io/github/v/release/dzaczek/pingvin-share-x)](https://github.com/dzaczek/pingvin-share-x/releases/latest) [![CI](https://github.com/dzaczek/pingvin-share-x/actions/workflows/ci.yml/badge.svg)](https://github.com/dzaczek/pingvin-share-x/actions/workflows/ci.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/dzaczek/pingvin-share-x)](https://github.com/dzaczek/pingvin-share-x/releases/latest) [![CI](https://github.com/dzaczek/pingvin-share-x/actions/workflows/ci.yml/badge.svg)](https://github.com/dzaczek/pingvin-share-x/actions/workflows/ci.yml) [![Demo](https://github.com/dzaczek/pingvin-share-x/actions/workflows/demo.yml/badge.svg)](https://pingvin-share-x-demo.fly.dev/)
 
   </p>
+
+  <p><b><a href="https://pingvin-share-x-demo.fly.dev/">Try the live demo</a></b></p>
 </div>
 
 A self hosted file sharing platform, an alternative to WeTransfer.
 
 This repository is [dzaczek](https://github.com/dzaczek)'s fork of [smp46/pingvin-share-x](https://github.com/smp46/pingvin-share-x), which is itself a fork of the original [Pingvin Share](https://github.com/stonith404/pingvin-share). It focuses on running the app for an organisation: managing, auditing and cleaning up many shares every day. It is in sync with upstream 2.0.0, see [What this fork adds](#what-this-fork-adds).
+
+## Contents
+
+- [Try the demo](#try-the-demo)
+- [Features](#features)
+- [What this fork adds](#what-this-fork-adds)
+- [Installation](#installation)
+- [Updating](#updating)
+- [Configuration](#configuration)
+- [Security](#security)
+- [Contributing](#contributing)
+- [Translations](#translations) and [Credits](#credits)
+
+## Try the demo
+
+A public demo runs at **https://pingvin-share-x-demo.fly.dev/**, always on the latest `main`.
+
+| Account | Password | What you can do |
+|---|---|---|
+| `demo` | `demo1234` | a normal user with about 60 shares |
+| `demoadmin` | shown in the banner at the top of every page, new at every reset | look around the whole admin panel |
+| none | | share files without an account |
+
+- Everything is reset every 10 minutes, and when the demo wakes up after being idle. Whatever you upload is gone after that.
+- A share can hold at most 1 MB.
+- About 300 shares with lorem ipsum files are already there. A few are protected with the password `demo`.
+- Upload the [EICAR test file](https://www.eicar.org/download-anti-malware-testfile/) to see the virus scan remove a share.
+- The demo runs with `DEMO_MODE=true`, so the admin cannot change settings, the logo, passwords or accounts. With `ANONYMIZE_IP=mask`, logs only show addresses like `203.*.*.57`.
+- The admin page shows the commit the demo was built from, next to the version.
+
+The demo setup itself lives in [dzaczek/pingvin-share-x-demo](https://github.com/dzaczek/pingvin-share-x-demo).
 
 ## Features
 
@@ -35,9 +68,19 @@ This repository is [dzaczek](https://github.com/dzaczek)'s fork of [smp46/pingvi
 - Shows why a share was removed, for example by ClamAV
 - Shows the version and the commit the running image was built from, and offers an update when this fork publishes a newer release
 
+**Audit log**
+- An append only log of logins (including failed ones), uploads, downloads, previews and share views, for users and anonymous visitors
+- Follows one visitor across requests through a browser fingerprint, even without an account
+- Admin page with a live timeline, the trail of one user, visitor or IP, and traffic per shard
+- Passwords and tokens are redacted, entries older than `AUDIT_LOG_RETENTION_DAYS` are deleted every night
+
 **Shares**
 - Optional warning before downloading a share created without an account, with a custom message per language
 - Anonymous shares are locked once uploaded, so nobody holding the link can reopen them or swap the files
+- Download all in one of four ways, chosen by the admin: off, a zip built after upload, a zip built while it downloads (no extra disk space), or every file on its own
+
+**Privacy**
+- `ANONYMIZE_IP` keeps only a shortened (`203.0.113.0`) or masked (`203.*.*.57`) address of every visitor, in every log
 
 **ClamAV**
 - Retries a scan instead of treating a ClamAV error as "file is clean"
@@ -111,7 +154,21 @@ Releases are numbered by date: `2026.10.0` is the first release of October 2026,
 
 Settings live in the admin page under Configuration. You can also set them in a `config.yaml`, see [config.example.yaml](config.example.yaml). Keys left out of the file keep the value set in the admin page.
 
-For details on each setting, OIDC, LDAP, S3 and reverse proxies, see the [upstream documentation](https://smp46.github.io/pingvin-share-x/). Almost all of it applies here. The `docs` folder in this repository is a copy of that site and is not published separately.
+### Environment variables
+
+The ones this fork adds or relies on most. All of them are optional.
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `TRUST_PROXY` | `false` | Set to `true` behind a reverse proxy, otherwise every IP in the logs is the proxy's |
+| `TRUST_PROXY_FROM` | private networks | Addresses of the proxies to trust when `TRUST_PROXY` is on |
+| `ANONYMIZE_IP` | off | `true` keeps a shortened address (`203.0.113.0`), `mask` a masked one (`203.*.*.57`) |
+| `AUDIT_LOG_RETENTION_DAYS` | `90` | Days the audit log is kept, `0` keeps it forever |
+| `SHARD_ID` | `main-node` | Name of this instance in the audit log, when several share one database |
+| `DEMO_MODE` | off | `true` for a public demo: the admin cannot change settings, the logo, passwords or accounts |
+| `BUILD_COMMIT` | none | Commit shown next to the version on the admin page, set at build time |
+
+For the rest, and for details on each setting, OIDC, LDAP, S3 and reverse proxies, see the [upstream documentation](https://smp46.github.io/pingvin-share-x/). Almost all of it applies here. The `docs` folder in this repository is a copy of that site and is not published separately, but it does describe the variables above.
 
 ## Security
 
@@ -155,6 +212,12 @@ npm run dev
 | `npm run test:system` | `backend` | runs the API system tests, as CI does |
 | `npm test` | `frontend` | nothing |
 | `npm run test:release` | root | nothing, checks the release numbering |
+
+### The demo
+
+Every merge to `main` is merged into the `demo` branch and deployed to the [demo](https://pingvin-share-x-demo.fly.dev/) by [demo.yml](.github/workflows/demo.yml). A conflict or a failed build stops the run, and the demo keeps the version before. To try something on the demo before it is in `main`, push it to `demo`.
+
+The demo never builds a release and never touches the published images.
 
 ### Releasing
 
