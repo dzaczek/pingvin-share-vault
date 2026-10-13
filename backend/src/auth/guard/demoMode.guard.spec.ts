@@ -33,6 +33,35 @@ describe("DemoModeGuard", () => {
     demoMode = true;
     expect(() => guard.canActivate()).toThrow(ForbiddenException);
   });
+
+  const saving = (body: unknown) =>
+    ({ switchToHttp: () => ({ getRequest: () => ({ body }) }) }) as any;
+
+  it("lets the look and the download mode be tried in the demo", () => {
+    demoMode = true;
+    expect(
+      guard.canActivate(
+        saving([
+          { key: "appearance.uiStyle", value: "glass" },
+          { key: "share.downloadAll", value: "files" },
+        ]),
+      ),
+    ).toBe(true);
+  });
+
+  it("refuses a save that mixes in anything else", () => {
+    demoMode = true;
+    for (const body of [
+      [
+        { key: "appearance.uiStyle", value: "glass" },
+        { key: "appearance.customCss", value: "body{}" },
+      ],
+      [{ key: "share.maxSize", value: "999999999" }],
+      [],
+      { key: "appearance.uiStyle", value: "glass" },
+    ])
+      expect(() => guard.canActivate(saving(body))).toThrow(ForbiddenException);
+  });
 });
 
 describe("routes closed in the demo", () => {
