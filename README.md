@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/b5bc0c1e-5641-4106-b322-a1b0f5448b0f" width="60"/>
+  <img src="frontend/public/img/logo.svg" width="60" alt="Pingvin Share Vault logo"/>
 
   <h1>Pingvin Share Vault</h1>
 
