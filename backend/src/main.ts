@@ -10,7 +10,9 @@ import { I18nValidationExceptionFilter, I18nValidationPipe } from "nestjs-i18n";
 import { AppModule } from "./app.module";
 import { auditRequestMiddleware } from "./auditLog/auditLog.context";
 import { ConfigService } from "./config/config.service";
+import { anonymizeIpMiddleware } from "./utils/anonymizeIp.util";
 import {
+  ANONYMIZE_IP,
   DATA_DIRECTORY,
   LOG_LEVEL_AVAILABLE,
   LOG_LEVEL_DEFAULT,
@@ -65,6 +67,12 @@ async function bootstrap() {
   app.use(cookieParser());
   app.use(auditRequestMiddleware);
   app.set("trust proxy", process.env.TRUST_PROXY === "true");
+  if (ANONYMIZE_IP) {
+    Logger.log(
+      "ANONYMIZE_IP is set, only shortened visitor addresses are kept",
+    );
+    app.use(anonymizeIpMiddleware);
+  }
 
   await fs.promises.mkdir(`${DATA_DIRECTORY}/uploads/_temp`, {
     recursive: true,
