@@ -203,6 +203,11 @@ export class ShareService {
     return shareTuple;
   }
 
+  // the other download all modes keep no zip on disk
+  private zipsInBackground() {
+    return this.config.get("share.downloadAll") === "zip-prebuilt";
+  }
+
   // Runs in the background, so it must never reject: nothing would catch it
   // and an unhandled rejection stops the whole process.
   async createZip(shareId: string) {
@@ -315,7 +320,8 @@ export class ShareService {
     }
 
     // Asynchronously create a zip of all files
-    if (share.files.length > 1) void this.createZip(id);
+    if (share.files.length > 1 && this.zipsInBackground())
+      void this.createZip(id);
 
     const recipientEmails = share.recipients.map((r) => r.email);
     const matchedUsers =
@@ -477,7 +483,8 @@ export class ShareService {
       throw new NotFoundException(this.i18n.t("share.notFound"));
 
     // a zip that failed or was cut short by a restart gets another go
-    if (!share.isZipReady && share._count.files > 1) void this.createZip(id);
+    if (!share.isZipReady && share._count.files > 1 && this.zipsInBackground())
+      void this.createZip(id);
 
     return share;
   }

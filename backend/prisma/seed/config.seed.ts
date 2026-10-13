@@ -217,6 +217,11 @@ export const configVariables = {
       defaultValue: "1000000000",
       secret: false,
     },
+    downloadAll: {
+      type: "string",
+      defaultValue: "zip-prebuilt",
+      secret: false,
+    },
     zipCompressionLevel: {
       type: "number",
       defaultValue: "9",
