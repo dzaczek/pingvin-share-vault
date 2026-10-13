@@ -14,7 +14,7 @@ import { execFileSync } from "node:child_process";
 import * as fs from "node:fs";
 import { fileURLToPath } from "node:url";
 
-const REPOSITORY = "dzaczek/pingvin-share-x";
+const REPOSITORY = "dzaczek/pingvin-share-vault";
 
 // a four digit year tells this fork's tags apart from upstream's v2.0.0
 const CALENDAR_TAG = /^v(\d{4})\.(\d+)\.(\d+)$/;

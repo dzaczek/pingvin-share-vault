@@ -5,9 +5,9 @@
 #   sh scripts/diagnose-prod.sh <container-name> <host-path-to-data-dir>
 #
 # example:
-#   sh scripts/diagnose-prod.sh pingvin-share-x /srv/pingvin/data
+#   sh scripts/diagnose-prod.sh pingvin-share-vault /srv/pingvin/data
 
-CT="${1:-pingvin-share-x}"
+CT="${1:-pingvin-share-vault}"
 DATA="${2:-./data}"
 # prefer whichever runtime actually answers, not merely whichever is installed
 RUN="$RUNTIME"

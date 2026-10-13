@@ -3,15 +3,15 @@ import type { Config } from "@docusaurus/types";
 import { themes as prismThemes } from "prism-react-renderer";
 
 const config: Config = {
-  title: "Pingvin Share X",
+  title: "Pingvin Share Vault",
   tagline:
-    "Pingvin Share X is a self-hosted file sharing platform and an alternative for WeTransfer.",
+    "Pingvin Share Vault is a self-hosted file sharing platform and an alternative for WeTransfer.",
   favicon: "img/pingvinshare.svg",
 
-  url: "https://smp46.github.io",
-  baseUrl: "/pingvin-share-x/",
-  organizationName: "smp46",
-  projectName: "pingvin-share-x",
+  url: "https://dzaczek.github.io",
+  baseUrl: "/pingvin-share-vault/",
+  organizationName: "dzaczek",
+  projectName: "pingvin-share-vault",
 
   onBrokenLinks: "warn",
   onBrokenMarkdownLinks: "warn",
@@ -28,7 +28,8 @@ const config: Config = {
         docs: {
           routeBasePath: "/",
           sidebarPath: "./sidebars.ts",
-          editUrl: "https://github.com/smp46/pingvin-share-x/edit/main/docs",
+          editUrl:
+            "https://github.com/dzaczek/pingvin-share-vault/edit/main/docs",
           lastVersion: "v1",
           versions: {
             v1: {
@@ -53,7 +54,7 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: "Pingvin Share X",
+      title: "Pingvin Share Vault",
       logo: {
         alt: "Pingvin Share Logo",
         src: "img/pingvinshare.svg",
@@ -64,7 +65,7 @@ const config: Config = {
           position: "right",
         },
         {
-          href: "https://github.com/smp46/pingvin-share-x",
+          href: "https://github.com/dzaczek/pingvin-share-vault",
           label: "GitHub",
           position: "right",
         },

@@ -613,7 +613,7 @@ export default {
   // /admin/config
   "admin.config.config-file-warning.title": "Configuration file present",
   "admin.config.config-file-warning.description":
-    "As you have configured Pingvin Share X with a configuration file, these settings cannot be changed through the UI.",
+    "As you have configured Pingvin Share Vault with a configuration file, these settings cannot be changed through the UI.",
   "admin.config.title": "Configuration",
   "admin.config.category.general": "General",
   "admin.config.category.appearance": "Appearance",
@@ -664,7 +664,7 @@ export default {
     "Percentage and time remaining",
   "admin.config.general.app-url": "App URL",
   "admin.config.general.app-url.description":
-    "URL where Pingvin Share X is available.",
+    "URL where Pingvin Share Vault is available.",
   "admin.config.security.secure-cookies": "Secure cookies",
   "admin.config.security.secure-cookies.description":
     "Whether to set the secure flag on cookies. If enabled, the site will not function when accessed over HTTP.",
@@ -708,7 +708,7 @@ export default {
     "Maximum number of items inside the cache.",
   "admin.config.cache.redis-enabled": "Redis enabled",
   "admin.config.cache.redis-enabled.description":
-    "Pingvin Share X caches data in memory by default. Enable Redis to share the cache across multiple instances.",
+    "Pingvin Share Vault caches data in memory by default. Enable Redis to share the cache across multiple instances.",
   "admin.config.cache.redis-url": "Redis URL",
   "admin.config.cache.redis-url.description":
     "URL of the Redis instance used for caching.",

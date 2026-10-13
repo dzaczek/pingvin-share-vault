@@ -32,8 +32,11 @@ describe("Footer", () => {
     (config) => {
       renderInPolish(config);
       expect(
-        screen.getByRole("link", { name: "Pingvin Share X" }),
-      ).toHaveAttribute("href", "https://github.com/dzaczek/pingvin-share-x");
+        screen.getByRole("link", { name: "Pingvin Share Vault" }),
+      ).toHaveAttribute(
+        "href",
+        "https://github.com/dzaczek/pingvin-share-vault",
+      );
     },
   );
 });
