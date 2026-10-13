@@ -250,6 +250,9 @@ export class FileService {
   }
 
   async getZip(shareId: string): Promise<Readable> {
+    if (!this.configService.get("share.downloadAll").startsWith("zip-"))
+      throw new NotFoundException();
+
     const share = await this.prisma.share.findFirst({
       where: { id: shareId },
       select: { storageProvider: true },

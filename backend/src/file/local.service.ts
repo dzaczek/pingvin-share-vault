@@ -6,6 +6,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from "@nestjs/common";
+import * as archiver from "archiver";
 import * as crypto from "crypto";
 import { createReadStream } from "fs";
 import * as fs from "fs/promises";
@@ -252,6 +253,29 @@ export class LocalFileService {
   }
 
   async getZip(shareId: string): Promise<Readable> {
+    if (this.config.get("share.downloadAll") === "zip-on-the-fly") {
+      const files = await this.prisma.file.findMany({ where: { shareId } });
+      const paths = files.map((file) => this.getSafeFilePath(shareId, file.id));
+
+      // checked before anything is sent: once the download runs, nest answers
+      // a failed stream with the error itself, which names the path on disk
+      await Promise.all(paths.map((path) => fs.access(path))).catch(() => {
+        throw new NotFoundException(this.i18n.t("file.notFound"));
+      });
+
+      const archive = archiver("zip", {
+        zlib: { level: this.config.get("share.zipCompressionLevel") },
+      });
+      // a missing file is only a warning to archiver, the download would then
+      // look fine and be a zip without it
+      archive.on("warning", () =>
+        archive.destroy(new Error("A file of the share could not be read")),
+      );
+      files.forEach((file, i) => archive.file(paths[i], { name: file.name }));
+      archive.finalize().catch(() => undefined);
+      return archive;
+    }
+
     return new Promise((resolve, reject) => {
       const zipStream = createReadStream(
         `${SHARE_DIRECTORY}/${shareId}/archive.zip`,

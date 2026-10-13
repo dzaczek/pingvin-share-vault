@@ -246,6 +246,17 @@ export class ConfigService extends EventEmitter {
         ),
       },
       {
+        key: "share.downloadAll",
+        condition: (value: string | number | boolean) =>
+          ["disabled", "zip-prebuilt", "zip-on-the-fly", "files"].includes(
+            `${value}`,
+          ),
+        message: this.t(
+          "config.downloadAllValidation",
+          "Download all must be one of disabled, zip-prebuilt, zip-on-the-fly or files",
+        ),
+      },
+      {
         key: "share.zipCompressionLevel",
         condition: (value: number) => value >= 0 && value <= 9,
         message: this.t(

@@ -166,6 +166,12 @@ export function getDefaultConfig(): Config[] {
       type: "timespan",
     },
     {
+      key: "share.downloadAll",
+      value: "zip-prebuilt",
+      defaultValue: "zip-prebuilt",
+      type: "string",
+    },
+    {
       key: "share.enableShareEmailRecipients",
       value: "false",
       defaultValue: "false",
