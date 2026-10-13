@@ -15,6 +15,7 @@ import { Readable } from "stream";
 import { PrismaService } from "../prisma/prisma.service";
 import { EmailService } from "src/email/email.service";
 import { I18nService } from "nestjs-i18n";
+import { AuditLogService } from "src/auditLog/auditLog.service";
 
 const UPDATED_AT_THROTTLE_MS = 5 * 60 * 1000;
 const DOWNLOAD_NOTIFICATION_COOLDOWN_MS = 15 * 60 * 1000;
@@ -30,6 +31,7 @@ export class FileService {
     private emailService: EmailService,
     private readonly i18n: I18nService,
     @Inject(CACHE_MANAGER) private cache: Cache,
+    private auditLog: AuditLogService,
   ) {}
   private readonly logger = new Logger(FileService.name);
 
@@ -58,7 +60,35 @@ export class FileService {
   ) {
     await this.touchShare(shareId);
     const storageService = this.getStorageService();
-    return storageService.create(data, chunk, file, shareId);
+    const created = await storageService.create(data, chunk, file, shareId);
+    if (chunk.index == chunk.total - 1)
+      void this.auditUpload(shareId, created.id);
+    return created;
+  }
+
+  // read back from the database, that is where the final size is. Never
+  // awaited by the upload, a failed lookup must not fail it.
+  private async auditUpload(shareId: string, fileId: string) {
+    const file = await this.prisma.file
+      .findUnique({
+        where: { id: fileId },
+        select: {
+          name: true,
+          size: true,
+          share: { select: { storageProvider: true } },
+        },
+      })
+      .catch(() => null);
+    if (!file) return;
+    this.auditLog.log("FILE_UPLOAD", {
+      resourceId: fileId,
+      resourceName: file.name,
+      metadata: {
+        shareId,
+        size: parseInt(file.size, 10),
+        storage: file.share.storageProvider,
+      },
+    });
   }
 
   private async touchShare(shareId: string) {
@@ -114,13 +144,15 @@ export class FileService {
     if (share?.storageProvider !== "S3") {
       throw new BadRequestException(this.i18n.t("file.s3NotSupported"));
     }
-    return this.s3FileService.completePreSignedUpload(
+    const completed = await this.s3FileService.completePreSignedUpload(
       shareId,
       fileId,
       fileName,
       uploadId,
       parts,
     );
+    void this.auditUpload(shareId, completed.id);
+    return completed;
   }
 
   async abortPreSignedUpload(

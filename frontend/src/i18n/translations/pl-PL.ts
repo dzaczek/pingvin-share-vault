@@ -262,6 +262,7 @@ export default {
   "admin.button.users": "Zarządzanie użytkownikami",
   "admin.button.shares": "Zarządzanie udostępnieniami",
   "admin.button.config": "Konfiguracja",
+  "admin.button.auditLogs": "Dziennik zdarzeń",
   "admin.version": "Wersja",
   // END /admin
 
@@ -323,6 +324,29 @@ export default {
   "admin.users.modal.create.admin.description":
     "Jeśli zaznaczone, użytkownik będzie miał dostęp do panelu administratora.",
   // END /admin/users
+
+  // /admin/auditLogs
+  "admin.auditLogs.title": "Dziennik zdarzeń",
+  "admin.auditLogs.tab.timeline": "Oś czasu",
+  "admin.auditLogs.tab.identity": "Użytkownik, odwiedzający lub IP",
+  "admin.auditLogs.tab.shards": "Shardy",
+  "admin.auditLogs.filter.action": "Wszystkie akcje",
+  "admin.auditLogs.filter.identity": "ID użytkownika, ID odwiedzającego lub adres IP",
+  "admin.auditLogs.live": "Na żywo",
+  "admin.auditLogs.loadMore": "Wczytaj więcej",
+  "admin.auditLogs.empty": "Brak wpisów",
+  "admin.auditLogs.table.time": "Czas",
+  "admin.auditLogs.table.action": "Akcja",
+  "admin.auditLogs.table.user": "Użytkownik",
+  "admin.auditLogs.table.visitor": "Odwiedzający",
+  "admin.auditLogs.table.ip": "IP",
+  "admin.auditLogs.table.resource": "Zasób",
+  "admin.auditLogs.table.details": "Szczegóły",
+  "admin.auditLogs.shards.storage": "Magazyn",
+  "admin.auditLogs.shards.count": "Zdarzenia",
+  "admin.auditLogs.shards.bytes": "Dane",
+  "admin.auditLogs.shards.lastSeen": "Ostatnie zdarzenie",
+  // END /admin/auditLogs
 
   // /admin/shares
   "admin.shares.title": "Zarządzanie udostępnieniami",

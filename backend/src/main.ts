@@ -8,6 +8,7 @@ import { NextFunction, Request, Response } from "express";
 import * as fs from "fs";
 import { I18nValidationExceptionFilter, I18nValidationPipe } from "nestjs-i18n";
 import { AppModule } from "./app.module";
+import { auditRequestMiddleware } from "./auditLog/auditLog.context";
 import { ConfigService } from "./config/config.service";
 import {
   DATA_DIRECTORY,
@@ -62,6 +63,7 @@ async function bootstrap() {
   });
 
   app.use(cookieParser());
+  app.use(auditRequestMiddleware);
   app.set("trust proxy", process.env.TRUST_PROXY === "true");
 
   await fs.promises.mkdir(`${DATA_DIRECTORY}/uploads/_temp`, {
