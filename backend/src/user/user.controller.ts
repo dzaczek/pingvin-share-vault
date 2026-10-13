@@ -21,6 +21,7 @@ import { UpdateOwnUserDTO } from "./dto/updateOwnUser.dto";
 import { UpdateUserDto } from "./dto/updateUser.dto";
 import { UserDTO } from "./dto/user.dto";
 import { UserSevice } from "./user.service";
+import { DemoModeGuard } from "../auth/guard/demoMode.guard";
 
 @Controller("users")
 export class UserController {
@@ -40,7 +41,7 @@ export class UserController {
   }
 
   @Patch("me")
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, DemoModeGuard)
   async updateCurrentUser(
     @GetUser() user: User,
     @Body() data: UpdateOwnUserDTO,
@@ -50,7 +51,7 @@ export class UserController {
 
   @Delete("me")
   @HttpCode(204)
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, DemoModeGuard)
   async deleteCurrentUser(
     @GetUser() user: User,
     @Res({ passthrough: true }) response: Response,
@@ -85,13 +86,13 @@ export class UserController {
   }
 
   @Patch(":id")
-  @UseGuards(JwtGuard, AdministratorGuard)
+  @UseGuards(JwtGuard, AdministratorGuard, DemoModeGuard)
   async update(@Param("id") id: string, @Body() user: UpdateUserDto) {
     return new UserDTO().from(await this.userService.update(id, user));
   }
 
   @Delete(":id")
-  @UseGuards(JwtGuard, AdministratorGuard)
+  @UseGuards(JwtGuard, AdministratorGuard, DemoModeGuard)
   async delete(@Param("id") id: string) {
     return new UserDTO().from(await this.userService.delete(id));
   }

@@ -26,6 +26,7 @@ import { ConfigDTO } from "./dto/config.dto";
 import { TestEmailDTO } from "./dto/testEmail.dto";
 import UpdateConfigDTO from "./dto/updateConfig.dto";
 import { LogoService } from "./logo.service";
+import { DemoModeGuard } from "../auth/guard/demoMode.guard";
 
 @Controller("configs")
 export class ConfigController {
@@ -51,7 +52,7 @@ export class ConfigController {
   }
 
   @Patch("admin")
-  @UseGuards(JwtGuard, AdministratorGuard)
+  @UseGuards(JwtGuard, AdministratorGuard, DemoModeGuard)
   async updateMany(@Body() data: UpdateConfigDTO[]) {
     return new AdminConfigDTO().fromList(
       await this.configService.updateMany(data),
@@ -59,13 +60,13 @@ export class ConfigController {
   }
 
   @Post("admin/testEmail")
-  @UseGuards(JwtGuard, AdministratorGuard)
+  @UseGuards(JwtGuard, AdministratorGuard, DemoModeGuard)
   async testEmail(@Body() { email }: TestEmailDTO) {
     await this.emailService.sendTestMail(email);
   }
 
   @Post("admin/testRedis")
-  @UseGuards(JwtGuard, AdministratorGuard)
+  @UseGuards(JwtGuard, AdministratorGuard, DemoModeGuard)
   async testRedis() {
     const redisUrl = this.configService.get("cache.redis-url");
     const enabled = this.configService.get("cache.redis-enabled");
@@ -141,7 +142,7 @@ export class ConfigController {
 
   @Post("admin/logo")
   @UseInterceptors(FileInterceptor("file"))
-  @UseGuards(JwtGuard, AdministratorGuard)
+  @UseGuards(JwtGuard, AdministratorGuard, DemoModeGuard)
   async uploadLogo(
     @UploadedFile(
       new ParseFilePipe({
@@ -155,7 +156,7 @@ export class ConfigController {
 
   @Post("admin/logoDark")
   @UseInterceptors(FileInterceptor("file"))
-  @UseGuards(JwtGuard, AdministratorGuard)
+  @UseGuards(JwtGuard, AdministratorGuard, DemoModeGuard)
   async uploadDarkLogo(
     @UploadedFile(
       new ParseFilePipe({
