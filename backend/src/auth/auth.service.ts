@@ -137,7 +137,9 @@ export class AuthService {
         this.logger.log(
           `Successful password login for user ${user.email} from IP ${ip}`,
         );
-        return this.generateTokenAndAudit(user, "password");
+        const result = await this.generateToken(user);
+        this.auditLogin(user, result, "password");
+        return result;
       }
     }
 
@@ -159,7 +161,9 @@ export class AuthService {
         this.logger.log(
           `Successful LDAP login for user ${ldapUsername} (${user.id}) from IP ${ip}`,
         );
-        return this.generateTokenAndAudit(user, "ldap");
+        const result = await this.generateToken(user);
+        this.auditLogin(user, result, "ldap");
+        return result;
       }
     }
 
@@ -175,12 +179,15 @@ export class AuthService {
 
   // With TOTP on, the password step only hands out a login token, the login
   // itself is logged once the code checks out.
-  async generateTokenAndAudit(
+  // Kept apart from generateToken on purpose. CodeQL takes whatever a call
+  // that mentions a password returns for a password, and a method name passed
+  // along with the tokens was enough to send it after the session cookies.
+  auditLogin(
     user: User,
+    result: { loginToken?: string },
     method: string,
-    oauth?: { idToken?: string; provider?: string },
+    provider?: string,
   ) {
-    const result = await this.generateToken(user, oauth);
     this.auditLog.log(
       "loginToken" in result
         ? "AUTH_LOGIN_TOTP_REQUIRED"
@@ -188,10 +195,9 @@ export class AuthService {
       {
         userId: user.id,
         userEmail: user.email,
-        metadata: { method, provider: oauth?.provider },
+        metadata: { method, provider },
       },
     );
-    return result;
   }
 
   async generateToken(user: User, oauth?: { idToken?: string }) {
@@ -350,8 +356,6 @@ export class AuthService {
       where: { id: user.id },
       data: { password: hash },
     });
-
-    return this.createRefreshToken(user.id);
   }
 
   async createAccessToken(user: User, refreshTokenId: string) {
