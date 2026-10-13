@@ -13,6 +13,7 @@ import * as argon from "argon2";
 import { Request, Response } from "express";
 import * as moment from "moment";
 import { I18nService } from "nestjs-i18n";
+import { AuditLogService } from "src/auditLog/auditLog.service";
 import { ConfigService } from "src/config/config.service";
 import { EmailService } from "src/email/email.service";
 import { duplicatedField } from "src/prisma/prismaError";
@@ -35,6 +36,7 @@ export class AuthService {
     private userService: UserSevice,
     @Inject(forwardRef(() => OAuthService)) private oAuthService: OAuthService,
     private readonly i18n: I18nService,
+    private auditLog: AuditLogService,
   ) {}
   private readonly logger = new Logger(AuthService.name);
 
@@ -123,6 +125,11 @@ export class AuthService {
 
       if (user?.password && (await argon.verify(user.password, dto.password))) {
         if (!user.isActivated) {
+          this.auditLog.log("AUTH_LOGIN_FAILED", {
+            userId: user.id,
+            userEmail: user.email,
+            metadata: { method: "password", reason: "account_not_activated" },
+          });
           throw new UnauthorizedException(
             this.i18n.t("auth.accountNotActivated"),
           );
@@ -130,7 +137,7 @@ export class AuthService {
         this.logger.log(
           `Successful password login for user ${user.email} from IP ${ip}`,
         );
-        return this.generateToken(user);
+        return this.generateTokenAndAudit(user, "password");
       }
     }
 
@@ -152,14 +159,39 @@ export class AuthService {
         this.logger.log(
           `Successful LDAP login for user ${ldapUsername} (${user.id}) from IP ${ip}`,
         );
-        return this.generateToken(user);
+        return this.generateTokenAndAudit(user, "ldap");
       }
     }
 
     this.logger.log(
       `Failed login attempt for user ${dto.email || dto.username} from IP ${ip}`,
     );
+    this.auditLog.log("AUTH_LOGIN_FAILED", {
+      userEmail: dto.email || dto.username,
+      metadata: { reason: "wrong_credentials" },
+    });
     throw new UnauthorizedException(this.i18n.t("auth.wrongCredentials"));
+  }
+
+  // With TOTP on, the password step only hands out a login token, the login
+  // itself is logged once the code checks out.
+  async generateTokenAndAudit(
+    user: User,
+    method: string,
+    oauth?: { idToken?: string; provider?: string },
+  ) {
+    const result = await this.generateToken(user, oauth);
+    this.auditLog.log(
+      "loginToken" in result
+        ? "AUTH_LOGIN_TOTP_REQUIRED"
+        : "AUTH_LOGIN_SUCCESS",
+      {
+        userId: user.id,
+        userEmail: user.email,
+        metadata: { method, provider: oauth?.provider },
+      },
+    );
+    return result;
   }
 
   async generateToken(user: User, oauth?: { idToken?: string }) {

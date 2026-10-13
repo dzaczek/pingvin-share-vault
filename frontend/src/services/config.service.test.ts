@@ -2,6 +2,9 @@ import axios from "axios";
 import configService from "./config.service";
 
 jest.mock("axios");
+// the whole of axios is mocked, so axios.create has nothing to give the api
+// client and its interceptor setup would fail on import
+jest.mock("./api.service", () => ({ __esModule: true, default: {} }));
 
 // The admin page offers an update when this repository has a newer release.
 // Versions are calendar based (year.month.n), the original project still

@@ -8,6 +8,7 @@
   "editNotAllowed": "You are only allowed to update config variables via the config.yaml file",
   "invalidType": "Config variable must be of type {type}",
   "shareIdLengthValidation": "Share ID length must be between 2 and 50",
+  "downloadAllValidation": "Download all must be one of disabled, zip-prebuilt, zip-on-the-fly or files",
   "zipCompressionLevelValidation": "Zip compression level must be between 0 and 9",
   "disabledInDemo": "This is disabled in the demo"
 }

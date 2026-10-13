@@ -175,7 +175,7 @@ describe("createZip", () => {
     }
   });
 
-  it("is started again when a share is opened without its zip", async () => {
+  const openWithoutZip = (downloadAll: string) => {
     const service = construct(
       {
         share: {
@@ -187,16 +187,33 @@ describe("createZip", () => {
           }),
         },
       },
-      { get: () => false },
+      { get: (key: string) => key === "share.downloadAll" && downloadAll },
     );
     const createZip = jest
       .spyOn(service, "createZip")
       .mockResolvedValue(undefined);
+    return { service, createZip };
+  };
+
+  it("is started again when a share is opened without its zip", async () => {
+    const { service, createZip } = openWithoutZip("zip-prebuilt");
 
     await service.getMetaData(SHARE_ID);
 
     expect(createZip).toHaveBeenCalledWith(SHARE_ID);
   });
+
+  // only the prebuilt mode keeps a zip on disk, the others must not fill it
+  it.each(["disabled", "zip-on-the-fly", "files"])(
+    "is not built when download all is %s",
+    async (mode) => {
+      const { service, createZip } = openWithoutZip(mode);
+
+      await service.getMetaData(SHARE_ID);
+
+      expect(createZip).not.toHaveBeenCalled();
+    },
+  );
 
   // an S3 share is zipped on the fly while it downloads, so there is nothing
   // to build and the download all button must not wait for it

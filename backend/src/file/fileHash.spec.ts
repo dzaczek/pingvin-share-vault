@@ -16,7 +16,7 @@ import { FileService } from "./file.service";
 // reads is the admin guard, so it is tested directly.
 
 // computeSha256 reaches prisma, the local service and the cache, which are
-// the first, second and seventh of seven constructor arguments
+// the first, second and seventh of eight constructor arguments
 const construct = (prisma: unknown, local: unknown, cache: unknown) => {
   const unused = {} as any;
   return new FileService(
@@ -27,6 +27,7 @@ const construct = (prisma: unknown, local: unknown, cache: unknown) => {
     unused,
     { t: (key: string) => key } as any,
     cache as any,
+    unused,
   );
 };
 

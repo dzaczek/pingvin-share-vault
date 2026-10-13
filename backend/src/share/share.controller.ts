@@ -18,6 +18,7 @@ import { Share, ShareSecurity, User } from "@prisma/client";
 import { Request, Response } from "express";
 import * as moment from "moment";
 import { GetUser } from "src/auth/decorator/getUser.decorator";
+import { AuditLogService } from "src/auditLog/auditLog.service";
 import { AdministratorGuard } from "src/auth/guard/isAdmin.guard";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { ConfigService } from "src/config/config.service";
@@ -45,6 +46,7 @@ export class ShareController {
     private shareService: ShareService,
     private jwtService: JwtService,
     private config: ConfigService,
+    private auditLog: AuditLogService,
   ) {}
 
   @Get("all")
@@ -99,7 +101,13 @@ export class ShareController {
   @Get(":id")
   @UseGuards(IdValidation, ShareSecurityGuard)
   async get(@Param("id") id: string) {
-    return new ShareDTO().from(await this.shareService.get(id));
+    const share = await this.shareService.get(id);
+    this.auditLog.log("SHARE_VIEW", {
+      resourceId: id,
+      resourceName: share.name ?? id,
+      metadata: { files: share.files?.length },
+    });
+    return new ShareDTO().from(share);
   }
 
   @Get(":id/from-owner")
