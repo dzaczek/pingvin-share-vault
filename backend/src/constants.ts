@@ -17,9 +17,9 @@ export const CLAMAV_PORT = parseInt(process.env.CLAMAV_PORT) || 3310;
 // this on a reachable instance, it is what stops password guessing.
 export const RATE_LIMIT_DISABLED = process.env.DISABLE_RATE_LIMIT === "true";
 
-// keeps only a shortened address of every visitor, for a public demo or any
-// instance that should not store full IPs
-export const ANONYMIZE_IP = process.env.ANONYMIZE_IP === "true";
+// "true" keeps only a shortened address of every visitor, "mask" only its
+// first and last part, for addresses shown in public like in a demo
+export const ANONYMIZE_IP = process.env.ANONYMIZE_IP;
 
 // for a public demo whose admin account anyone may use: settings, the logo,
 // passwords and accounts cannot be changed

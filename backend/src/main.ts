@@ -67,11 +67,10 @@ async function bootstrap() {
   app.use(cookieParser());
   app.use(auditRequestMiddleware);
   app.set("trust proxy", process.env.TRUST_PROXY === "true");
-  if (ANONYMIZE_IP) {
-    Logger.log(
-      "ANONYMIZE_IP is set, only shortened visitor addresses are kept",
-    );
-    app.use(anonymizeIpMiddleware);
+  const anonymize = anonymizeIpMiddleware(ANONYMIZE_IP);
+  if (anonymize) {
+    Logger.log(`ANONYMIZE_IP=${ANONYMIZE_IP}, no full visitor address is kept`);
+    app.use(anonymize);
   }
 
   await fs.promises.mkdir(`${DATA_DIRECTORY}/uploads/_temp`, {
