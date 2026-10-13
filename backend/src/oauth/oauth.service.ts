@@ -1,6 +1,7 @@
 import { forwardRef, Inject, Injectable, Logger } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { nanoid } from "nanoid";
+import { AuditLogService } from "../auditLog/auditLog.service";
 import { AuthService } from "../auth/auth.service";
 import { ConfigService } from "../config/config.service";
 import { PrismaService } from "../prisma/prisma.service";
@@ -17,6 +18,7 @@ export class OAuthService {
     @Inject("OAUTH_PLATFORMS") private platforms: string[],
     @Inject("OAUTH_PROVIDERS")
     private oAuthProviders: Record<string, OAuthProvider<unknown>>,
+    private auditLog: AuditLogService,
   ) {}
   private readonly logger = new Logger(OAuthService.name);
 
@@ -70,7 +72,10 @@ export class OAuthService {
         },
       });
       this.logger.log(`Successful login for user ${user.email} from IP ${ip}`);
-      return this.auth.generateToken(updatedUser, { idToken: user.idToken });
+      return this.auth.generateTokenAndAudit(updatedUser, "oauth", {
+        idToken: user.idToken,
+        provider: user.provider,
+      });
     }
 
     return this.signUp(user, ip);
@@ -185,6 +190,12 @@ export class OAuthService {
         providerUsername: user.providerUsername,
         userId: result.user.id,
       },
+    });
+
+    this.auditLog.log("AUTH_LOGIN_SUCCESS", {
+      userId: result.user.id,
+      userEmail: result.user.email,
+      metadata: { method: "oauth", provider: user.provider, signUp: true },
     });
 
     return result;

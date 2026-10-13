@@ -33,6 +33,7 @@ import { CurrentUser } from "../types/user.type";
 import { emotionCache } from "../utils/emotionCache";
 import i18nUtil from "../utils/i18n.util";
 import userPreferences from "../utils/userPreferences.util";
+import { getVisitorId } from "../utils/visitorId.util";
 import Footer from "../components/footer/Footer";
 import { getDefaultConfig } from "../utils/defaultConfig.util";
 import AdminNoticeModal, {
@@ -225,6 +226,10 @@ function App({ Component, pageProps }: AppProps) {
   // a deploy swaps every chunk hash, so a tab left open has to fetch itself
   // again once the new worker takes over
   useEffect(() => watchForNewServiceWorker(), []);
+
+  // sets the visitor cookie before anything is downloaded, a download link
+  // is not an api call and would otherwise go out without it
+  useEffect(() => void getVisitorId(), []);
 
   useEffect(() => {
     if (!pageProps.language) return;

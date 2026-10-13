@@ -166,6 +166,30 @@ const downloadFile = async (
   window.location.href = `${window.location.origin}/api/shares/${shareId}/files/${fileId}${recipientQuery}`;
 };
 
+// Every file of a share, each as its own download. Moving window.location
+// again would cancel the download before it, so each one gets a hidden iframe,
+// spaced out so the browser does not drop them. It asks once whether the site
+// may download several files.
+const downloadFiles = (
+  shareId: string,
+  fileIds: string[],
+  recipientId?: string,
+) => {
+  const recipientQuery = recipientId
+    ? `&recipient=${encodeURIComponent(recipientId)}`
+    : "";
+  fileIds.forEach((fileId, i) =>
+    setTimeout(() => {
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = `${window.location.origin}/api/shares/${shareId}/files/${fileId}?download=true${recipientQuery}`;
+      document.body.appendChild(iframe);
+      // long enough for the download to have started, it carries on without it
+      setTimeout(() => iframe.remove(), 60_000);
+    }, i * 1000),
+  );
+};
+
 const removeFile = async (shareId: string, fileId: string) => {
   if (!isValidId(shareId)) throw new Error("Invalid Share ID");
   await api.delete(`shares/${shareId}/files/${fileId}`);
@@ -471,6 +495,7 @@ export default {
   isShareIdAvailable,
   isReverseShareTokenAvailable,
   downloadFile,
+  downloadFiles,
   removeFile,
   uploadFile,
   setReverseShare,
