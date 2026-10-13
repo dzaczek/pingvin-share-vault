@@ -1,8 +1,8 @@
 name: Demo
 
 # Every merge to main also lands on the demo branch, and the demo branch is
-# deployed to https://pingvin-share-x-demo.fly.dev with the demo layer from
-# dzaczek/pingvin-share-x-demo. A push straight to demo deploys it as well,
+# deployed to https://pingvin-share-vault-demo.fly.dev with the demo layer from
+# dzaczek/pingvin-share-vault-demo. A push straight to demo deploys it as well,
 # for trying something on the demo before it is in main.
 
 on:
@@ -50,18 +50,18 @@ jobs:
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          repository: dzaczek/pingvin-share-x-demo
+          repository: dzaczek/pingvin-share-vault-demo
           path: demo
 
       - name: Build
         run: |
-          echo "IMAGE=registry.fly.io/pingvin-share-x-demo:$(git -C app rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "IMAGE=registry.fly.io/pingvin-share-vault-demo:$(git -C app rev-parse HEAD)" >> "$GITHUB_ENV"
           # the admin page shows the commit next to the version
           docker build --build-arg BUILD_COMMIT="$(git -C app rev-parse HEAD)" \
-            -t pingvin-share-x-demo-base app
+            -t pingvin-share-vault-demo-base app
           # builds the demo data too, a seed that fails stops the deploy
-          docker build --build-arg BASE_IMAGE=pingvin-share-x-demo-base \
-            -t "registry.fly.io/pingvin-share-x-demo:$(git -C app rev-parse HEAD)" demo
+          docker build --build-arg BASE_IMAGE=pingvin-share-vault-demo-base \
+            -t "registry.fly.io/pingvin-share-vault-demo:$(git -C app rev-parse HEAD)" demo
 
       - uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # master
 

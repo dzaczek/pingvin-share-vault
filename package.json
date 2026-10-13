@@ -1,13 +1,13 @@
 {
-  "name": "pingvin-share-x",
+  "name": "pingvin-share-vault",
   "version": "2026.10.2",
-  "repository": "github:dzaczek/pingvin-share-x",
+  "repository": "github:dzaczek/pingvin-share-vault",
   "scripts": {
     "format": "cd frontend && npm run format && cd ../backend && npm run format",
     "lint": "cd frontend && npm run lint && cd ../backend && npm run lint",
     "release": "node scripts/release.mjs",
     "test:release": "node --test scripts/release.test.mjs",
-    "deploy:dev": "docker buildx build --push --tag smp46/pingvin-share-x:development --platform linux/amd64,linux/arm64 ."
+    "deploy:dev": "docker buildx build --push --tag ghcr.io/dzaczek/pingvin-share-vault:development --platform linux/amd64,linux/arm64 ."
   },
   "prettier": {
     "singleQuote": false,

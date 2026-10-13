@@ -1,7 +1,7 @@
 #!/bin/sh
 # Builds a tagged image and stamps it with the commit it came from.
 #
-#   scripts/build.sh 32          -> pingvin-share-x:v32
+#   scripts/build.sh 32          -> pingvin-share-vault:v32
 #
 # The stamp is the reason this exists rather than a bare build command. A build
 # argument has to be passed with --build-arg: setting BUILD_COMMIT in the
@@ -19,7 +19,7 @@ if [ -z "$VERSION" ]; then
 fi
 
 REPO_ROOT=$(cd "$(dirname "$0")/.." && pwd)
-TAG="pingvin-share-x:v${VERSION}"
+TAG="pingvin-share-vault:v${VERSION}"
 
 RUN="${RUNTIME:-}"
 if [ -z "$RUN" ]; then

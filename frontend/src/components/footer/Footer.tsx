@@ -34,7 +34,7 @@ const Footer = () => {
             href={REPOSITORY_URL}
             target="_blank"
           >
-            Pingvin Share X
+            Pingvin Share Vault
           </Anchor>
         </Text>
       )}
@@ -48,7 +48,7 @@ const Footer = () => {
               href={REPOSITORY_URL}
               target="_blank"
             >
-              Pingvin Share X
+              Pingvin Share Vault
             </Anchor>
           </Text>
           <div>
