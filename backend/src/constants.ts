@@ -21,6 +21,10 @@ export const RATE_LIMIT_DISABLED = process.env.DISABLE_RATE_LIMIT === "true";
 // instance that should not store full IPs
 export const ANONYMIZE_IP = process.env.ANONYMIZE_IP === "true";
 
+// for a public demo whose admin account anyone may use: settings, the logo,
+// passwords and accounts cannot be changed
+export const DEMO_MODE = process.env.DEMO_MODE === "true";
+
 export const LOG_LEVEL_AVAILABLE: LogLevel[] = ['verbose', 'debug', 'log', 'warn', 'error', 'fatal'];
 export const LOG_LEVEL_DEFAULT: LogLevel = process.env.NODE_ENV === 'development' ? "verbose" : "log";
 export const LOG_LEVEL_ENV = `${process.env.PV_LOG_LEVEL || ""}`;

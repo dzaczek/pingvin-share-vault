@@ -30,6 +30,7 @@ import { TokenDTO } from "./dto/token.dto";
 import { UpdatePasswordDTO } from "./dto/updatePassword.dto";
 import { VerifyTotpDTO } from "./dto/verifyTotp.dto";
 import { JwtGuard } from "./guard/jwt.guard";
+import { DemoModeGuard } from "./guard/demoMode.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -164,7 +165,7 @@ export class AuthController {
   }
 
   @Patch("password")
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, DemoModeGuard)
   async updatePassword(
     @GetUser() user: User,
     @Res({ passthrough: true }) response: Response,
