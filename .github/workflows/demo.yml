@@ -56,7 +56,9 @@ jobs:
       - name: Build
         run: |
           echo "IMAGE=registry.fly.io/pingvin-share-x-demo:$(git -C app rev-parse HEAD)" >> "$GITHUB_ENV"
-          docker build -t pingvin-share-x-demo-base app
+          # the admin page shows the commit next to the version
+          docker build --build-arg BUILD_COMMIT="$(git -C app rev-parse HEAD)" \
+            -t pingvin-share-x-demo-base app
           # builds the demo data too, a seed that fails stops the deploy
           docker build --build-arg BASE_IMAGE=pingvin-share-x-demo-base \
             -t "registry.fly.io/pingvin-share-x-demo:$(git -C app rev-parse HEAD)" demo
