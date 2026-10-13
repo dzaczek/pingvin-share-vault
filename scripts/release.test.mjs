@@ -59,25 +59,25 @@ test("writes a section with breaking changes, features and fixes", () => {
     previous: "v2026.10.0",
     date: new Date(2026, 9, 11),
     commits,
-    repository: "dzaczek/pingvin-share-x",
+    repository: "dzaczek/pingvin-share-vault",
   });
   assert.equal(
     text,
-    `## [2026.10.1](https://github.com/dzaczek/pingvin-share-x/compare/v2026.10.0...v2026.10.1) (2026-10-11)
+    `## [2026.10.1](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.0...v2026.10.1) (2026-10-11)
 
 ### ⚠ BREAKING CHANGES
 
-* number releases by date ([eeeeeee](https://github.com/dzaczek/pingvin-share-x/commit/eeeeeee5555))
+* number releases by date ([eeeeeee](https://github.com/dzaczek/pingvin-share-vault/commit/eeeeeee5555))
 
 ### Features
 
-* **user:** add an optional display name ([bbbbbbb](https://github.com/dzaczek/pingvin-share-x/commit/bbbbbbb2222))
-* number releases by date ([eeeeeee](https://github.com/dzaczek/pingvin-share-x/commit/eeeeeee5555))
+* **user:** add an optional display name ([bbbbbbb](https://github.com/dzaczek/pingvin-share-vault/commit/bbbbbbb2222))
+* number releases by date ([eeeeeee](https://github.com/dzaczek/pingvin-share-vault/commit/eeeeeee5555))
 
 ### Bug Fixes
 
-* **deps:** close the critical alerts ([aaaaaaa](https://github.com/dzaczek/pingvin-share-x/commit/aaaaaaa1111))
-* plain fix without scope ([fffffff](https://github.com/dzaczek/pingvin-share-x/commit/fffffff6666))
+* **deps:** close the critical alerts ([aaaaaaa](https://github.com/dzaczek/pingvin-share-vault/commit/aaaaaaa1111))
+* plain fix without scope ([fffffff](https://github.com/dzaczek/pingvin-share-vault/commit/fffffff6666))
 `,
   );
 });
@@ -88,7 +88,7 @@ test("says so when a release has nothing to list", () => {
     previous: "v2026.10.1",
     date: new Date(2026, 9, 11),
     commits: [{ hash: "ccccccc3333", subject: "chore: tidy up" }],
-    repository: "dzaczek/pingvin-share-x",
+    repository: "dzaczek/pingvin-share-vault",
   });
   assert.match(text, /Maintenance only/);
 });

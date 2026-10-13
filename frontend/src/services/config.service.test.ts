@@ -23,7 +23,7 @@ describe("isNewReleaseAvailable", () => {
     latestRelease("v2026.10.0");
     await configService.isNewReleaseAvailable();
     expect(axios.get).toHaveBeenCalledWith(
-      "https://api.github.com/repos/dzaczek/pingvin-share-x/releases/latest",
+      "https://api.github.com/repos/dzaczek/pingvin-share-vault/releases/latest",
     );
   });
 

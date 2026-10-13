@@ -6,7 +6,7 @@ id: configuration
 
 ## General configuration
 
-There are plenty of settings you can adjust to your needs. Pingvin Share X can be configured in two ways:
+There are plenty of settings you can adjust to your needs. Pingvin Share Vault can be configured in two ways:
 
 ### UI
 
@@ -16,9 +16,9 @@ You can change the settings in the UI (`/admin/config`)
 
 You can set the configuration via a YAML file. If you choose this way, you won't be able to change the settings in the UI.
 
-If you use Docker you can create a `config.yml` file based on the [`config.example.yaml`](https://github.com/smp46/pingvin-share-x/blob/main/config.example.yaml) and mount it to `/opt/app/config.yaml` in the container.
+If you use Docker you can create a `config.yml` file based on the [`config.example.yaml`](https://github.com/dzaczek/pingvin-share-vault/blob/main/config.example.yaml) and mount it to `/opt/app/config.yaml` in the container.
 
-If you run Pingvin Share X without Docker, you can create a `config.yml` file based on the [`config.example.yaml`](https://github.com/smp46/pingvin-share-x/blob/main/config.example.yaml) in the root directory of the project.
+If you run Pingvin Share Vault without Docker, you can create a `config.yml` file based on the [`config.example.yaml`](https://github.com/dzaczek/pingvin-share-vault/blob/main/config.example.yaml) in the root directory of the project.
 
 ---
 
@@ -46,12 +46,12 @@ For installation specific configuration, you can use environment variables. The 
 
 #### Docker specific
 
-Environment variables that are only available when running Pingvin Share X with Docker.
+Environment variables that are only available when running Pingvin Share Vault with Docker.
 
 | Variable          | Default Value | Description                                                                                                                                                                                                                                                                                                                                                                     |
 | ----------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `TRUST_PROXY`     | `false`       | Whether Pingvin Share X is behind a reverse proxy. If set to `true`, the `X-Forwarded-For` header is trusted.                                                                                                                                                                                                                                                                   |
+| `TRUST_PROXY`     | `false`       | Whether Pingvin Share Vault is behind a reverse proxy. If set to `true`, the `X-Forwarded-For` header is trusted.                                                                                                                                                                                                                                                                   |
 | `ANONYMIZE_IP`    | `false`       | If set to `true`, only a shortened address of every visitor is kept (the last octet of IPv4, everything after the first 48 bits of IPv6). If set to `mask`, only the first and the last part are kept (`203.*.*.57`, `2001:*:7348`), which suits addresses shown in public, like in a demo. It applies to the share access log, the audit log, the server log and everything else that records an IP. |
 | `DEMO_MODE`       | `false`       | For a public demo whose admin account anyone may use. If set to `true`, settings, the logo, passwords and accounts cannot be changed. Creating users and two factor login still work. |
-| `CADDY_DISABLED`  | `false`       | Configures if Pingvin Share X is starting built-in Caddy. If set to `true`, Caddy will not be started. If disabled, you must configure your reverse proxy to correctly map all paths. Refer to the [official Caddyfile](https://github.com/smp46/pingvin-share-x/blob/main/reverse-proxy/Caddyfile) for guidance.                                                               |
-| `PUID` and `PGID` | `1000`        | The user and group ID of the user who should run Pingvin Share X inside the Docker container and owns the files that are mounted with the volume. You can get the `PUID` and `GUID` of your user on your host machine by using the command `id`. For more information see [this article](https://docs.linuxserver.io/general/understanding-puid-and-pgid/#using-the-variables). |
+| `CADDY_DISABLED`  | `false`       | Configures if Pingvin Share Vault is starting built-in Caddy. If set to `true`, Caddy will not be started. If disabled, you must configure your reverse proxy to correctly map all paths. Refer to the [official Caddyfile](https://github.com/dzaczek/pingvin-share-vault/blob/main/reverse-proxy/Caddyfile) for guidance.                                                               |
+| `PUID` and `PGID` | `1000`        | The user and group ID of the user who should run Pingvin Share Vault inside the Docker container and owns the files that are mounted with the volume. You can get the `PUID` and `GUID` of your user on your host machine by using the command `id`. For more information see [this article](https://docs.linuxserver.io/general/understanding-puid-and-pgid/#using-the-variables). |

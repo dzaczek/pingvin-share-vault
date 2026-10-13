@@ -21,8 +21,8 @@ export function getDefaultConfig(): Config[] {
   return [
     {
       key: "general.appName",
-      value: "Pingvin Share X",
-      defaultValue: "Pingvin Share X",
+      value: "Pingvin Share Vault",
+      defaultValue: "Pingvin Share Vault",
       type: "string",
     },
     {

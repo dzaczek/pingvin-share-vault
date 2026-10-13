@@ -1,6 +1,6 @@
 services:
-  pingvin-share-x:
-    container_name: pingvin-share-x
+  pingvin-share-vault:
+    container_name: pingvin-share-vault
     build:
       context: .
       args:
@@ -16,7 +16,7 @@ services:
     volumes:
       - "./data:/opt/app/backend/data:rw,z"
       - "./data/images:/opt/app/frontend/public/img:rw,z"
-  #      - "./config.yaml:/opt/app/config.yaml" # Add this line, if you want to configure pingvin-share-x via config file and not via UI
+  #      - "./config.yaml:/opt/app/config.yaml" # Add this line, if you want to configure pingvin-share-vault via config file and not via UI
 
   # To add ClamAV, to scan your shares for malicious files,
   # see https://smp46.github.io/pingvin-share-x/setup/integrations/#clamav-docker-only

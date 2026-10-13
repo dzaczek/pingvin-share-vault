@@ -1,15 +1,15 @@
 <div align="center">
   <img src="https://github.com/user-attachments/assets/b5bc0c1e-5641-4106-b322-a1b0f5448b0f" width="60"/>
 
-  <h1>Pingvin Share X</h1>
+  <h1>Pingvin Share Vault</h1>
 
   <p align="center">
 
-[![GitHub Release](https://img.shields.io/github/v/release/dzaczek/pingvin-share-x)](https://github.com/dzaczek/pingvin-share-x/releases/latest) [![CI](https://github.com/dzaczek/pingvin-share-x/actions/workflows/ci.yml/badge.svg)](https://github.com/dzaczek/pingvin-share-x/actions/workflows/ci.yml) [![Demo](https://github.com/dzaczek/pingvin-share-x/actions/workflows/demo.yml/badge.svg)](https://pingvin-share-x-demo.fly.dev/)
+[![GitHub Release](https://img.shields.io/github/v/release/dzaczek/pingvin-share-vault)](https://github.com/dzaczek/pingvin-share-vault/releases/latest) [![CI](https://github.com/dzaczek/pingvin-share-vault/actions/workflows/ci.yml/badge.svg)](https://github.com/dzaczek/pingvin-share-vault/actions/workflows/ci.yml) [![Demo](https://github.com/dzaczek/pingvin-share-vault/actions/workflows/demo.yml/badge.svg)](https://pingvin-share-vault-demo.fly.dev/)
 
   </p>
 
-  <p><b><a href="https://pingvin-share-x-demo.fly.dev/">Try the live demo</a></b></p>
+  <p><b><a href="https://pingvin-share-vault-demo.fly.dev/">Try the live demo</a></b></p>
 </div>
 
 A self hosted file sharing platform, an alternative to WeTransfer.
@@ -30,7 +30,7 @@ This repository is [dzaczek](https://github.com/dzaczek)'s fork of [smp46/pingvi
 
 ## Try the demo
 
-A public demo runs at **https://pingvin-share-x-demo.fly.dev/**, always on the latest `main`.
+A public demo runs at **https://pingvin-share-vault-demo.fly.dev/**, always on the latest `main`.
 
 | Account | Password | What you can do |
 |---|---|---|
@@ -45,7 +45,7 @@ A public demo runs at **https://pingvin-share-x-demo.fly.dev/**, always on the l
 - The demo runs with `DEMO_MODE=true`, so the admin cannot change settings, the logo, passwords or accounts. With `ANONYMIZE_IP=mask`, logs only show addresses like `203.*.*.57`.
 - The admin page shows the commit the demo was built from, next to the version.
 
-The demo setup itself lives in [dzaczek/pingvin-share-x-demo](https://github.com/dzaczek/pingvin-share-x-demo).
+The demo setup itself lives in [dzaczek/pingvin-share-vault-demo](https://github.com/dzaczek/pingvin-share-vault-demo).
 
 ## Features
 
@@ -102,8 +102,8 @@ Every release is published to the GitHub Container Registry, starting with 2026.
 
 ```yaml
 services:
-  pingvin-share-x:
-    image: ghcr.io/dzaczek/pingvin-share-x:latest
+  pingvin-share-vault:
+    image: ghcr.io/dzaczek/pingvin-share-vault:latest
     restart: unless-stopped
     ports:
       - 3000:3000
@@ -116,15 +116,17 @@ services:
 
 Then run `docker compose up -d`. The app listens on `http://localhost:3000`, and the first account you create becomes the admin.
 
-To stay on one version, use a tag like `ghcr.io/dzaczek/pingvin-share-x:v2026.10.1` instead of `latest`.
+To stay on one version, use a version tag instead of `latest`.
+
+This fork was called Pingvin Share X until 2026.10.2, and those releases are still at `ghcr.io/dzaczek/pingvin-share-x`. Later releases go to `ghcr.io/dzaczek/pingvin-share-vault`. To move over, change the image name and keep the same `data` folder: the database, the settings and the shares carry over unchanged.
 
 ### From source
 
 The `docker-compose.yml` in this repository builds the image from the source:
 
 ```bash
-git clone https://github.com/dzaczek/pingvin-share-x.git
-cd pingvin-share-x
+git clone https://github.com/dzaczek/pingvin-share-vault.git
+cd pingvin-share-vault
 BUILD_COMMIT=$(git rev-parse HEAD) docker compose up -d --build
 ```
 
@@ -140,7 +142,7 @@ To scan uploads for malware, add a ClamAV container as described in the [upstrea
 2. Pull the new image (`docker compose pull`) or the new source (`git pull`, then `docker compose build`).
 3. Run `docker compose up -d`. Database migrations run on startup.
 
-The admin page shows an Update tile when a newer release exists here. Each release lists its changes in the [changelog](CHANGELOG.md) and on the [releases page](https://github.com/dzaczek/pingvin-share-x/releases).
+The admin page shows an Update tile when a newer release exists here. Each release lists its changes in the [changelog](CHANGELOG.md) and on the [releases page](https://github.com/dzaczek/pingvin-share-vault/releases).
 
 ### Coming from smp46/pingvin-share-x
 
@@ -215,7 +217,7 @@ npm run dev
 
 ### The demo
 
-Every merge to `main` is merged into the `demo` branch and deployed to the [demo](https://pingvin-share-x-demo.fly.dev/) by [demo.yml](.github/workflows/demo.yml). A conflict or a failed build stops the run, and the demo keeps the version before. To try something on the demo before it is in `main`, push it to `demo`.
+Every merge to `main` is merged into the `demo` branch and deployed to the [demo](https://pingvin-share-vault-demo.fly.dev/) by [demo.yml](.github/workflows/demo.yml). A conflict or a failed build stops the run, and the demo keeps the version before. To try something on the demo before it is in `main`, push it to `demo`.
 
 The demo never builds a release and never touches the published images.
 
@@ -227,7 +229,7 @@ From an up to date `main` with no local changes:
 npm run release   # works out the next number, writes the changelog, commits and tags
 git push origin HEAD
 git push origin v2026.10.1
-gh release create v2026.10.1 --repo dzaczek/pingvin-share-x --generate-notes
+gh release create v2026.10.1 --repo dzaczek/pingvin-share-vault --generate-notes
 ```
 
 `npm run release -- --dry-run` only prints the next number and the changelog. Publishing the GitHub release builds and pushes the Docker image.

@@ -1,6 +1,6 @@
 # Contributing
 
-We would appreciate for you to contribute to Pingvin Share X and help make it better! All contributions are welcome, including issues, suggestions, pull requests and more.
+We would appreciate for you to contribute to Pingvin Share Vault and help make it better! All contributions are welcome, including issues, suggestions, pull requests and more.
 
 ## Getting started
 
@@ -37,7 +37,7 @@ Before you submit the pull request for review please ensure that
 2. Clone your fork to your machine with `git clone`
 
 ```
-git clone https://github.com/[your_username]/pingvin-share-x
+git clone https://github.com/[your_username]/pingvin-share-vault
 ```
 
 3. Work - commit - repeat
