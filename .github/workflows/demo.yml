@@ -1,0 +1,70 @@
+name: Demo
+
+# Every merge to main also lands on the demo branch, and the demo branch is
+# deployed to https://pingvin-share-x-demo.fly.dev with the demo layer from
+# dzaczek/pingvin-share-x-demo. A push straight to demo deploys it as well,
+# for trying something on the demo before it is in main.
+
+on:
+  push:
+    branches: [main, demo]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: demo
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: demo
+          fetch-depth: 0
+
+      # a conflict stops here, the demo keeps running the version before
+      - name: Merge main into demo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git merge --no-edit origin/main
+          git push origin demo
+
+  deploy:
+    needs: sync
+    # also runs for a push to demo, when there is nothing to sync
+    if: ${{ !cancelled() && (needs.sync.result == 'success' || needs.sync.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: demo
+          path: app
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: dzaczek/pingvin-share-x-demo
+          path: demo
+
+      - name: Build
+        run: |
+          echo "IMAGE=registry.fly.io/pingvin-share-x-demo:$(git -C app rev-parse HEAD)" >> "$GITHUB_ENV"
+          docker build -t pingvin-share-x-demo-base app
+          # builds the demo data too, a seed that fails stops the deploy
+          docker build --build-arg BASE_IMAGE=pingvin-share-x-demo-base \
+            -t "registry.fly.io/pingvin-share-x-demo:$(git -C app rev-parse HEAD)" demo
+
+      - uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # master
+
+      - name: Deploy
+        run: |
+          flyctl auth docker
+          docker push "$IMAGE"
+          flyctl deploy --config demo/fly.toml --image "$IMAGE" --ha=false
