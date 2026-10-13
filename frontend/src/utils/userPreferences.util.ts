@@ -7,6 +7,10 @@ const defaultPreferences = [
     key: "locale",
     value: "system",
   },
+  {
+    key: "uiStyle",
+    value: "default",
+  },
 ];
 
 const get = (key: string) => {

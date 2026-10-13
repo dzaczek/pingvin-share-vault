@@ -135,6 +135,31 @@ export const configVariables = {
       defaultValue: "circle",
       secret: false,
     },
+    uiStyle: {
+      type: "string",
+      defaultValue: "standard",
+      secret: false,
+    },
+    glassVariant: {
+      type: "string",
+      defaultValue: "regular",
+      secret: false,
+    },
+    glassBlur: {
+      type: "number",
+      defaultValue: "20",
+      secret: false,
+    },
+    glassBackground: {
+      type: "string",
+      defaultValue: "gradient",
+      secret: false,
+    },
+    glassTint: {
+      type: "boolean",
+      defaultValue: "true",
+      secret: false,
+    },
   },
   share: {
     enableShareEmailRecipients: {
