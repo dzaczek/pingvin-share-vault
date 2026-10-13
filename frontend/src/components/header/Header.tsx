@@ -17,9 +17,11 @@ import { useRouter } from "next/router";
 import { ReactNode, useState } from "react";
 import { TbChevronLeft } from "react-icons/tb";
 import useConfig from "../../hooks/config.hook";
+import useUiStyle, { GlassSettings } from "../../hooks/uiStyle.hook";
 import useUser from "../../hooks/user.hook";
 import useTranslate from "../../hooks/useTranslate.hook";
 import authService from "../../services/auth.service";
+import { glassSurface } from "../../styles/glass.style";
 import Logo from "../Logo";
 import ActionAvatar from "./ActionAvatar";
 import NavbarShareMenu from "./NavbarShareMenu";
@@ -35,9 +37,23 @@ type NavLink = {
 
 type MobileMenuView = "root" | "shares" | "profile";
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles((theme, glass: GlassSettings | null) => ({
   root: {
     zIndex: 1,
+    // a floating capsule above the content, doubled to win over the header's
+    // own border and background
+    ...(glass && {
+      "&&": {
+        ...glassSurface(theme, glass),
+        position: "sticky",
+        top: 12,
+        zIndex: 100,
+        width: "calc(100% - 24px)",
+        maxWidth: 1000,
+        margin: "12px auto 0",
+        borderRadius: 999,
+      },
+    }),
   },
 
   mobilePanel: {
@@ -46,6 +62,17 @@ const useStyles = createStyles((theme) => ({
     borderTopLeftRadius: 0,
     overflow: "hidden",
     width: "100%",
+    ...(glass && {
+      "&&": {
+        ...glassSurface(theme, glass, { variant: "regular" }),
+        position: "sticky",
+        top: 12 + HEADER_HEIGHT + 8,
+        zIndex: 99,
+        width: "calc(100% - 24px)",
+        margin: `8px auto ${theme.spacing.md}`,
+        borderRadius: 20,
+      },
+    }),
 
     [theme.fn.largerThan("sm")]: {
       display: "none",
@@ -75,7 +102,7 @@ const useStyles = createStyles((theme) => ({
     display: "block",
     lineHeight: 1,
     padding: "8px 12px",
-    borderRadius: theme.radius.sm,
+    borderRadius: glass ? 999 : theme.radius.sm,
     textDecoration: "none",
     color:
       theme.colorScheme === "dark"
@@ -275,7 +302,8 @@ const Header = () => {
     },
   ];
 
-  const { classes, cx } = useStyles();
+  const { glass } = useUiStyle();
+  const { classes, cx } = useStyles(glass);
   const desktopItems = (
     <>
       {(user ? authenticatedLinks : unauthenticatedLinks).map((link, i) => {

@@ -5,20 +5,23 @@ import {
   Group,
   Text,
   Menu,
+  SimpleGrid,
   useMantineColorScheme,
 } from "@mantine/core";
 import { Dropzone as MantineDropzone } from "@mantine/dropzone";
 import React, { ForwardedRef, useRef, useState } from "react";
-import { TbCloudUpload, TbUpload, TbFolder } from "react-icons/tb";
+import { TbCloudUpload, TbUpload, TbFolder, TbFiles } from "react-icons/tb";
 import { FormattedMessage } from "react-intl";
 import { fromEvent } from "file-selector";
+import useUiStyle, { GlassSettings } from "../../hooks/uiStyle.hook";
 import { useIsHydrated } from "../../hooks/useIsHydrated.hook";
 import useTranslate from "../../hooks/useTranslate.hook";
 import { FileUpload } from "../../types/File.type";
 import { byteToHumanSizeString } from "../../utils/fileSize.util";
 import toast from "../../utils/toast.util";
+import { glassSurface } from "../../styles/glass.style";
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles((theme, glass: GlassSettings | null) => ({
   wrapper: {
     position: "relative",
     marginBottom: 30,
@@ -40,6 +43,24 @@ const useStyles = createStyles((theme) => ({
     position: "absolute",
     bottom: -20,
   },
+
+  // files and folders get a card each, doubled to win over the dropzone's
+  // own border and background
+  card: glass
+    ? {
+        "&&": {
+          ...glassSurface(theme, glass),
+          borderRadius: 28,
+          padding: "36px 20px",
+          cursor: "pointer",
+          transition: "filter 120ms ease",
+          "&:hover": { filter: "brightness(1.04)" },
+          "&[data-accept]": {
+            boxShadow: `0 0 0 3px ${theme.fn.rgba(theme.fn.primaryColor(), 0.6)}`,
+          },
+        },
+      }
+    : {},
 
   // a touch screen gets the tap wording, everything else click and drop
   mobileDescription: {
@@ -154,7 +175,8 @@ const Dropzone = ({
   onFilesChanged: (files: FileUpload[]) => void;
 }) => {
   const t = useTranslate();
-  const { classes } = useStyles();
+  const { glass } = useUiStyle();
+  const { classes } = useStyles(glass);
   const openRef = useRef<() => void>();
   const folderInputRef = useRef<HTMLInputElement>(null);
   const isHydrated = useIsHydrated();
@@ -195,6 +217,114 @@ const Dropzone = ({
     event.target.value = "";
   };
 
+  const handleDrop = (files: FileUpload[]) => {
+    const fileSizeSum = files.reduce((n, { size }) => n + size, 0);
+
+    if (fileSizeSum + currentFilesSize > maxShareSize) {
+      toast.error(
+        t("upload.dropzone.notify.file-too-big", {
+          maxSize: byteToHumanSizeString(maxShareSize),
+        }),
+      );
+    } else {
+      files = files.map((newFile) => {
+        newFile.uploadingProgress = 0;
+        return newFile;
+      });
+      onFilesChanged(files);
+    }
+  };
+
+  const card = (kind: "files" | "folder") => (
+    <MantineDropzone
+      onReject={(e) => {
+        toast.error(e[0].errors[0].message);
+      }}
+      disabled={isUploading}
+      getFilesFromEvent={getFilesFromEvent}
+      onDrop={handleDrop}
+      className={classes.card}
+      {...(kind === "files"
+        ? { openRef: openRef as ForwardedRef<() => void> }
+        : {
+            activateOnClick: false,
+            onClick: () => folderInputRef.current?.click(),
+            // the dropzone's own key handler would open the file picker
+            onKeyDown: (event: React.KeyboardEvent) => {
+              if (event.key !== "Enter" && event.key !== " ") return;
+              event.preventDefault();
+              folderInputRef.current?.click();
+            },
+          })}
+    >
+      <div style={{ pointerEvents: "none" }}>
+        <Group position="center">
+          {kind === "files" ? <TbFiles size={44} /> : <TbFolder size={44} />}
+        </Group>
+        <Text align="center" weight={700} size="lg" mt="md">
+          {kind === "files" && title ? (
+            title
+          ) : (
+            <FormattedMessage id={`upload.dropzone.glass.${kind}.title`} />
+          )}
+        </Text>
+        <Text align="center" size="sm" mt="xs" color="dimmed">
+          <span className={classes.mobileDescription}>
+            <FormattedMessage
+              id={`upload.dropzone.glass.${kind}.description.mobile`}
+            />
+          </span>
+          <span className={classes.desktopDescription}>
+            <FormattedMessage
+              id={`upload.dropzone.glass.${kind}.description`}
+            />
+          </span>
+        </Text>
+      </div>
+    </MantineDropzone>
+  );
+
+  if (glass)
+    return (
+      <div className={classes.wrapper}>
+        <input
+          type="file"
+          ref={folderInputRef}
+          style={{ display: "none" }}
+          {...({
+            webkitdirectory: "",
+            directory: "",
+          } as any)}
+          multiple
+          onChange={handleFolderSelect}
+        />
+        <SimpleGrid
+          cols={isFolderUploadSupported ? 2 : 1}
+          breakpoints={[{ maxWidth: "sm", cols: 1 }]}
+        >
+          {card("files")}
+          {isFolderUploadSupported && card("folder")}
+        </SimpleGrid>
+        <Text align="center" size="sm" mt="md" color="dimmed">
+          <span className={classes.mobileDescription}>
+            <FormattedMessage
+              id="upload.dropzone.glass.hint.mobile"
+              values={{ maxSize: byteToHumanSizeString(maxShareSize) }}
+            />
+          </span>
+          <span className={classes.desktopDescription}>
+            <FormattedMessage
+              id="upload.dropzone.glass.hint"
+              values={{
+                maxSize: byteToHumanSizeString(maxShareSize),
+                shortcut: isMac ? "⌘+V" : "Ctrl+V",
+              }}
+            />
+          </span>
+        </Text>
+      </div>
+    );
+
   return (
     <div className={classes.wrapper}>
       <input
@@ -215,23 +345,7 @@ const Dropzone = ({
         disabled={isUploading}
         openRef={openRef as ForwardedRef<() => void>}
         getFilesFromEvent={getFilesFromEvent}
-        onDrop={(files: FileUpload[]) => {
-          const fileSizeSum = files.reduce((n, { size }) => n + size, 0);
-
-          if (fileSizeSum + currentFilesSize > maxShareSize) {
-            toast.error(
-              t("upload.dropzone.notify.file-too-big", {
-                maxSize: byteToHumanSizeString(maxShareSize),
-              }),
-            );
-          } else {
-            files = files.map((newFile) => {
-              newFile.uploadingProgress = 0;
-              return newFile;
-            });
-            onFilesChanged(files);
-          }
-        }}
+        onDrop={handleDrop}
         className={classes.dropzone}
         radius="md"
       >

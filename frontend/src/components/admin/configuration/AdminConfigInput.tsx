@@ -52,6 +52,11 @@ const AdminConfigInput = ({
   const isUploadProgressStyleConfig =
     configVariable.key === "appearance.uploadProgressStyle";
   const isDownloadAllConfig = configVariable.key === "share.downloadAll";
+  const styleOptions = {
+    "appearance.uiStyle": ["standard", "glass"],
+    "appearance.glassVariant": ["regular", "clear"],
+    "appearance.glassBackground": ["gradient", "aurora", "none"],
+  }[configVariable.key];
   const isEmailShareConfig =
     configVariable.key === "share.enableShareEmailRecipients";
   const isEmailVerificationConfig =
@@ -299,6 +304,23 @@ const AdminConfigInput = ({
                 label: t(`admin.config.share.download-all.${mode}`),
               }),
             )}
+            value={form.values.stringValue}
+            placeholder={configVariable.defaultValue}
+            onChange={(value) => onValueChange(configVariable, value ?? "")}
+            allowDeselect={false}
+          />
+        ) : styleOptions ? (
+          <Select
+            style={{
+              width: "100%",
+            }}
+            disabled={!configVariable.allowEdit}
+            data={styleOptions.map((option) => ({
+              value: option,
+              label: t(
+                `admin.config.${configVariable.key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}.${option}`,
+              ),
+            }))}
             value={form.values.stringValue}
             placeholder={configVariable.defaultValue}
             onChange={(value) => onValueChange(configVariable, value ?? "")}

@@ -21,12 +21,18 @@ import { useEffect, useMemo, useState } from "react";
 import { IntlProvider } from "react-intl";
 import Header from "../components/header/Header";
 import { ConfigContext } from "../hooks/config.hook";
+import { GlassSettings, UiStyleContext } from "../hooks/uiStyle.hook";
 import { UserContext } from "../hooks/user.hook";
 import { LOCALES } from "../i18n/locales";
 import authService from "../services/auth.service";
 import configService from "../services/config.service";
 import userService from "../services/user.service";
 import GlobalStyle from "../styles/global.style";
+import {
+  GlassGlobalStyle,
+  glassTheme,
+  joinComponents,
+} from "../styles/glass.style";
 import globalStyle from "../styles/mantine.style";
 import Config from "../types/config.type";
 import { CurrentUser } from "../types/user.type";
@@ -204,6 +210,31 @@ function App({ Component, pageProps }: AppProps) {
     defaultRadius: themeRadius,
   };
 
+  // the account page choice wins over the admin default, and it lives in
+  // local storage, so like the color scheme it is read after hydration
+  const [uiPreference, setUiPreference] = useState("default");
+  useEffect(() => setUiPreference(userPreferences.get("uiStyle")), []);
+  const uiStyle = ["standard", "glass"].includes(uiPreference)
+    ? uiPreference
+    : getStringConfigValue("appearance.uiStyle", "standard");
+  const glassBlur = parseInt(getStringConfigValue("appearance.glassBlur"));
+  const glass: GlassSettings | null =
+    uiStyle === "glass"
+      ? {
+          variant:
+            getStringConfigValue("appearance.glassVariant") === "clear"
+              ? "clear"
+              : "regular",
+          blur: glassBlur >= 0 && glassBlur <= 40 ? glassBlur : 20,
+          background: (["gradient", "aurora", "none"].includes(
+            getStringConfigValue("appearance.glassBackground"),
+          )
+            ? getStringConfigValue("appearance.glassBackground")
+            : "gradient") as GlassSettings["background"],
+          tint: getStringConfigValue("appearance.glassTint", "true") === "true",
+        }
+      : null;
+
   const mergedTheme: MantineThemeOverride = {
     ...globalStyle,
     ...adminTheme,
@@ -212,6 +243,10 @@ function App({ Component, pageProps }: AppProps) {
       ...(globalStyle.colors ?? {}),
       ...(adminTheme.colors ?? {}),
     },
+    components: joinComponents(
+      globalStyle.components,
+      glass ? glassTheme(glass).components : {},
+    ),
   };
 
   useEffect(() => {
@@ -345,6 +380,7 @@ function App({ Component, pageProps }: AppProps) {
             toggleColorScheme={toggleColorScheme}
           >
             <GlobalStyle />
+            {glass && <GlassGlobalStyle glass={glass} />}
             <Notifications />
             <ModalsProvider>
               <ConfigContext.Provider
@@ -355,39 +391,50 @@ function App({ Component, pageProps }: AppProps) {
                   },
                 }}
               >
-                <UserContext.Provider
+                <UiStyleContext.Provider
                   value={{
-                    user,
-                    refreshUser: async () => {
-                      const user = await userService.getCurrentUser();
-                      setUser(user);
-                      return user;
+                    glass,
+                    preference: uiPreference,
+                    setPreference: (value) => {
+                      userPreferences.set("uiStyle", value);
+                      setUiPreference(value);
                     },
                   }}
                 >
-                  <AdminNoticeModal
-                    notice={pendingNotices[0] || null}
-                    onDismiss={handleDismissNotice}
-                  />
-                  {excludeDefaultLayoutRoutes.includes(route) ? (
-                    <Component {...pageProps} />
-                  ) : (
-                    <>
-                      <Stack
-                        justify="space-between"
-                        sx={{ minHeight: "100vh" }}
-                      >
-                        <div>
-                          <Header />
-                          <Container fluid={route === "/admin/shares"}>
-                            <Component {...pageProps} />
-                          </Container>
-                        </div>
-                        <Footer />
-                      </Stack>
-                    </>
-                  )}
-                </UserContext.Provider>
+                  <UserContext.Provider
+                    value={{
+                      user,
+                      refreshUser: async () => {
+                        const user = await userService.getCurrentUser();
+                        setUser(user);
+                        return user;
+                      },
+                    }}
+                  >
+                    <AdminNoticeModal
+                      notice={pendingNotices[0] || null}
+                      onDismiss={handleDismissNotice}
+                    />
+                    {excludeDefaultLayoutRoutes.includes(route) ? (
+                      <Component {...pageProps} />
+                    ) : (
+                      <>
+                        <Stack
+                          justify="space-between"
+                          sx={{ minHeight: "100vh" }}
+                        >
+                          <div>
+                            <Header />
+                            <Container fluid={route === "/admin/shares"}>
+                              <Component {...pageProps} />
+                            </Container>
+                          </div>
+                          <Footer />
+                        </Stack>
+                      </>
+                    )}
+                  </UserContext.Provider>
+                </UiStyleContext.Provider>
               </ConfigContext.Provider>
             </ModalsProvider>
           </ColorSchemeProvider>

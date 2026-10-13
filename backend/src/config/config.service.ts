@@ -257,6 +257,39 @@ export class ConfigService extends EventEmitter {
         ),
       },
       {
+        key: "appearance.uiStyle",
+        condition: (value: string) => ["standard", "glass"].includes(value),
+        message: this.t(
+          "config.uiStyleValidation",
+          "The style must be standard or glass",
+        ),
+      },
+      {
+        key: "appearance.glassVariant",
+        condition: (value: string) => ["regular", "clear"].includes(value),
+        message: this.t(
+          "config.glassVariantValidation",
+          "The glass variant must be regular or clear",
+        ),
+      },
+      {
+        key: "appearance.glassBlur",
+        condition: (value: number) => value >= 0 && value <= 40,
+        message: this.t(
+          "config.glassBlurValidation",
+          "The glass blur must be between 0 and 40",
+        ),
+      },
+      {
+        key: "appearance.glassBackground",
+        condition: (value: string) =>
+          ["gradient", "aurora", "none"].includes(value),
+        message: this.t(
+          "config.glassBackgroundValidation",
+          "The glass background must be gradient, aurora or none",
+        ),
+      },
+      {
         key: "share.zipCompressionLevel",
         condition: (value: number) => value >= 0 && value <= 9,
         message: this.t(

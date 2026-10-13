@@ -150,6 +150,10 @@ export default {
   "account.theme.dark": "Ciemny",
   "account.theme.light": "Jasny",
   "account.theme.system": "Systemowy",
+  "account.theme.style": "Styl",
+  "account.theme.style.default": "Domyślny instancji",
+  "account.theme.style.standard": "Standardowy",
+  "account.theme.style.glass": "Glass",
   "account.button.delete": "Usuń Konto",
   "account.modal.delete.title": "Usuń Konto",
   "account.modal.delete.description":
@@ -427,6 +431,19 @@ export default {
   "upload.dropzone.description.desktop.no-folder": "Kliknij tutaj lub przeciągnij i upuść pojedyncze pliki, zdjęcia lub wideo albo naciśnij {shortcut}, aby przesłać tekst ze schowka. Maksymalny łączny rozmiar przesyłania: {maxSize}.",
   "upload.dropzone.notify.file-too-big":
     "Twoje pliki przekraczają maksymalny rozmiar {maxSize}.",
+  "upload.dropzone.glass.files.title": "Pliki",
+  "upload.dropzone.glass.files.description":
+    "Kliknij, aby wybrać pliki, zdjęcia lub filmy, albo upuść je tutaj.",
+  "upload.dropzone.glass.files.description.mobile":
+    "Stuknij, aby wybrać pliki, zdjęcia lub filmy.",
+  "upload.dropzone.glass.folder.title": "Folder",
+  "upload.dropzone.glass.folder.description":
+    "Kliknij, aby wybrać cały folder, albo upuść go tutaj.",
+  "upload.dropzone.glass.folder.description.mobile":
+    "Stuknij, aby wybrać cały folder.",
+  "upload.dropzone.glass.hint":
+    "Naciśnij {shortcut}, aby przesłać tekst ze schowka. Maksymalny łączny rozmiar: {maxSize}.",
+  "upload.dropzone.glass.hint.mobile": "Maksymalny łączny rozmiar: {maxSize}.",
   "upload.button.folder": "Prześlij folder",
   "upload.button.folder.append": "Dołącz folder",
   "upload.button.add": "Dodaj do przesyłania",
@@ -614,6 +631,28 @@ export default {
     "Koło z wartością procentową",
   "admin.config.appearance.upload-progress-style.percentage-time":
     "Procenty i pozostały czas",
+  "admin.config.appearance.ui-style": "Styl",
+  "admin.config.appearance.ui-style.description":
+    "Standardowy to klasyczny wygląd. Glass umieszcza nawigację, przyciski i menu na półprzezroczystym szkle, według wytycznych Apple Liquid Glass. Każdy użytkownik może wybrać własny styl na stronie konta.",
+  "admin.config.appearance.ui-style.standard": "Standardowy",
+  "admin.config.appearance.ui-style.glass": "Glass",
+  "admin.config.appearance.glass-variant": "Wariant szkła",
+  "admin.config.appearance.glass-variant.description":
+    "Regular mocniej rozmywa i zachowuje czytelność tekstu. Clear jest bardziej przezroczysty i najlepiej wygląda na kolorowym tle. Menu i okna dialogowe zawsze używają regular.",
+  "admin.config.appearance.glass-variant.regular": "Regular",
+  "admin.config.appearance.glass-variant.clear": "Clear",
+  "admin.config.appearance.glass-blur": "Rozmycie szkła",
+  "admin.config.appearance.glass-blur.description":
+    "Jak mocno szkło rozmywa to, co jest pod nim, od 0 do 40 pikseli.",
+  "admin.config.appearance.glass-background": "Tło pod szkłem",
+  "admin.config.appearance.glass-background.description":
+    "Kolor, który szkło przejmuje od spodu. Gradient używa koloru głównego, aurora dodaje kilka kolorów.",
+  "admin.config.appearance.glass-background.gradient": "Gradient",
+  "admin.config.appearance.glass-background.aurora": "Aurora",
+  "admin.config.appearance.glass-background.none": "Brak",
+  "admin.config.appearance.glass-tint": "Kolor głównych akcji",
+  "admin.config.appearance.glass-tint.description":
+    "Wypełnione przyciski, np. Udostępnij, dostają kolor główny. Po wyłączeniu wszystkie przyciski są neutralnym szkłem.",
   "admin.config.general.app-url": "Adres URL aplikacji",
   "admin.config.general.app-url.description":
     "Pod którym adresem URL Pingvin Share jest dostępny",

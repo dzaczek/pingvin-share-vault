@@ -4,12 +4,14 @@ import {
   ColorScheme,
   SegmentedControl,
   Stack,
+  Text,
   useMantineColorScheme,
 } from "@mantine/core";
 import { useColorScheme } from "@mantine/hooks";
 import { useState } from "react";
 import { TbDeviceLaptop, TbMoon, TbSun } from "react-icons/tb";
 import { FormattedMessage } from "react-intl";
+import useUiStyle from "../../hooks/uiStyle.hook";
 import userPreferences from "../../utils/userPreferences.util";
 
 const ThemeSwitcher = () => {
@@ -18,6 +20,7 @@ const ThemeSwitcher = () => {
   );
   const { toggleColorScheme } = useMantineColorScheme();
   const systemColorScheme = useColorScheme();
+  const { preference, setPreference } = useUiStyle();
   return (
     <Stack>
       <SegmentedControl
@@ -64,6 +67,17 @@ const ThemeSwitcher = () => {
             value: "system",
           },
         ]}
+      />
+      <Text size="sm" weight={500} mb={-8}>
+        <FormattedMessage id="account.theme.style" />
+      </Text>
+      <SegmentedControl
+        value={preference}
+        onChange={setPreference}
+        data={["default", "standard", "glass"].map((value) => ({
+          label: <FormattedMessage id={`account.theme.style.${value}`} />,
+          value,
+        }))}
       />
     </Stack>
   );

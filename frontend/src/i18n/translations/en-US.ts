@@ -161,6 +161,10 @@ export default {
   "account.theme.dark": "Dark",
   "account.theme.light": "Light",
   "account.theme.system": "System",
+  "account.theme.style": "Style",
+  "account.theme.style.default": "Instance default",
+  "account.theme.style.standard": "Standard",
+  "account.theme.style.glass": "Glass",
 
   "account.button.delete": "Delete Account",
   "account.modal.delete.title": "Delete Account",
@@ -467,6 +471,19 @@ export default {
     "Click here or drag and drop individual files, photos, or videos, or press {shortcut} to upload text from your clipboard. Maximum total upload size: {maxSize}.",
   "upload.dropzone.notify.file-too-big":
     "Your files exceed the maximum share size of {maxSize}.",
+  "upload.dropzone.glass.files.title": "Files",
+  "upload.dropzone.glass.files.description":
+    "Click to choose files, photos or videos, or drop them here.",
+  "upload.dropzone.glass.files.description.mobile":
+    "Tap to choose files, photos or videos.",
+  "upload.dropzone.glass.folder.title": "Folder",
+  "upload.dropzone.glass.folder.description":
+    "Click to choose a whole folder, or drop one here.",
+  "upload.dropzone.glass.folder.description.mobile":
+    "Tap to choose a whole folder.",
+  "upload.dropzone.glass.hint":
+    "Press {shortcut} to upload text from your clipboard. Maximum total upload size: {maxSize}.",
+  "upload.dropzone.glass.hint.mobile": "Maximum total upload size: {maxSize}.",
   "upload.button.folder": "Upload folder",
   "upload.button.folder.append": "Append folder",
   "upload.button.add": "Add to upload",
@@ -662,6 +679,28 @@ export default {
     "Circle with percentage",
   "admin.config.appearance.upload-progress-style.percentage-time":
     "Percentage and time remaining",
+  "admin.config.appearance.ui-style": "Style",
+  "admin.config.appearance.ui-style.description":
+    "Standard keeps the classic look. Glass puts the navigation, buttons and menus on translucent glass, modeled on Apple's Liquid Glass guidelines. Each user can still pick their own style on the account page.",
+  "admin.config.appearance.ui-style.standard": "Standard",
+  "admin.config.appearance.ui-style.glass": "Glass",
+  "admin.config.appearance.glass-variant": "Glass variant",
+  "admin.config.appearance.glass-variant.description":
+    "Regular blurs more and keeps text easy to read. Clear is more transparent and works best over a colorful background. Menus and dialogs always use regular.",
+  "admin.config.appearance.glass-variant.regular": "Regular",
+  "admin.config.appearance.glass-variant.clear": "Clear",
+  "admin.config.appearance.glass-blur": "Glass blur",
+  "admin.config.appearance.glass-blur.description":
+    "How strongly the glass blurs what is behind it, from 0 to 40 pixels.",
+  "admin.config.appearance.glass-background": "Glass background",
+  "admin.config.appearance.glass-background.description":
+    "The color the glass picks up from behind. Gradient uses the primary color, aurora adds a few more colors.",
+  "admin.config.appearance.glass-background.gradient": "Gradient",
+  "admin.config.appearance.glass-background.aurora": "Aurora",
+  "admin.config.appearance.glass-background.none": "None",
+  "admin.config.appearance.glass-tint": "Tint the main actions",
+  "admin.config.appearance.glass-tint.description":
+    "Gives filled buttons, such as Share, the primary color. When off, every button is neutral glass.",
   "admin.config.general.app-url": "App URL",
   "admin.config.general.app-url.description":
     "URL where Pingvin Share Vault is available.",
