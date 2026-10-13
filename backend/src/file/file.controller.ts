@@ -15,6 +15,7 @@ import {
 import { SkipThrottle, Throttle } from "@nestjs/throttler";
 import * as contentDisposition from "content-disposition";
 import { Request, Response } from "express";
+import { AuditLogService } from "src/auditLog/auditLog.service";
 import { AdministratorGuard } from "src/auth/guard/isAdmin.guard";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { CreateShareGuard } from "src/share/guard/createShare.guard";
@@ -33,7 +34,10 @@ function getValidRecipientId(recipientId?: string): string | undefined {
 
 @Controller("shares/:shareId/files")
 export class FileController {
-  constructor(private fileService: FileService) {}
+  constructor(
+    private fileService: FileService,
+    private auditLog: AuditLogService,
+  ) {}
 
   @Post("upload-init")
   @SkipThrottle()
@@ -139,6 +143,12 @@ export class FileController {
       getValidRecipientId(recipientId),
     );
 
+    this.auditLog.log("FILE_DOWNLOAD", {
+      resourceId: shareId,
+      resourceName: `${shareId}.zip`,
+      metadata: { shareId, zip: true },
+    });
+
     return new StreamableFile(zipStream);
   }
 
@@ -180,6 +190,17 @@ export class FileController {
     const isDownload = download === "true";
     const storageProvider = await this.fileService.getStorageProvider(shareId);
 
+    // a video seeks with many range requests, only the first one counts
+    const range = req.headers.range;
+    const audit = (resourceName: string, size?: number) => {
+      if (range && !range.startsWith("bytes=0-")) return;
+      this.auditLog.log(isDownload ? "FILE_DOWNLOAD" : "FILE_PREVIEW", {
+        resourceId: fileId,
+        resourceName,
+        metadata: { shareId, size, storage: storageProvider },
+      });
+    };
+
     if (storageProvider === "S3") {
       const url = await this.fileService.getPreSignedDownloadUrl(
         shareId,
@@ -187,6 +208,7 @@ export class FileController {
         isDownload,
       );
       const fileName = await this.fileService.getFileName(shareId, fileId);
+      audit(fileName);
       if (isDownload) {
         void this.fileService.notifyRecipientDownload(
           shareId,
@@ -244,6 +266,7 @@ export class FileController {
     }
 
     res.set(headers);
+    audit(file.metaData.name, totalSize);
 
     if (isDownload && !file.range) {
       void this.fileService.notifyRecipientDownload(

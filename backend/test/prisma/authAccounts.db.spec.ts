@@ -52,6 +52,7 @@ beforeAll(async () => {
     unused,
     unused,
     i18n,
+    unused,
   );
 });
 
