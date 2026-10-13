@@ -61,6 +61,36 @@ export function getDefaultConfig(): Config[] {
       defaultValue: "circle",
       type: "string",
     },
+    {
+      key: "appearance.uiStyle",
+      value: "standard",
+      defaultValue: "standard",
+      type: "string",
+    },
+    {
+      key: "appearance.glassVariant",
+      value: "regular",
+      defaultValue: "regular",
+      type: "string",
+    },
+    {
+      key: "appearance.glassBlur",
+      value: "20",
+      defaultValue: "20",
+      type: "number",
+    },
+    {
+      key: "appearance.glassBackground",
+      value: "gradient",
+      defaultValue: "gradient",
+      type: "string",
+    },
+    {
+      key: "appearance.glassTint",
+      value: "true",
+      defaultValue: "true",
+      type: "boolean",
+    },
     // deliberately stricter than the seed, which defaults this to true: an
     // instance whose config we cannot read should not be accepting signups
     {

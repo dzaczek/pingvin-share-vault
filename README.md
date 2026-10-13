@@ -79,6 +79,11 @@ The demo setup itself lives in [dzaczek/pingvin-share-vault-demo](https://github
 - Anonymous shares are locked once uploaded, so nobody holding the link can reopen them or swap the files
 - Download all in one of four ways, chosen by the admin: off, a zip built after upload, a zip built while it downloads (no extra disk space), or every file on its own
 
+**Look**
+- A second style, Glass, modeled on Apple's [Liquid Glass guidelines](https://developer.apple.com/documentation/technologyoverviews/liquid-glass): a floating header, translucent buttons, menus and dialogs, and separate cards for uploading files and folders
+- The admin sets the default style, glass variant, blur, background and tint under Appearance, and every user can pick their own style on the account page
+- Glass turns solid when the system asks for less transparency or more contrast, and the press animation stops when it asks for less motion
+
 **Privacy**
 - `ANONYMIZE_IP` keeps only a shortened (`203.0.113.0`) or masked (`203.*.*.57`) address of every visitor, in every log
 

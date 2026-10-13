@@ -10,5 +10,9 @@
   "shareIdLengthValidation": "Share ID length must be between 2 and 50",
   "downloadAllValidation": "Download all must be one of disabled, zip-prebuilt, zip-on-the-fly or files",
   "zipCompressionLevelValidation": "Zip compression level must be between 0 and 9",
-  "disabledInDemo": "This is disabled in the demo"
+  "disabledInDemo": "This is disabled in the demo",
+  "uiStyleValidation": "The style must be standard or glass",
+  "glassVariantValidation": "The glass variant must be regular or clear",
+  "glassBlurValidation": "The glass blur must be between 0 and 40",
+  "glassBackgroundValidation": "The glass background must be gradient, aurora or none"
 }
