@@ -1,4 +1,5 @@
 import {
+  Anchor,
   Button,
   Center,
   createStyles,
@@ -6,11 +7,18 @@ import {
   Text,
   Menu,
   SimpleGrid,
+  ThemeIcon,
   useMantineColorScheme,
 } from "@mantine/core";
 import { Dropzone as MantineDropzone } from "@mantine/dropzone";
 import React, { ForwardedRef, useRef, useState } from "react";
-import { TbCloudUpload, TbUpload, TbFolder, TbFiles } from "react-icons/tb";
+import {
+  TbCloudUpload,
+  TbUpload,
+  TbFolder,
+  TbFiles,
+  TbPlus,
+} from "react-icons/tb";
 import { FormattedMessage } from "react-intl";
 import { fromEvent } from "file-selector";
 import useUiStyle, { GlassSettings } from "../../hooks/uiStyle.hook";
@@ -20,6 +28,7 @@ import { FileUpload } from "../../types/File.type";
 import { byteToHumanSizeString } from "../../utils/fileSize.util";
 import toast from "../../utils/toast.util";
 import { glassSurface } from "../../styles/glass.style";
+import { precisionTokens } from "../../styles/precision.style";
 
 const useStyles = createStyles((theme, glass: GlassSettings | null) => ({
   wrapper: {
@@ -175,7 +184,7 @@ const Dropzone = ({
   onFilesChanged: (files: FileUpload[]) => void;
 }) => {
   const t = useTranslate();
-  const { glass } = useUiStyle();
+  const { glass, name } = useUiStyle();
   const { classes } = useStyles(glass);
   const openRef = useRef<() => void>();
   const folderInputRef = useRef<HTMLInputElement>(null);
@@ -283,6 +292,89 @@ const Dropzone = ({
       </div>
     </MantineDropzone>
   );
+
+  // Precision: one compact row inside the upload panel, and files can be
+  // dropped anywhere on the page, the way WeTransfer does it
+  if (name === "precision")
+    return (
+      <div>
+        <input
+          type="file"
+          ref={folderInputRef}
+          style={{ display: "none" }}
+          {...({
+            webkitdirectory: "",
+            directory: "",
+          } as any)}
+          multiple
+          onChange={handleFolderSelect}
+        />
+        <MantineDropzone
+          onReject={(e) => {
+            toast.error(e[0].errors[0].message);
+          }}
+          disabled={isUploading}
+          openRef={openRef as ForwardedRef<() => void>}
+          getFilesFromEvent={getFilesFromEvent}
+          onDrop={handleDrop}
+          sx={(theme) => ({
+            padding: 16,
+            borderRadius: 8,
+            border: `1px dashed ${precisionTokens(theme).border}`,
+            background: "transparent",
+            "&:hover": { background: precisionTokens(theme).hover },
+          })}
+        >
+          <Group noWrap spacing="md" style={{ pointerEvents: "none" }}>
+            <ThemeIcon size={44} radius={999}>
+              <TbPlus size={24} />
+            </ThemeIcon>
+            <div>
+              <Text weight={650} size="lg">
+                {title || <FormattedMessage id="upload.precision.add-files" />}
+              </Text>
+              <Text size="xs" color="dimmed">
+                <FormattedMessage
+                  id="upload.precision.limit"
+                  values={{ maxSize: byteToHumanSizeString(maxShareSize) }}
+                />
+              </Text>
+            </div>
+          </Group>
+        </MantineDropzone>
+        {isFolderUploadSupported && (
+          <Anchor
+            component="button"
+            type="button"
+            size="sm"
+            mt={8}
+            disabled={isUploading}
+            onClick={() => folderInputRef.current?.click()}
+          >
+            <FormattedMessage id="upload.precision.add-folder" />
+          </Anchor>
+        )}
+        <MantineDropzone.FullScreen
+          active={!isUploading}
+          onReject={(e) => {
+            toast.error(e[0].errors[0].message);
+          }}
+          getFilesFromEvent={getFilesFromEvent}
+          onDrop={handleDrop}
+        >
+          <Center style={{ height: "70vh", pointerEvents: "none" }}>
+            <div>
+              <Group position="center">
+                <TbCloudUpload size={64} />
+              </Group>
+              <Text align="center" weight={650} size="xl" mt="md">
+                <FormattedMessage id="upload.precision.drop" />
+              </Text>
+            </div>
+          </Center>
+        </MantineDropzone.FullScreen>
+      </div>
+    );
 
   if (glass)
     return (

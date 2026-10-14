@@ -482,6 +482,15 @@ export default {
     "Click to choose a whole folder, or drop one here.",
   "upload.dropzone.glass.folder.description.mobile":
     "Tap to choose a whole folder.",
+  "share.precision.from": "Shared by {name}",
+  "upload.precision.add-files": "Add files",
+  "upload.precision.add-folder": "Or add a whole folder",
+  "upload.precision.limit": "Drop files anywhere on the page. Up to {maxSize} per share.",
+  "upload.precision.drop": "Drop to add your files",
+  "upload.precision.summary": "{count, plural, one {# file} other {# files}}, {size} of {max}",
+  "upload.precision.uploading": "Sending your files",
+  "upload.precision.progress": "{done} of {total}",
+  "upload.precision.done": "You're done!",
   "upload.dropzone.glass.hint":
     "Press {shortcut} to upload text from your clipboard. Maximum total upload size: {maxSize}.",
   "upload.dropzone.glass.hint.mobile": "Maximum total upload size: {maxSize}.",
