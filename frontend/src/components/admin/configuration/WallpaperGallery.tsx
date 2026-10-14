@@ -24,7 +24,15 @@ import wallpaperService, {
 import { byteToHumanSizeString } from "../../../utils/fileSize.util";
 import toast from "../../../utils/toast.util";
 
-const BUILT_IN = ["alps", "dunes", "lagoon", "meadow", "midnight"];
+// the detailed landscape is a 4K picture, a vector with that many shapes
+// would take the browser too long to draw behind every page
+const BUILT_IN: { file: string; width?: number; height?: number }[] = [
+  { file: "alps.webp", width: 3840, height: 2160 },
+  { file: "dunes.svg" },
+  { file: "lagoon.svg" },
+  { file: "meadow.svg" },
+  { file: "midnight.svg" },
+];
 const MAX_SIZE = { image: 20 * 1024 * 1024, video: 60 * 1024 * 1024 };
 const REQUIREMENTS = { image: 4, video: 5 };
 
@@ -61,6 +69,7 @@ type Tile = {
   url: string;
   preview: string;
   name: string;
+  vector?: boolean;
   width?: number;
   height?: number;
   wallpaper?: Wallpaper;
@@ -95,10 +104,13 @@ const WallpaperGallery = ({
 
   const tiles: Tile[] = [
     ...(kind === "image"
-      ? BUILT_IN.map((name) => ({
-          url: `/wallpapers/${name}.svg`,
-          preview: `/wallpapers/${name}.svg`,
-          name: t(`admin.wallpapers.built-in.${name}`),
+      ? BUILT_IN.map(({ file, width, height }) => ({
+          url: `/wallpapers/${file}`,
+          preview: `/wallpapers/${file}`,
+          name: t(`admin.wallpapers.built-in.${file.split(".")[0]}`),
+          width,
+          height,
+          vector: file.endsWith(".svg"),
         }))
       : []),
     ...wallpapers
@@ -172,7 +184,7 @@ const WallpaperGallery = ({
             const quality = wallpaperQuality(
               tile.width,
               tile.height,
-              !tile.wallpaper,
+              tile.vector,
             );
             return (
               <Box key={tile.url} sx={{ position: "relative" }}>
