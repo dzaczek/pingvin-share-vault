@@ -725,7 +725,9 @@ export default {
   "admin.config.appearance.glass-background-url": "Wallpaper address",
   "admin.config.appearance.glass-background-url.description":
     "Pick a wallpaper from the gallery, upload your own or give an http(s) address. The gallery shows images when the background is set to image and videos when it is set to video. A video plays muted in a loop and stays on its first frame for people who ask for less motion.",
-  "admin.wallpapers.built-in.alps": "Alps (built in)",
+  "admin.wallpapers.built-in.alpine-lake-day": "Alpine lake, day (built in)",
+  "admin.wallpapers.built-in.alpine-lake-dusk": "Alpine lake, dusk (built in)",
+  "admin.wallpapers.built-in.alpine-lake-night": "Alpine lake, night (built in)",
   "admin.wallpapers.built-in.dunes": "Dunes (built in)",
   "admin.wallpapers.built-in.lagoon": "Lagoon (built in)",
   "admin.wallpapers.built-in.meadow": "Meadow (built in)",

@@ -24,10 +24,12 @@ import wallpaperService, {
 import { byteToHumanSizeString } from "../../../utils/fileSize.util";
 import toast from "../../../utils/toast.util";
 
-// the detailed landscape is a 4K picture, a vector with that many shapes
-// would take the browser too long to draw behind every page
+// the detailed landscapes are 4K pictures, as vectors with that many shapes
+// they would take the browser seconds to draw behind every page
 const BUILT_IN: { file: string; width?: number; height?: number }[] = [
-  { file: "alps.webp", width: 3840, height: 2160 },
+  { file: "alpine-lake-day.webp", width: 3840, height: 2160 },
+  { file: "alpine-lake-dusk.webp", width: 3840, height: 2160 },
+  { file: "alpine-lake-night.webp", width: 3840, height: 2160 },
   { file: "dunes.svg" },
   { file: "lagoon.svg" },
   { file: "meadow.svg" },
