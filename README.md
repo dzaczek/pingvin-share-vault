@@ -82,7 +82,7 @@ The demo setup itself lives in [dzaczek/pingvin-share-vault-demo](https://github
 **Look**
 - A second style, Glass, modeled on Apple's [Liquid Glass guidelines](https://developer.apple.com/documentation/technologyoverviews/liquid-glass): a floating header, translucent buttons, menus and dialogs, and separate cards for uploading files and folders
 - The admin sets the default style, glass variant, blur, background and tint under Appearance, and every user can pick their own style on the account page
-- Glass sits on a gradient, an aurora, one color of your choice, or a photo or video wallpaper from an address you set, like a desktop wallpaper on macOS
+- Glass sits on a gradient, an aurora, one color of your choice, or a photo or video wallpaper, like a desktop wallpaper on macOS. Wallpapers come from a gallery under Appearance: four built in vector wallpapers, your own uploads (JPG, PNG, WebP up to 20 MB, MP4 and WebM up to 60 MB, stored in `data/wallpapers`) or any address, each marked with how well it covers a large screen
 - Glass turns solid when the system asks for less transparency or more contrast, and the press animation stops when it asks for less motion
 - A third style, Precision, for people who work with a lot of data: crisp 1px borders, small radii, compact tables with a pinned header, monospace IPs and IDs, a red accent and colors that pass WCAG AA in light and dark mode
 
