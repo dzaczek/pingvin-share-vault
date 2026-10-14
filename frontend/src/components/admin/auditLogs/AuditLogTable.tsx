@@ -201,10 +201,14 @@ const AuditLogTable = ({
                     onSelect={onSelectIdentity}
                   />
                 </td>
-                <td>{entry.resourceName ?? entry.resourceId ?? "-"}</td>
-                <td>
+                <td style={{ minWidth: 160 }}>
+                  {entry.resourceName ?? entry.resourceId ?? "-"}
+                </td>
+                <td style={{ minWidth: 220 }}>
                   {entry.metadata && (
-                    <Code>{JSON.stringify(entry.metadata)}</Code>
+                    <Code sx={{ overflowWrap: "anywhere" }}>
+                      {JSON.stringify(entry.metadata)}
+                    </Code>
                   )}{" "}
                   <Text span size="xs" color="dimmed">
                     {entry.shardId}

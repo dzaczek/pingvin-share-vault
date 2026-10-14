@@ -56,6 +56,24 @@ export const glassSurface = (
   };
 };
 
+const contentSurface = (theme: MantineTheme): CSSObject => {
+  const dark = theme.colorScheme === "dark";
+  return {
+    background: dark ? "rgba(37, 38, 43, 0.62)" : "rgba(255, 255, 255, 0.72)",
+    backdropFilter: "blur(12px) saturate(150%)",
+    WebkitBackdropFilter: "blur(12px) saturate(150%)",
+    borderRadius: 20,
+    "&[data-with-border]": {
+      border: `1px solid rgba(255, 255, 255, ${dark ? 0.08 : 0.6})`,
+    },
+    "@media (prefers-reduced-transparency: reduce), (prefers-contrast: more)": {
+      background: dark ? theme.colors.dark[7] : theme.white,
+      backdropFilter: "none",
+      WebkitBackdropFilter: "none",
+    },
+  };
+};
+
 // a short squeeze on press, the liquid part, left out for reduced motion
 const press: CSSObject = {
   transition: "transform 120ms ease, filter 120ms ease",
@@ -104,25 +122,38 @@ export const glassTheme = (glass: GlassSettings): MantineThemeOverride => ({
     // cards hold content, so they get a lighter material without the glass
     // highlights, still see through enough to belong on the background
     Paper: {
+      styles: (theme) => ({
+        root: {
+          ...contentSurface(theme),
+          "&:has(> table)": { overflowX: "auto" },
+        },
+      }),
+    },
+    // quiet gray rows instead of white blocks, which look patchy on glass
+    Table: {
       styles: (theme) => {
         const dark = theme.colorScheme === "dark";
+        const line = `1px solid rgba(${dark ? "255, 255, 255, 0.08" : "0, 0, 0, 0.06"})`;
         return {
           root: {
-            background: dark
-              ? "rgba(37, 38, 43, 0.62)"
-              : "rgba(255, 255, 255, 0.72)",
-            backdropFilter: "blur(12px) saturate(150%)",
-            WebkitBackdropFilter: "blur(12px) saturate(150%)",
-            borderRadius: 20,
-            "&[data-with-border]": {
-              border: `1px solid rgba(255, 255, 255, ${dark ? 0.08 : 0.6})`,
+            "&& thead tr th, && tbody tr td": { borderColor: "transparent" },
+            "&& tbody tr td": { borderTop: line },
+            "&& thead tr th": { borderBottom: line },
+            "&&[data-striped] tbody tr:nth-of-type(odd)": {
+              background: `rgba(118, 118, 128, ${dark ? 0.12 : 0.06})`,
             },
-            "@media (prefers-reduced-transparency: reduce), (prefers-contrast: more)":
-              {
-                background: dark ? theme.colors.dark[7] : theme.white,
-                backdropFilter: "none",
-                WebkitBackdropFilter: "none",
-              },
+            "&& tbody tr:hover": {
+              background: `rgba(118, 118, 128, ${dark ? 0.2 : 0.1})`,
+            },
+            // the share list keeps its header pinned while rows scroll under
+            "&& thead": { background: "transparent" },
+            "&& thead th": {
+              background: dark
+                ? "rgba(37, 38, 43, 0.5)"
+                : "rgba(255, 255, 255, 0.45)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+            },
           },
         };
       },
@@ -302,10 +333,21 @@ const backgroundLayers = (theme: MantineTheme, glass: GlassSettings) => {
 export const GlassGlobalStyle = ({ glass }: { glass: GlassSettings }) => (
   <Global
     styles={(theme) => ({
-      "html body": {
+      html: {
         background: backgroundLayers(theme, glass),
         backgroundAttachment: "fixed",
-        minHeight: "100vh",
+        minHeight: "100%",
+        // a white scrollbar track shows as a stripe down the right edge
+        colorScheme: theme.colorScheme,
+        scrollbarColor: `rgba(118, 118, 128, 0.5) transparent`,
+      },
+      "html body": { background: "transparent" },
+      // the scroll box around a table becomes its card, so a wide table
+      // scrolls inside a visible frame instead of being cut off
+      "div:not(.mantine-Paper-root):has(> table)": {
+        ...contentSurface(theme),
+        padding: "4px 6px",
+        overflowX: "auto",
       },
     })}
   />
