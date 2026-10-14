@@ -53,7 +53,7 @@ const AdminConfigInput = ({
     configVariable.key === "appearance.uploadProgressStyle";
   const isDownloadAllConfig = configVariable.key === "share.downloadAll";
   const styleOptions = {
-    "appearance.uiStyle": ["standard", "glass"],
+    "appearance.uiStyle": ["standard", "glass", "precision"],
     "appearance.glassVariant": ["regular", "clear"],
     "appearance.glassBackground": ["gradient", "aurora", "none"],
   }[configVariable.key];

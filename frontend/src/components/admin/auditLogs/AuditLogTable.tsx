@@ -46,6 +46,7 @@ const Identity = ({
       <Anchor
         component="button"
         size="sm"
+        data-mono={kind === "userId" ? undefined : true}
         onClick={() => onSelect?.(kind, value)}
       >
         {label ?? (value.length > 12 ? `${value.slice(0, 12)}…` : value)}

@@ -425,7 +425,11 @@ const ManageShareTable = ({
                     <td>{moment(share.createdAt).format("LLL")}</td>
                     <td>
                       {share.id ? (
-                        <Anchor component={Link} href={"/share/" + share.id}>
+                        <Anchor
+                          component={Link}
+                          href={"/share/" + share.id}
+                          data-mono
+                        >
                           {share.id}
                         </Anchor>
                       ) : (

@@ -154,6 +154,7 @@ export default {
   "account.theme.style.default": "Domyślny instancji",
   "account.theme.style.standard": "Standardowy",
   "account.theme.style.glass": "Glass",
+  "account.theme.style.precision": "Precision",
   "account.button.delete": "Usuń Konto",
   "account.modal.delete.title": "Usuń Konto",
   "account.modal.delete.description":
@@ -633,9 +634,10 @@ export default {
     "Procenty i pozostały czas",
   "admin.config.appearance.ui-style": "Styl",
   "admin.config.appearance.ui-style.description":
-    "Standardowy to klasyczny wygląd. Glass umieszcza nawigację, przyciski i menu na półprzezroczystym szkle, według wytycznych Apple Liquid Glass. Każdy użytkownik może wybrać własny styl na stronie konta.",
+    "Standardowy to klasyczny wygląd. Glass umieszcza nawigację, przyciski i menu na półprzezroczystym szkle, według wytycznych Apple Liquid Glass. Precision to spokojny, gęsty wygląd dla osób pracujących z dużą ilością danych, z ostrymi ramkami, zwartymi tabelami i czerwonym akcentem. Każdy użytkownik może wybrać własny styl na stronie konta.",
   "admin.config.appearance.ui-style.standard": "Standardowy",
   "admin.config.appearance.ui-style.glass": "Glass",
+  "admin.config.appearance.ui-style.precision": "Precision",
   "admin.config.appearance.glass-variant": "Wariant szkła",
   "admin.config.appearance.glass-variant.description":
     "Regular mocniej rozmywa i zachowuje czytelność tekstu. Clear jest bardziej przezroczysty i najlepiej wygląda na kolorowym tle. Menu i okna dialogowe zawsze używają regular.",

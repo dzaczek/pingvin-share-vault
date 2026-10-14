@@ -22,6 +22,7 @@ const render = (withGlass = true) =>
   renderWithProviders(
     <UiStyleContext.Provider
       value={{
+        name: withGlass ? "glass" : "standard",
         glass: withGlass ? glass : null,
         preference: "default",
         setPreference: jest.fn(),
