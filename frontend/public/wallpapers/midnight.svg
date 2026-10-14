@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3840 2160" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1026"/>
+      <stop offset="1" stop-color="#1a1440"/>
+    </linearGradient>
+    <radialGradient id="a" cx="0.25" cy="0.3" r="0.45">
+      <stop offset="0" stop-color="#5f3dc4" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#5f3dc4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b" cx="0.78" cy="0.65" r="0.5">
+      <stop offset="0" stop-color="#1c7ed6" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#1c7ed6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="c" cx="0.55" cy="0.1" r="0.3">
+      <stop offset="0" stop-color="#e64980" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#e64980" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="3840" height="2160" fill="url(#bg)"/>
+  <rect width="3840" height="2160" fill="url(#a)"/>
+  <rect width="3840" height="2160" fill="url(#b)"/>
+  <rect width="3840" height="2160" fill="url(#c)"/>
+  <path d="M0 1700 C 900 1500 1600 1850 2500 1650 S 3500 1550 3840 1620 V2160 H0Z" fill="#0b1026" fill-opacity="0.65"/>
+</svg>

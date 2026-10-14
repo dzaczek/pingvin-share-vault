@@ -24,6 +24,7 @@ import FileSizeInput from "../../core/FileSizeInput";
 import TimespanInput from "../../core/TimespanInput";
 import { LOCALES } from "../../../i18n/locales";
 import useTranslate from "../../../hooks/useTranslate.hook";
+import WallpaperGallery from "./WallpaperGallery";
 
 const AdminConfigInput = ({
   configVariable,
@@ -332,6 +333,17 @@ const AdminConfigInput = ({
             placeholder={configVariable.defaultValue}
             onChange={(value) => onValueChange(configVariable, value ?? "")}
             allowDeselect={false}
+          />
+        ) : configVariable.key === "appearance.glassBackgroundUrl" ? (
+          <WallpaperGallery
+            kind={
+              getEffectiveConfigValue("appearance.glassBackground") === "video"
+                ? "video"
+                : "image"
+            }
+            value={form.values.stringValue}
+            disabled={!configVariable.allowEdit}
+            onChange={(url) => onValueChange(configVariable, url)}
           />
         ) : (
           <TextInput

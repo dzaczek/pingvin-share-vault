@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3840 2160" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd8a8"/>
+      <stop offset="0.55" stop-color="#ffa94d"/>
+      <stop offset="1" stop-color="#e8590c"/>
+    </linearGradient>
+    <linearGradient id="d1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f08c00"/>
+      <stop offset="1" stop-color="#c2410c"/>
+    </linearGradient>
+    <linearGradient id="d2" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9480f"/>
+      <stop offset="1" stop-color="#7c2d12"/>
+    </linearGradient>
+    <linearGradient id="d3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9a3412"/>
+      <stop offset="1" stop-color="#431407"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0.72" cy="0.3" r="0.35">
+      <stop offset="0" stop-color="#fff4e6" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#fff4e6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="3840" height="2160" fill="url(#sky)"/>
+  <rect width="3840" height="2160" fill="url(#sun)"/>
+  <path d="M0 1240 C 700 1020 1300 1160 1900 1080 S 3200 900 3840 1060 V2160 H0Z" fill="url(#d1)"/>
+  <path d="M0 1520 C 900 1300 1500 1560 2300 1380 S 3400 1300 3840 1420 V2160 H0Z" fill="url(#d2)"/>
+  <path d="M0 1820 C 800 1680 1700 1900 2500 1760 S 3500 1700 3840 1780 V2160 H0Z" fill="url(#d3)"/>
+</svg>
