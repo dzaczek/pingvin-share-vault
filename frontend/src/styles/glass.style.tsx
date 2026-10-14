@@ -6,6 +6,7 @@ import {
   MantineThemeOverride,
 } from "@mantine/core";
 import { useReducedMotion } from "@mantine/hooks";
+import { useEffect, useState } from "react";
 import { GlassSettings } from "../hooks/uiStyle.hook";
 
 // The glass look follows Apple's Liquid Glass guidance: glass is for the
@@ -312,6 +313,73 @@ export const joinComponents = (
   return joined;
 };
 
+// A living wallpaper is a few frames of the same scene that fade into each
+// other, day into dusk into night and back. Only opacity changes, and only
+// while a fade runs, so nothing is redrawn while a frame holds.
+export const LIVING: Record<string, string[]> = {
+  "/wallpapers/alpine-lake.cycle": ["day", "dusk", "night"].map(
+    (mode) => `/wallpapers/alpine-lake-${mode}.webp`,
+  ),
+};
+// [frames shown, seconds held], a round takes about three minutes
+const CYCLE: [number, number][] = [
+  [1, 40],
+  [2, 25],
+  [3, 45],
+  [2, 20],
+];
+const FADE = 15;
+
+const frameStyle = (url: string, visible: boolean) => ({
+  position: "fixed" as const,
+  inset: 0,
+  zIndex: -1,
+  pointerEvents: "none" as const,
+  background: `url("${url}") center / cover no-repeat`,
+  opacity: visible ? 1 : 0,
+  transition: `opacity ${FADE}s ease-in-out`,
+});
+
+const Veil = () => (
+  <Box
+    aria-hidden
+    sx={(theme) => ({
+      position: "fixed",
+      inset: 0,
+      zIndex: -1,
+      pointerEvents: "none",
+      background:
+        theme.colorScheme === "dark"
+          ? "rgba(0, 0, 0, 0.45)"
+          : "rgba(255, 255, 255, 0.4)",
+    })}
+  />
+);
+
+const LivingWallpaper = ({ frames }: { frames: string[] }) => {
+  const reducedMotion = useReducedMotion();
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    if (reducedMotion) return;
+    const timer = setTimeout(
+      () => setStep((step + 1) % CYCLE.length),
+      (CYCLE[step][1] + FADE) * 1000,
+    );
+    return () => clearTimeout(timer);
+  }, [step, reducedMotion]);
+
+  // with reduced motion it stays on the first frame
+  const shown = reducedMotion ? 1 : CYCLE[step][0];
+  return (
+    <>
+      {frames.map((url, i) => (
+        <div key={url} aria-hidden style={frameStyle(url, i < shown)} />
+      ))}
+      <Veil />
+    </>
+  );
+};
+
 // the color the glass picks up from below. Gradients are drawn in CSS, a
 // wallpaper comes from the address the admin set
 const backgroundLayers = (theme: MantineTheme, glass: GlassSettings) => {
@@ -351,9 +419,13 @@ const backgroundLayers = (theme: MantineTheme, glass: GlassSettings) => {
         ? `linear-gradient(160deg, ${theme.fn.darken(color, 0.35)}, ${theme.fn.darken(color, 0.7)})`
         : `linear-gradient(160deg, ${theme.fn.lighten(color, 0.75)}, ${theme.fn.lighten(color, 0.4)})`,
     ],
-    image: glass.url
-      ? [veil, `url("${glass.url}") center / cover no-repeat`]
-      : gradient,
+    // a living wallpaper draws its frames as elements, the first one shows
+    // here until they are mounted
+    image: LIVING[glass.url]
+      ? [veil, `url("${LIVING[glass.url][0]}") center / cover no-repeat`]
+      : glass.url
+        ? [veil, `url("${glass.url}") center / cover no-repeat`]
+        : gradient,
     // the video itself is an element, this is what shows until it plays
     video: glass.url ? [veil, ...gradient] : gradient,
   }[glass.background];
@@ -409,20 +481,9 @@ export const GlassGlobalStyle = ({ glass }: { glass: GlassSettings }) => {
           }}
         />
       )}
-      {glass.background === "video" && glass.url && (
-        <Box
-          aria-hidden
-          sx={(theme) => ({
-            position: "fixed",
-            inset: 0,
-            zIndex: -1,
-            pointerEvents: "none",
-            background:
-              theme.colorScheme === "dark"
-                ? "rgba(0, 0, 0, 0.45)"
-                : "rgba(255, 255, 255, 0.4)",
-          })}
-        />
+      {glass.background === "video" && glass.url && <Veil />}
+      {glass.background === "image" && LIVING[glass.url] && (
+        <LivingWallpaper frames={LIVING[glass.url]} />
       )}
     </>
   );

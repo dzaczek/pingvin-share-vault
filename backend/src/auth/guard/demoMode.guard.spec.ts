@@ -51,7 +51,12 @@ describe("DemoModeGuard", () => {
 
   it("lets the wallpapers that ship with the app be picked", () => {
     demoMode = true;
-    for (const value of ["/wallpapers/dunes.svg", "/wallpapers/alps.webp", ""])
+    for (const value of [
+      "/wallpapers/dunes.svg",
+      "/wallpapers/alpine-lake-day.webp",
+      "/wallpapers/alpine-lake.cycle",
+      "",
+    ])
       expect(
         guard.canActivate(
           saving([{ key: "appearance.glassBackgroundUrl", value }]),

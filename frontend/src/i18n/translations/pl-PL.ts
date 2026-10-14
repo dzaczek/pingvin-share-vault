@@ -677,9 +677,7 @@ export default {
   "admin.config.appearance.glass-background-url": "Adres tapety",
   "admin.config.appearance.glass-background-url.description":
     "Wybierz tapetę z galerii, wgraj własną albo podaj adres http(s). Galeria pokazuje zdjęcia, gdy tło jest ustawione na zdjęcie, i filmy, gdy jest ustawione na wideo. Wideo gra bez dźwięku w pętli, a dla osób, które proszą o mniej ruchu, zatrzymuje się na pierwszej klatce.",
-  "admin.wallpapers.built-in.alpine-lake-day": "Jezioro alpejskie, dzień (wbudowana)",
-  "admin.wallpapers.built-in.alpine-lake-dusk": "Jezioro alpejskie, zmierzch (wbudowana)",
-  "admin.wallpapers.built-in.alpine-lake-night": "Jezioro alpejskie, noc (wbudowana)",
+  "admin.wallpapers.built-in.alpine-lake": "Jezioro alpejskie, od dnia do nocy (wbudowana)",
   "admin.wallpapers.built-in.dunes": "Wydmy (wbudowana)",
   "admin.wallpapers.built-in.lagoon": "Laguna (wbudowana)",
   "admin.wallpapers.built-in.meadow": "Łąka (wbudowana)",
