@@ -753,6 +753,9 @@ export default {
   "admin.wallpapers.requirements.video.3": "Length: a short loop of 10 to 30 seconds whose end flows into its start, ideally under 15 MB, since every visitor downloads it.",
   "admin.wallpapers.requirements.video.4": "Motion: slow and calm. Fast or flashing video distracts and can be hard for some people. People who ask for less motion only see the first frame.",
   "admin.wallpapers.requirements.video.5": "Shape: as for images, 16:9 landscape with the subject near the middle.",
+  "admin.config.appearance.glass-upload-panel": "Upload like WeTransfer",
+  "admin.config.appearance.glass-upload-panel.description":
+    "The upload page becomes one glass panel: add files or a folder, the file list and the share options in one place, drop files anywhere on the page, a large progress ring and the link in the same panel. The download page gets one panel with a big Download all button. Precision always works this way.",
   "admin.config.appearance.glass-tint": "Tint the main actions",
   "admin.config.appearance.glass-tint.description":
     "Gives filled buttons, such as Share, the primary color. When off, every button is neutral glass.",

@@ -18,6 +18,7 @@ const glass = {
   color: "",
   url: "",
   tint: true,
+  uploadPanel: false,
 } as const;
 
 const render = (withGlass = true) =>

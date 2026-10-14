@@ -245,6 +245,8 @@ function App({ Component, pageProps }: AppProps) {
           color: getStringConfigValue("appearance.glassBackgroundColor"),
           url: getStringConfigValue("appearance.glassBackgroundUrl"),
           tint: getStringConfigValue("appearance.glassTint", "true") === "true",
+          uploadPanel:
+            getStringConfigValue("appearance.glassUploadPanel") === "true",
         }
       : null;
 

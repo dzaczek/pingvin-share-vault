@@ -26,7 +26,7 @@ import showErrorModal from "../../../components/share/showErrorModal";
 import showShareInformationsModal from "../../../components/share/showShareInformationsModal";
 import useConfig from "../../../hooks/config.hook";
 import useTranslate from "../../../hooks/useTranslate.hook";
-import useUiStyle from "../../../hooks/uiStyle.hook";
+import { useUploadPanel } from "../../../hooks/uiStyle.hook";
 import useUser from "../../../hooks/user.hook";
 import shareService from "../../../services/share.service";
 import { MyShare, Share as ShareType } from "../../../types/share.type";
@@ -47,7 +47,7 @@ const Share = ({ shareId }: { shareId: string }) => {
   const [share, setShare] = useState<ShareType>();
   const [isRestricted, setIsRestricted] = useState(false);
   const { user } = useUser();
-  const precision = useUiStyle().name === "precision";
+  const uploadPanel = useUploadPanel();
   const config = useConfig();
   const t = useTranslate();
 
@@ -207,7 +207,7 @@ const Share = ({ shareId }: { shareId: string }) => {
 
       {showAnonymousWarning && <AnonymousShareWarning />}
 
-      {precision ? (
+      {uploadPanel ? (
         <Paper p="lg" mx="auto" sx={{ maxWidth: 900 }}>
           <Group position="apart" mb="lg">
             <Box style={{ maxWidth: "70%" }}>
@@ -254,7 +254,7 @@ const Share = ({ shareId }: { shareId: string }) => {
                   </ActionIcon>
                 </HoverTip>
               )}
-              {share?.files.length > 1 && !precision && (
+              {share?.files.length > 1 && !uploadPanel && (
                 <DownloadAllButton
                   shareId={shareId}
                   files={share!.files}
@@ -349,7 +349,7 @@ const Share = ({ shareId }: { shareId: string }) => {
                   </ActionIcon>
                 </HoverTip>
               )}
-              {share?.files.length > 1 && !precision && (
+              {share?.files.length > 1 && !uploadPanel && (
                 <DownloadAllButton
                   shareId={shareId}
                   files={share!.files}

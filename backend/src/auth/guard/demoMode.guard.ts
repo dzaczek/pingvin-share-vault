@@ -17,6 +17,7 @@ export const EDITABLE_IN_DEMO = [
   "appearance.glassBackground",
   "appearance.glassBackgroundColor",
   "appearance.glassTint",
+  "appearance.glassUploadPanel",
   "appearance.themePrimaryColor",
   "appearance.themePrimaryColorOverride",
   "appearance.themeRadius",
