@@ -2,6 +2,7 @@ import {
   Box,
   CSSObject,
   Global,
+  keyframes,
   MantineTheme,
   MantineThemeOverride,
 } from "@mantine/core";
@@ -361,7 +362,151 @@ const Veil = () => (
   />
 );
 
-const LivingWallpaper = ({ frames }: { frames: string[] }) => {
+// Things that move across a living scene: aircraft, a steamer, balloons.
+// Each is a small picture carried by a full size track that only changes
+// its transform, so the browser moves a layer instead of redrawing the
+// scene. Positions are in the 3840 x 2160 units of the scene.
+type Actor = {
+  src: string;
+  // the picture's box around its anchor point
+  box: [number, number, number, number];
+  from: [number, number];
+  to: [number, number];
+  seconds: number;
+  delay?: number;
+  // back and forth instead of across and over again
+  alternate?: boolean;
+  scale?: number;
+  opacity?: number;
+};
+
+export const ACTORS: Record<string, Actor[]> = {
+  "/wallpapers/alpine-flight.cycle": [
+    {
+      src: "/wallpapers/alpine-flight-aircraft.svg",
+      box: [-980, -130, 1110, 180],
+      from: [-500, 350],
+      to: [4400, 500],
+      seconds: 115,
+      delay: -55,
+    },
+  ],
+  "/wallpapers/lake-voyage.cycle": [
+    {
+      src: "/wallpapers/lake-voyage-steamer.svg",
+      box: [-480, -100, 610, 135],
+      from: [-700, 1680],
+      to: [4480, 1650],
+      seconds: 155,
+      delay: -90,
+    },
+  ],
+  "/wallpapers/nordic-balloons.cycle": [
+    {
+      src: "/wallpapers/nordic-balloons-balloon.svg",
+      box: [-125, -105, 250, 245],
+      from: [1100, 370],
+      to: [1370, 310],
+      seconds: 50,
+      alternate: true,
+      opacity: 0.9,
+    },
+    {
+      src: "/wallpapers/nordic-balloons-balloon.svg",
+      box: [-125, -105, 250, 245],
+      from: [2520, 540],
+      to: [2660, 485],
+      seconds: 62,
+      alternate: true,
+      scale: 0.62,
+      opacity: 0.72,
+    },
+  ],
+};
+
+const at = ([x, y]: [number, number]) =>
+  `translate(${(x / 3840) * 100}%, ${(y / 2160) * 100}%)`;
+
+// dimmer at dusk and at night, like the rest of the scene
+const ACTOR_LIGHT = [1, 0.85, 0.5];
+
+const Actors = ({
+  actors,
+  shown,
+  moving,
+}: {
+  actors: Actor[];
+  shown: number;
+  moving: boolean;
+}) => (
+  // the stage covers the window the way the frames do with cover
+  <div
+    aria-hidden
+    style={{
+      position: "fixed",
+      left: "50%",
+      top: "50%",
+      width: "max(100vw, 177.78vh)",
+      height: "max(100vh, 56.25vw)",
+      transform: "translate(-50%, -50%)",
+      overflow: "hidden",
+      zIndex: -1,
+      pointerEvents: "none",
+      opacity: ACTOR_LIGHT[shown - 1],
+      transition: `opacity ${FADE}s ease-in-out`,
+    }}
+  >
+    {actors.map((actor, i) => {
+      const scale = actor.scale ?? 1;
+      const [bx, by, bw] = actor.box;
+      const travel = keyframes({
+        from: { transform: at(actor.from) },
+        to: { transform: at(actor.to) },
+      });
+      return (
+        <Box
+          key={i}
+          sx={{
+            position: "absolute",
+            inset: 0,
+            willChange: "transform",
+            ...(moving
+              ? {
+                  animation: `${travel} ${actor.seconds}s ${actor.alternate ? "ease-in-out" : "linear"} ${actor.delay ?? 0}s infinite ${actor.alternate ? "alternate" : "normal"}`,
+                }
+              : // with reduced motion it rests halfway along its way
+                {
+                  transform: at([
+                    (actor.from[0] + actor.to[0]) / 2,
+                    (actor.from[1] + actor.to[1]) / 2,
+                  ]),
+                }),
+          }}
+        >
+          <img
+            src={actor.src}
+            alt=""
+            style={{
+              position: "absolute",
+              left: `${((bx * scale) / 3840) * 100}%`,
+              top: `${((by * scale) / 2160) * 100}%`,
+              width: `${((bw * scale) / 3840) * 100}%`,
+              opacity: actor.opacity ?? 1,
+            }}
+          />
+        </Box>
+      );
+    })}
+  </div>
+);
+
+const LivingWallpaper = ({
+  frames,
+  actors = [],
+}: {
+  frames: string[];
+  actors?: Actor[];
+}) => {
   const reducedMotion = useReducedMotion();
   const [step, setStep] = useState(0);
   useEffect(() => {
@@ -380,6 +525,9 @@ const LivingWallpaper = ({ frames }: { frames: string[] }) => {
       {frames.map((url, i) => (
         <div key={url} aria-hidden style={frameStyle(url, i < shown)} />
       ))}
+      {actors.length > 0 && (
+        <Actors actors={actors} shown={shown} moving={!reducedMotion} />
+      )}
       <Veil />
     </>
   );
@@ -488,7 +636,10 @@ export const GlassGlobalStyle = ({ glass }: { glass: GlassSettings }) => {
       )}
       {glass.background === "video" && glass.url && <Veil />}
       {glass.background === "image" && LIVING[glass.url] && (
-        <LivingWallpaper frames={LIVING[glass.url]} />
+        <LivingWallpaper
+          frames={LIVING[glass.url]}
+          actors={ACTORS[glass.url]}
+        />
       )}
     </>
   );
