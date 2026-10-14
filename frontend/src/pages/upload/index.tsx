@@ -1,24 +1,44 @@
-import { Button, Center, Group, Space, Stack, Text, Title } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Center,
+  Divider,
+  Group,
+  Paper,
+  RingProgress,
+  Space,
+  Stack,
+  Text,
+  ThemeIcon,
+  Title,
+} from "@mantine/core";
 import { useModals } from "@mantine/modals";
 import { cleanNotifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import pLimit from "p-limit";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { TbShieldLock } from "react-icons/tb";
+import { TbCheck, TbShieldLock } from "react-icons/tb";
 import { FormattedMessage } from "react-intl";
 import Meta from "../../components/Meta";
 import Dropzone from "../../components/upload/Dropzone";
 import FileList from "../../components/upload/FileList";
-import showCompletedUploadModal from "../../components/upload/modals/showCompletedUploadModal";
-import showCreateUploadModal from "../../components/upload/modals/showCreateUploadModal";
+import showCompletedUploadModal, {
+  Body as CompletedUploadBody,
+} from "../../components/upload/modals/showCompletedUploadModal";
+import showCreateUploadModal, {
+  CreateUploadModalBody,
+  SimplifiedCreateUploadModalModal,
+} from "../../components/upload/modals/showCreateUploadModal";
 import useConfig from "../../hooks/config.hook";
 import useConfirmLeave from "../../hooks/confirm-leave.hook";
 import useTranslate from "../../hooks/useTranslate.hook";
+import useUiStyle from "../../hooks/uiStyle.hook";
 import useUser from "../../hooks/user.hook";
 import shareService from "../../services/share.service";
 import { FileUpload } from "../../types/File.type";
-import { CreateShare, Share } from "../../types/share.type";
+import { CompletedShare, CreateShare, Share } from "../../types/share.type";
+import { byteToHumanSizeString } from "../../utils/fileSize.util";
 import toast from "../../utils/toast.util";
 import { useRouter } from "next/router";
 import {
@@ -47,6 +67,9 @@ const Upload = ({
   const config = useConfig();
   const [files, setFiles] = useState<FileUpload[]>([]);
   const [isUploading, setisUploading] = useState(false);
+  // Precision keeps the whole flow in one panel instead of two modals
+  const precision = useUiStyle().name === "precision";
+  const [completedShare, setCompletedShare] = useState<CompletedShare>();
 
   useConfirmLeave({
     message: t("upload.notify.confirm-leave"),
@@ -162,29 +185,26 @@ const Upload = ({
     Promise.all(fileUploadPromises);
   };
 
+  const createUploadOptions = {
+    isUserSignedIn: user ? true : false,
+    isReverseShare,
+    appUrl: config.get("general.appUrl"),
+    defaultAppUrl: config.get("general.appUrl", true),
+    allowUnauthenticatedShares: config.get(
+      "security.allowUnauthenticatedShares",
+    ),
+    enableEmailRecepients: config.get("share.enableShareEmailRecipients"),
+    enableUserRecipients: config.get("share.enableUserRecipients"),
+    maxExpiration: user?.isAdmin
+      ? { value: 0, unit: "days" }
+      : config.get("share.maxExpiration"),
+    defaultExpiration: config.get("share.defaultExpiration"),
+    shareIdLength: config.get("share.shareIdLength"),
+    simplified,
+  };
+
   const showCreateUploadModalCallback = (files: FileUpload[]) => {
-    showCreateUploadModal(
-      modals,
-      {
-        isUserSignedIn: user ? true : false,
-        isReverseShare,
-        appUrl: config.get("general.appUrl"),
-        defaultAppUrl: config.get("general.appUrl", true),
-        allowUnauthenticatedShares: config.get(
-          "security.allowUnauthenticatedShares",
-        ),
-        enableEmailRecepients: config.get("share.enableShareEmailRecipients"),
-        enableUserRecipients: config.get("share.enableUserRecipients"),
-        maxExpiration: user?.isAdmin
-          ? { value: 0, unit: "days" }
-          : config.get("share.maxExpiration"),
-        defaultExpiration: config.get("share.defaultExpiration"),
-        shareIdLength: config.get("share.shareIdLength"),
-        simplified,
-      },
-      files,
-      uploadFiles,
-    );
+    showCreateUploadModal(modals, createUploadOptions, files, uploadFiles);
   };
 
   const handleDropzoneFilesChanged = (newFiles: FileUpload[]) => {
@@ -195,7 +215,7 @@ const Upload = ({
     );
     if (filtered.length === 0) return;
 
-    if (autoOpenCreateUploadModal) {
+    if (autoOpenCreateUploadModal && !precision) {
       setFiles(filtered);
       showCreateUploadModalCallback(filtered);
     } else {
@@ -244,7 +264,7 @@ const Upload = ({
         );
         if (filtered.length === 0) return;
 
-        if (autoOpenCreateUploadModal) {
+        if (autoOpenCreateUploadModal && !precision) {
           setFiles(filtered);
           showCreateUploadModalCallback(filtered);
         } else {
@@ -258,7 +278,7 @@ const Upload = ({
     return () => {
       window.removeEventListener("paste", handlePaste);
     };
-  }, [autoOpenCreateUploadModal, modals.modals.length]);
+  }, [autoOpenCreateUploadModal, modals.modals.length, precision]);
 
   useEffect(() => {
     // Check if there are any files that failed to upload
@@ -292,12 +312,14 @@ const Upload = ({
         .completeShare(createdShare.id)
         .then((share) => {
           setisUploading(false);
-          showCompletedUploadModal(
-            modals,
-            share,
-            config.get("general.appUrl"),
-            config.get("general.appUrl", true),
-          );
+          if (precision) setCompletedShare(share);
+          else
+            showCompletedUploadModal(
+              modals,
+              share,
+              config.get("general.appUrl"),
+              config.get("general.appUrl", true),
+            );
           setFiles([]);
         })
         .catch(() => toast.error(t("upload.notify.generic-error")));
@@ -323,6 +345,112 @@ const Upload = ({
             </Button>
           </Stack>
         </Center>
+      </>
+    );
+  }
+
+  if (precision) {
+    const uploadedBytes = files.reduce(
+      (n, file) => n + (file.size * Math.max(file.uploadingProgress, 0)) / 100,
+      0,
+    );
+    const percent = currentFilesSize
+      ? Math.floor((uploadedBytes / currentFilesSize) * 100)
+      : 0;
+
+    return (
+      <>
+        <Meta title={t("upload.title")} />
+        <Paper p="lg" mx="auto" sx={{ maxWidth: 460 }}>
+          {completedShare ? (
+            <Stack>
+              <Group spacing="sm" noWrap>
+                <ThemeIcon color="green" radius={999} size={36}>
+                  <TbCheck size={20} />
+                </ThemeIcon>
+                <Title order={3}>
+                  <FormattedMessage id="upload.precision.done" />
+                </Title>
+              </Group>
+              <CompletedUploadBody
+                share={completedShare}
+                appUrl={config.get("general.appUrl")}
+                defaultAppUrl={config.get("general.appUrl", true)}
+                onDone={
+                  isReverseShare
+                    ? undefined
+                    : () => setCompletedShare(undefined)
+                }
+              />
+            </Stack>
+          ) : isUploading ? (
+            <Stack align="center" spacing="xs" py="md">
+              <RingProgress
+                size={180}
+                thickness={10}
+                roundCaps
+                sections={[{ value: percent, color: "precision" }]}
+                label={
+                  <Text align="center" weight={650} size={28}>
+                    {percent}%
+                  </Text>
+                }
+              />
+              <Text weight={600}>
+                <FormattedMessage id="upload.precision.uploading" />
+              </Text>
+              <Text size="sm" color="dimmed">
+                <FormattedMessage
+                  id="upload.precision.progress"
+                  values={{
+                    done: byteToHumanSizeString(uploadedBytes),
+                    total: byteToHumanSizeString(currentFilesSize),
+                  }}
+                />
+              </Text>
+            </Stack>
+          ) : (
+            <Stack>
+              <Dropzone
+                maxShareSize={maxShareSize}
+                currentFilesSize={currentFilesSize}
+                onFilesChanged={handleDropzoneFilesChanged}
+                isUploading={isUploading}
+              />
+              {files.length > 0 && (
+                <>
+                  <Text size="xs" color="dimmed">
+                    <FormattedMessage
+                      id="upload.precision.summary"
+                      values={{
+                        count: files.length,
+                        size: byteToHumanSizeString(currentFilesSize),
+                        max: byteToHumanSizeString(maxShareSize),
+                      }}
+                    />
+                  </Text>
+                  <Box sx={{ maxHeight: 240, overflowY: "auto" }}>
+                    <FileList<FileUpload> files={files} setFiles={setFiles} />
+                  </Box>
+                  <Divider />
+                  {simplified ? (
+                    <SimplifiedCreateUploadModalModal
+                      options={createUploadOptions}
+                      files={files}
+                      uploadCallback={uploadFiles}
+                    />
+                  ) : (
+                    <CreateUploadModalBody
+                      options={createUploadOptions}
+                      files={files}
+                      uploadCallback={uploadFiles}
+                    />
+                  )}
+                </>
+              )}
+            </Stack>
+          )}
+        </Paper>
       </>
     );
   }

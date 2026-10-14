@@ -30,14 +30,17 @@ const showCompletedUploadModal = (
   });
 };
 
-const Body = ({
+export const Body = ({
   share,
   appUrl,
   defaultAppUrl,
+  onDone,
 }: {
   share: CompletedShare;
   appUrl: string;
   defaultAppUrl: string;
+  // set when the body is shown in place instead of in a modal
+  onDone?: () => void;
 }) => {
   const modals = useModals();
   const router = useRouter();
@@ -89,7 +92,9 @@ const Body = ({
       <Button
         onClick={() => {
           modals.closeAll();
-          if (isReverseShare) {
+          if (onDone) {
+            onDone();
+          } else if (isReverseShare) {
             router.reload();
           } else {
             router.push("/upload");
