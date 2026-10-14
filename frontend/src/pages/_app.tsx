@@ -21,7 +21,11 @@ import { useEffect, useMemo, useState } from "react";
 import { IntlProvider } from "react-intl";
 import Header from "../components/header/Header";
 import { ConfigContext } from "../hooks/config.hook";
-import { GlassSettings, UiStyleContext } from "../hooks/uiStyle.hook";
+import {
+  GlassSettings,
+  UI_STYLES,
+  UiStyleContext,
+} from "../hooks/uiStyle.hook";
 import { UserContext } from "../hooks/user.hook";
 import { LOCALES } from "../i18n/locales";
 import authService from "../services/auth.service";
@@ -34,6 +38,10 @@ import {
   joinComponents,
 } from "../styles/glass.style";
 import globalStyle from "../styles/mantine.style";
+import {
+  PrecisionGlobalStyle,
+  precisionTheme,
+} from "../styles/precision.style";
 import Config from "../types/config.type";
 import { CurrentUser } from "../types/user.type";
 import { emotionCache } from "../utils/emotionCache";
@@ -214,7 +222,7 @@ function App({ Component, pageProps }: AppProps) {
   // local storage, so like the color scheme it is read after hydration
   const [uiPreference, setUiPreference] = useState("default");
   useEffect(() => setUiPreference(userPreferences.get("uiStyle")), []);
-  const uiStyle = ["standard", "glass"].includes(uiPreference)
+  const uiStyle = UI_STYLES.includes(uiPreference)
     ? uiPreference
     : getStringConfigValue("appearance.uiStyle", "standard");
   const glassBlur = parseInt(getStringConfigValue("appearance.glassBlur"));
@@ -235,17 +243,25 @@ function App({ Component, pageProps }: AppProps) {
         }
       : null;
 
+  const precision = uiStyle === "precision";
+
   const mergedTheme: MantineThemeOverride = {
     ...globalStyle,
     ...adminTheme,
+    ...(precision ? precisionTheme : {}),
     colorScheme,
     colors: {
       ...(globalStyle.colors ?? {}),
       ...(adminTheme.colors ?? {}),
+      ...(precision ? precisionTheme.colors : {}),
     },
     components: joinComponents(
       globalStyle.components,
-      glass ? glassTheme(glass).components : {},
+      glass
+        ? glassTheme(glass).components
+        : precision
+          ? precisionTheme.components
+          : {},
     ),
   };
 
@@ -381,6 +397,7 @@ function App({ Component, pageProps }: AppProps) {
           >
             <GlobalStyle />
             {glass && <GlassGlobalStyle glass={glass} />}
+            {precision && <PrecisionGlobalStyle />}
             <Notifications />
             <ModalsProvider>
               <ConfigContext.Provider
@@ -393,6 +410,11 @@ function App({ Component, pageProps }: AppProps) {
               >
                 <UiStyleContext.Provider
                   value={{
+                    name: precision
+                      ? "precision"
+                      : glass
+                        ? "glass"
+                        : "standard",
                     glass,
                     preference: uiPreference,
                     setPreference: (value) => {

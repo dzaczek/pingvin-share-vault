@@ -258,10 +258,11 @@ export class ConfigService extends EventEmitter {
       },
       {
         key: "appearance.uiStyle",
-        condition: (value: string) => ["standard", "glass"].includes(value),
+        condition: (value: string) =>
+          ["standard", "glass", "precision"].includes(value),
         message: this.t(
           "config.uiStyleValidation",
-          "The style must be standard or glass",
+          "The style must be standard, glass or precision",
         ),
       },
       {
