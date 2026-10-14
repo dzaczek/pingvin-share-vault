@@ -14,5 +14,7 @@
   "uiStyleValidation": "The style must be standard, glass or precision",
   "glassVariantValidation": "The glass variant must be regular or clear",
   "glassBlurValidation": "The glass blur must be between 0 and 40",
-  "glassBackgroundValidation": "The glass background must be gradient, aurora or none"
+  "glassBackgroundValidation": "The glass background must be gradient, aurora, color, image, video or none",
+  "glassBackgroundColorValidation": "The glass background color must be a hex color like #4c6ef5",
+  "glassBackgroundUrlValidation": "The wallpaper must be an http(s) address or a path starting with /"
 }

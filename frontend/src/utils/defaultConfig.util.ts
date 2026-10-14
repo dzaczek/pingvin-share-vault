@@ -86,6 +86,18 @@ export function getDefaultConfig(): Config[] {
       type: "string",
     },
     {
+      key: "appearance.glassBackgroundColor",
+      value: "",
+      defaultValue: "",
+      type: "string",
+    },
+    {
+      key: "appearance.glassBackgroundUrl",
+      value: "",
+      defaultValue: "",
+      type: "string",
+    },
+    {
       key: "appearance.glassTint",
       value: "true",
       defaultValue: "true",

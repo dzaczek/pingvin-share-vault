@@ -484,8 +484,9 @@ export default {
     "Tap to choose a whole folder.",
   "share.precision.from": "Shared by {name}",
   "upload.precision.add-files": "Add files",
-  "upload.precision.add-folder": "Or add a whole folder",
-  "upload.precision.limit": "Drop files anywhere on the page. Up to {maxSize} per share.",
+  "upload.precision.add-folder": "Add a folder",
+  "upload.precision.files-hint": "Or drop files anywhere on the page. Up to {maxSize} per share.",
+  "upload.precision.folder-hint": "Keeps the folder structure in the share.",
   "upload.precision.drop": "Drop to add your files",
   "upload.precision.summary": "{count, plural, one {# file} other {# files}}, {size} of {max}",
   "upload.precision.uploading": "Sending your files",
@@ -711,10 +712,19 @@ export default {
     "How strongly the glass blurs what is behind it, from 0 to 40 pixels.",
   "admin.config.appearance.glass-background": "Glass background",
   "admin.config.appearance.glass-background.description":
-    "The color the glass picks up from behind. Gradient uses the primary color, aurora adds a few more colors.",
+    "What the glass sits on, like a desktop wallpaper. Gradient uses the primary color, aurora adds a few more colors, color is one color of your choice, image and video show a wallpaper from an address you set.",
   "admin.config.appearance.glass-background.gradient": "Gradient",
   "admin.config.appearance.glass-background.aurora": "Aurora",
+  "admin.config.appearance.glass-background.color": "Color",
+  "admin.config.appearance.glass-background.image": "Image",
+  "admin.config.appearance.glass-background.video": "Video",
   "admin.config.appearance.glass-background.none": "None",
+  "admin.config.appearance.glass-background-color": "Background color",
+  "admin.config.appearance.glass-background-color.description":
+    "The color behind the glass. Leave it empty to use the primary color.",
+  "admin.config.appearance.glass-background-url": "Wallpaper address",
+  "admin.config.appearance.glass-background-url.description":
+    "An image (JPG, PNG, WebP) or a video (MP4, WebM) as an http(s) address or a path on this server. The video plays muted and in a loop, and stays on its first frame for people who ask for less motion. A permanent share works as a host.",
   "admin.config.appearance.glass-tint": "Tint the main actions",
   "admin.config.appearance.glass-tint.description":
     "Gives filled buttons, such as Share, the primary color. When off, every button is neutral glass.",
