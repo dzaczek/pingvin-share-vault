@@ -67,8 +67,12 @@ const ShardSummary = () => {
                   <td>{row.action}</td>
                   <td>{row.storage ?? "-"}</td>
                   <td>{row.count}</td>
-                  <td>{row.bytes ? byteToHumanSizeString(row.bytes) : "-"}</td>
-                  <td>{moment(row.lastSeen).format("lll")}</td>
+                  <td style={{ whiteSpace: "nowrap" }}>
+                    {row.bytes ? byteToHumanSizeString(row.bytes) : "-"}
+                  </td>
+                  <td style={{ whiteSpace: "nowrap" }}>
+                    {moment(row.lastSeen).format("lll")}
+                  </td>
                 </tr>
               ))}
             </tbody>
