@@ -1,4 +1,4 @@
-import { ActionIcon, Table, Group } from "@mantine/core";
+import { ActionIcon, Box, Table, Group } from "@mantine/core";
 import { useModals } from "@mantine/modals";
 import { TbTrash, TbEdit } from "react-icons/tb";
 import { GrUndo } from "react-icons/gr";
@@ -164,20 +164,22 @@ const FileList = <T extends FileListItem = FileListItem>({
   ));
 
   return (
-    <Table>
-      <thead>
-        <tr>
-          <th>
-            <FormattedMessage id="upload.filelist.name" />
-          </th>
-          <th>
-            <FormattedMessage id="upload.filelist.size" />
-          </th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>{rows}</tbody>
-    </Table>
+    <Box sx={{ display: "block", overflowX: "auto" }}>
+      <Table>
+        <thead>
+          <tr>
+            <th>
+              <FormattedMessage id="upload.filelist.name" />
+            </th>
+            <th>
+              <FormattedMessage id="upload.filelist.size" />
+            </th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>{rows}</tbody>
+      </Table>
+    </Box>
   );
 };
 
