@@ -20,6 +20,7 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { IntlProvider } from "react-intl";
 import Header from "../components/header/Header";
+import PrecisionShell from "../components/precision/PrecisionShell";
 import { ConfigContext } from "../hooks/config.hook";
 import {
   GlassSettings,
@@ -439,6 +440,10 @@ function App({ Component, pageProps }: AppProps) {
                     />
                     {excludeDefaultLayoutRoutes.includes(route) ? (
                       <Component {...pageProps} />
+                    ) : precision && user ? (
+                      <PrecisionShell>
+                        <Component {...pageProps} />
+                      </PrecisionShell>
                     ) : (
                       <>
                         <Stack

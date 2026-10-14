@@ -638,6 +638,12 @@ export default {
   "admin.config.appearance.ui-style.standard": "Standardowy",
   "admin.config.appearance.ui-style.glass": "Glass",
   "admin.config.appearance.ui-style.precision": "Precision",
+  "precision.nav.overview": "Przegląd",
+  "precision.nav.menu": "Otwórz nawigację",
+  "precision.nav.collapse": "Zwiń panel boczny",
+  "precision.nav.expand": "Rozwiń panel boczny",
+  "precision.nav.color-scheme": "Przełącz tryb jasny i ciemny",
+  "precision.nav.breadcrumbs": "Ścieżka",
   "admin.config.appearance.glass-variant": "Wariant szkła",
   "admin.config.appearance.glass-variant.description":
     "Regular mocniej rozmywa i zachowuje czytelność tekstu. Clear jest bardziej przezroczysty i najlepiej wygląda na kolorowym tle. Menu i okna dialogowe zawsze używają regular.",
