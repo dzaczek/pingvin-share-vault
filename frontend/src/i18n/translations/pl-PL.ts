@@ -444,8 +444,9 @@ export default {
     "Stuknij, aby wybrać cały folder.",
   "share.precision.from": "Udostępnia {name}",
   "upload.precision.add-files": "Dodaj pliki",
-  "upload.precision.add-folder": "Albo dodaj cały folder",
-  "upload.precision.limit": "Upuść pliki w dowolnym miejscu strony. Do {maxSize} na udział.",
+  "upload.precision.add-folder": "Dodaj folder",
+  "upload.precision.files-hint": "Albo upuść pliki w dowolnym miejscu strony. Do {maxSize} na udział.",
+  "upload.precision.folder-hint": "Zachowuje strukturę folderu w udziale.",
   "upload.precision.drop": "Upuść, żeby dodać pliki",
   "upload.precision.summary": "{count, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}, {size} z {max}",
   "upload.precision.uploading": "Wysyłanie plików",
@@ -663,10 +664,19 @@ export default {
     "Jak mocno szkło rozmywa to, co jest pod nim, od 0 do 40 pikseli.",
   "admin.config.appearance.glass-background": "Tło pod szkłem",
   "admin.config.appearance.glass-background.description":
-    "Kolor, który szkło przejmuje od spodu. Gradient używa koloru głównego, aurora dodaje kilka kolorów.",
+    "To, na czym leży szkło, jak tapeta pulpitu. Gradient używa koloru głównego, aurora dodaje kilka kolorów, kolor to jeden wybrany kolor, a zdjęcie i wideo pokazują tapetę spod podanego adresu.",
   "admin.config.appearance.glass-background.gradient": "Gradient",
   "admin.config.appearance.glass-background.aurora": "Aurora",
+  "admin.config.appearance.glass-background.color": "Kolor",
+  "admin.config.appearance.glass-background.image": "Zdjęcie",
+  "admin.config.appearance.glass-background.video": "Wideo",
   "admin.config.appearance.glass-background.none": "Brak",
+  "admin.config.appearance.glass-background-color": "Kolor tła",
+  "admin.config.appearance.glass-background-color.description":
+    "Kolor pod szkłem. Zostaw puste, żeby użyć koloru głównego.",
+  "admin.config.appearance.glass-background-url": "Adres tapety",
+  "admin.config.appearance.glass-background-url.description":
+    "Zdjęcie (JPG, PNG, WebP) albo wideo (MP4, WebM) jako adres http(s) lub ścieżka na tym serwerze. Wideo gra bez dźwięku w pętli, a dla osób, które proszą o mniej ruchu, zatrzymuje się na pierwszej klatce. Jako hosting może posłużyć stały udział.",
   "admin.config.appearance.glass-tint": "Kolor głównych akcji",
   "admin.config.appearance.glass-tint.description":
     "Wypełnione przyciski, np. Udostępnij, dostają kolor główny. Po wyłączeniu wszystkie przyciski są neutralnym szkłem.",

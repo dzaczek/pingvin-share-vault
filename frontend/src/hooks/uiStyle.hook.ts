@@ -3,7 +3,11 @@ import { createContext, useContext } from "react";
 export type GlassSettings = {
   variant: "regular" | "clear";
   blur: number;
-  background: "gradient" | "aurora" | "none";
+  background: "gradient" | "aurora" | "color" | "image" | "video" | "none";
+  // used by the color background, empty means the primary color
+  color: string;
+  // the wallpaper for the image and video backgrounds
+  url: string;
   tint: boolean;
 };
 

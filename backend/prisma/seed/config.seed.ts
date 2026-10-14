@@ -155,6 +155,16 @@ export const configVariables = {
       defaultValue: "gradient",
       secret: false,
     },
+    glassBackgroundColor: {
+      type: "string",
+      defaultValue: "",
+      secret: false,
+    },
+    glassBackgroundUrl: {
+      type: "string",
+      defaultValue: "",
+      secret: false,
+    },
     glassTint: {
       type: "boolean",
       defaultValue: "true",
@@ -639,7 +649,8 @@ type ConfigVariables = {
 };
 
 const databaseUrl =
-  process.env.DATABASE_URL || "file:../data/pingvin-share.db?connection_limit=1";
+  process.env.DATABASE_URL ||
+  "file:../data/pingvin-share.db?connection_limit=1";
 
 // Same two adjustments as src/prisma/sqliteUrl.ts, repeated rather than
 // imported because this file is compiled on its own with prisma/seed as the

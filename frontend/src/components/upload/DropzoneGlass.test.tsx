@@ -15,6 +15,8 @@ const glass = {
   variant: "regular",
   blur: 20,
   background: "gradient",
+  color: "",
+  url: "",
   tint: true,
 } as const;
 

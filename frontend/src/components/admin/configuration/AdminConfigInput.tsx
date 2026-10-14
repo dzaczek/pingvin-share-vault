@@ -55,7 +55,14 @@ const AdminConfigInput = ({
   const styleOptions = {
     "appearance.uiStyle": ["standard", "glass", "precision"],
     "appearance.glassVariant": ["regular", "clear"],
-    "appearance.glassBackground": ["gradient", "aurora", "none"],
+    "appearance.glassBackground": [
+      "gradient",
+      "aurora",
+      "color",
+      "image",
+      "video",
+      "none",
+    ],
   }[configVariable.key];
   const isEmailShareConfig =
     configVariable.key === "share.enableShareEmailRecipients";
@@ -177,35 +184,35 @@ const AdminConfigInput = ({
             searchable
             allowDeselect={false}
           />
-        ) : isThemePrimaryColorOverrideConfig ? (
-          shouldShowPrimaryColorOverride ? (
-            <ColorInput
-              style={{
-                width: "100%",
-              }}
-              disabled={!configVariable.allowEdit}
-              value={form.values.stringValue}
-              placeholder="#464379"
-              format="hex"
-              swatches={[
-                "#464379",
-                "#228be6",
-                "#12b886",
-                "#40c057",
-                "#15aabf",
-                "#4c6ef5",
-                "#7950f2",
-                "#be4bdb",
-                "#e64980",
-                "#fa5252",
-                "#fd7e14",
-                "#fab005",
-                "#82c91e",
-              ]}
-              onChange={(value) => onValueChange(configVariable, value ?? "")}
-            />
-          ) : null
-        ) : isThemeRadiusConfig ? (
+        ) : (isThemePrimaryColorOverrideConfig &&
+            shouldShowPrimaryColorOverride) ||
+          configVariable.key === "appearance.glassBackgroundColor" ? (
+          <ColorInput
+            style={{
+              width: "100%",
+            }}
+            disabled={!configVariable.allowEdit}
+            value={form.values.stringValue}
+            placeholder="#464379"
+            format="hex"
+            swatches={[
+              "#464379",
+              "#228be6",
+              "#12b886",
+              "#40c057",
+              "#15aabf",
+              "#4c6ef5",
+              "#7950f2",
+              "#be4bdb",
+              "#e64980",
+              "#fa5252",
+              "#fd7e14",
+              "#fab005",
+              "#82c91e",
+            ]}
+            onChange={(value) => onValueChange(configVariable, value ?? "")}
+          />
+        ) : isThemePrimaryColorOverrideConfig ? null : isThemeRadiusConfig ? (
           <Select
             style={{
               width: "100%",
