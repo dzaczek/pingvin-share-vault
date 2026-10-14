@@ -686,6 +686,12 @@ export default {
   "admin.config.appearance.ui-style.standard": "Standard",
   "admin.config.appearance.ui-style.glass": "Glass",
   "admin.config.appearance.ui-style.precision": "Precision",
+  "precision.nav.overview": "Overview",
+  "precision.nav.menu": "Open navigation",
+  "precision.nav.collapse": "Collapse sidebar",
+  "precision.nav.expand": "Expand sidebar",
+  "precision.nav.color-scheme": "Switch light and dark mode",
+  "precision.nav.breadcrumbs": "Breadcrumbs",
   "admin.config.appearance.glass-variant": "Glass variant",
   "admin.config.appearance.glass-variant.description":
     "Regular blurs more and keeps text easy to read. Clear is more transparent and works best over a colorful background. Menus and dialogs always use regular.",
