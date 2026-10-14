@@ -729,6 +729,7 @@ export default {
   "admin.wallpapers.built-in.alpine-flight": "Alpine flight, day to night (built in)",
   "admin.wallpapers.built-in.lake-voyage": "Lake voyage, day to night (built in)",
   "admin.wallpapers.built-in.nordic-balloons": "Nordic balloons, day to night (built in)",
+  "admin.wallpapers.built-in.landwasser-passage": "Landwasser viaduct, day to night (built in)",
   "admin.wallpapers.built-in.orbital-quiet": "Orbital quiet (built in)",
   "admin.wallpapers.built-in.dunes": "Dunes (built in)",
   "admin.wallpapers.built-in.lagoon": "Lagoon (built in)",

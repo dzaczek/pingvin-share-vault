@@ -681,6 +681,7 @@ export default {
   "admin.wallpapers.built-in.alpine-flight": "Lot nad Alpami, od dnia do nocy (wbudowana)",
   "admin.wallpapers.built-in.lake-voyage": "Rejs po jeziorze, od dnia do nocy (wbudowana)",
   "admin.wallpapers.built-in.nordic-balloons": "Balony nad fiordem, od dnia do nocy (wbudowana)",
+  "admin.wallpapers.built-in.landwasser-passage": "Wiadukt Landwasser, od dnia do nocy (wbudowana)",
   "admin.wallpapers.built-in.orbital-quiet": "Cisza na orbicie (wbudowana)",
   "admin.wallpapers.built-in.dunes": "Wydmy (wbudowana)",
   "admin.wallpapers.built-in.lagoon": "Laguna (wbudowana)",

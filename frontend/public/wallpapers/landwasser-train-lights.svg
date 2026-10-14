@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -170 1230 190"><defs><filter id="lamp-glow" x="-60%" y="-150%" width="220%" height="400%"><feGaussianBlur stdDeviation="5"/></filter><g id="train-lit-windows" >
+<rect x="14" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M23-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="39" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M48-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="64" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M73-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="89" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M98-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="114" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M123-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="139" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M148-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="164" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M173-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="189" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M198-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="214" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M223-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="274" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M283-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="299" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M308-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="324" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M333-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="349" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M358-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="374" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M383-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="399" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M408-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="424" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M433-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="449" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M458-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="474" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M483-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="534" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M543-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="559" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M568-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="584" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M593-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="609" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M618-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="634" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M643-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="659" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M668-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="684" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M693-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="709" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M718-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="734" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M743-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="794" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M803-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="819" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M828-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="844" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M853-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="869" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M878-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="894" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M903-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="919" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M928-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="944" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M953-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="969" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M978-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<rect x="994" y="-57" width="19" height="20" rx="2" fill="#f1d899"/><path d="M1003-56v18" stroke="#ae9d6e" stroke-width="1"/>
+<path d="M1165-63H1180L1188-52H1165Z" fill="#eadcaa" />
+<circle cx="1188" cy="-35" r="3" fill="#fff1c2"/><circle cx="1188" cy="-21" r="2" fill="#fff1c2"/>
+<path d="M1190-37L1510-98V-3L1190-21Z" fill="url(#beam)" />
+</g></defs><g transform="rotate(-2.8624)"><use href="#train-lit-windows" filter="url(#lamp-glow)" opacity=".75"/><use href="#train-lit-windows"/></g></svg>
