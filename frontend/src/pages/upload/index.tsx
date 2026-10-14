@@ -11,6 +11,7 @@ import {
   Text,
   ThemeIcon,
   Title,
+  useMantineTheme,
 } from "@mantine/core";
 import { useModals } from "@mantine/modals";
 import { cleanNotifications } from "@mantine/notifications";
@@ -33,7 +34,7 @@ import showCreateUploadModal, {
 import useConfig from "../../hooks/config.hook";
 import useConfirmLeave from "../../hooks/confirm-leave.hook";
 import useTranslate from "../../hooks/useTranslate.hook";
-import useUiStyle from "../../hooks/uiStyle.hook";
+import { useUploadPanel } from "../../hooks/uiStyle.hook";
 import useUser from "../../hooks/user.hook";
 import shareService from "../../services/share.service";
 import { FileUpload } from "../../types/File.type";
@@ -67,8 +68,10 @@ const Upload = ({
   const config = useConfig();
   const [files, setFiles] = useState<FileUpload[]>([]);
   const [isUploading, setisUploading] = useState(false);
-  // Precision keeps the whole flow in one panel instead of two modals
-  const precision = useUiStyle().name === "precision";
+  // Precision, and Glass when asked, keep the whole flow in one panel
+  // instead of two modals
+  const uploadPanel = useUploadPanel();
+  const theme = useMantineTheme();
   const [completedShare, setCompletedShare] = useState<CompletedShare>();
 
   useConfirmLeave({
@@ -215,7 +218,7 @@ const Upload = ({
     );
     if (filtered.length === 0) return;
 
-    if (autoOpenCreateUploadModal && !precision) {
+    if (autoOpenCreateUploadModal && !uploadPanel) {
       setFiles(filtered);
       showCreateUploadModalCallback(filtered);
     } else {
@@ -264,7 +267,7 @@ const Upload = ({
         );
         if (filtered.length === 0) return;
 
-        if (autoOpenCreateUploadModal && !precision) {
+        if (autoOpenCreateUploadModal && !uploadPanel) {
           setFiles(filtered);
           showCreateUploadModalCallback(filtered);
         } else {
@@ -278,7 +281,7 @@ const Upload = ({
     return () => {
       window.removeEventListener("paste", handlePaste);
     };
-  }, [autoOpenCreateUploadModal, modals.modals.length, precision]);
+  }, [autoOpenCreateUploadModal, modals.modals.length, uploadPanel]);
 
   useEffect(() => {
     // Check if there are any files that failed to upload
@@ -312,7 +315,7 @@ const Upload = ({
         .completeShare(createdShare.id)
         .then((share) => {
           setisUploading(false);
-          if (precision) setCompletedShare(share);
+          if (uploadPanel) setCompletedShare(share);
           else
             showCompletedUploadModal(
               modals,
@@ -349,7 +352,7 @@ const Upload = ({
     );
   }
 
-  if (precision) {
+  if (uploadPanel) {
     const uploadedBytes = files.reduce(
       (n, file) => n + (file.size * Math.max(file.uploadingProgress, 0)) / 100,
       0,
@@ -389,7 +392,7 @@ const Upload = ({
                 size={180}
                 thickness={10}
                 roundCaps
-                sections={[{ value: percent, color: "precision" }]}
+                sections={[{ value: percent, color: theme.primaryColor }]}
                 label={
                   <Text align="center" weight={650} size={28}>
                     {percent}%

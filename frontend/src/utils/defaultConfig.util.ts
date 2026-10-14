@@ -103,6 +103,12 @@ export function getDefaultConfig(): Config[] {
       defaultValue: "true",
       type: "boolean",
     },
+    {
+      key: "appearance.glassUploadPanel",
+      value: "false",
+      defaultValue: "false",
+      type: "boolean",
+    },
     // deliberately stricter than the seed, which defaults this to true: an
     // instance whose config we cannot read should not be accepting signups
     {
