@@ -61,6 +61,8 @@ describe("validateConfigVariable, appearance style", () => {
 
   it("takes a hex color or nothing for the color background", () => {
     accepts("appearance.glassBackgroundColor", "");
+    // what update() hands over when the field is cleared
+    accepts("appearance.glassBackgroundColor", null);
     accepts("appearance.glassBackgroundColor", "#4c6ef5");
     rejects("appearance.glassBackgroundColor", "blue");
     rejects("appearance.glassBackgroundColor", "#4c6ef5; color: red");
@@ -68,6 +70,7 @@ describe("validateConfigVariable, appearance style", () => {
 
   it("takes only wallpaper addresses that are safe inside a CSS url()", () => {
     accepts("appearance.glassBackgroundUrl", "");
+    accepts("appearance.glassBackgroundUrl", null);
     accepts("appearance.glassBackgroundUrl", "https://example.com/sea.jpg");
     accepts("appearance.glassBackgroundUrl", "/img/wallpaper.webp");
     rejects("appearance.glassBackgroundUrl", "javascript:alert(1)");
