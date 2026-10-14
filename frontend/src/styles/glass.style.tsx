@@ -316,11 +316,16 @@ export const joinComponents = (
 // A living wallpaper is a few frames of the same scene that fade into each
 // other, day into dusk into night and back. Only opacity changes, and only
 // while a fade runs, so nothing is redrawn while a frame holds.
-export const LIVING: Record<string, string[]> = {
-  "/wallpapers/alpine-lake.cycle": ["day", "dusk", "night"].map(
-    (mode) => `/wallpapers/alpine-lake-${mode}.webp`,
+export const LIVING: Record<string, string[]> = Object.fromEntries(
+  ["alpine-lake", "alpine-flight", "lake-voyage", "nordic-balloons"].map(
+    (scene) => [
+      `/wallpapers/${scene}.cycle`,
+      ["day", "dusk", "night"].map(
+        (mode) => `/wallpapers/${scene}-${mode}.webp`,
+      ),
+    ],
   ),
-};
+);
 // [frames shown, seconds held], a round takes about three minutes
 const CYCLE: [number, number][] = [
   [1, 40],

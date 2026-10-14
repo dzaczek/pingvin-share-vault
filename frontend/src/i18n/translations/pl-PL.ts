@@ -678,6 +678,10 @@ export default {
   "admin.config.appearance.glass-background-url.description":
     "Wybierz tapetę z galerii, wgraj własną albo podaj adres http(s). Galeria pokazuje zdjęcia, gdy tło jest ustawione na zdjęcie, i filmy, gdy jest ustawione na wideo. Wideo gra bez dźwięku w pętli, a dla osób, które proszą o mniej ruchu, zatrzymuje się na pierwszej klatce.",
   "admin.wallpapers.built-in.alpine-lake": "Jezioro alpejskie, od dnia do nocy (wbudowana)",
+  "admin.wallpapers.built-in.alpine-flight": "Lot nad Alpami, od dnia do nocy (wbudowana)",
+  "admin.wallpapers.built-in.lake-voyage": "Rejs po jeziorze, od dnia do nocy (wbudowana)",
+  "admin.wallpapers.built-in.nordic-balloons": "Balony nad fiordem, od dnia do nocy (wbudowana)",
+  "admin.wallpapers.built-in.orbital-quiet": "Cisza na orbicie (wbudowana)",
   "admin.wallpapers.built-in.dunes": "Wydmy (wbudowana)",
   "admin.wallpapers.built-in.lagoon": "Laguna (wbudowana)",
   "admin.wallpapers.built-in.meadow": "Łąka (wbudowana)",
