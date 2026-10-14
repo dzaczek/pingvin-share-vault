@@ -6,6 +6,7 @@ import {
 import { randomBytes } from "crypto";
 import { createReadStream } from "fs";
 import * as fs from "fs/promises";
+import * as path from "path";
 import * as rangeParser from "range-parser";
 import { ConfigService } from "src/config/config.service";
 import { DATA_DIRECTORY } from "src/constants";
@@ -26,6 +27,17 @@ const MIME_TYPES = {
 
 // random ids only, so a name from the request can never point elsewhere
 const FILE_NAME = /^[A-Za-z0-9_-]{16}(\.thumb)?\.(jpg|png|webp|mp4|webm)$/;
+
+const ROOT = path.resolve(WALLPAPER_DIRECTORY);
+
+// the name is checked above, this keeps the resolved path inside the
+// directory as well, should the pattern ever be loosened
+const inDirectory = (name: string) => {
+  const resolved = path.resolve(ROOT, name);
+  if (!resolved.startsWith(ROOT + path.sep))
+    throw new NotFoundException("Wallpaper not found");
+  return resolved;
+};
 
 export type Wallpaper = {
   file: string;
@@ -49,9 +61,7 @@ export class WallpaperService {
       files
         .filter((file) => file.endsWith(".json"))
         .map(async (file) =>
-          JSON.parse(
-            await fs.readFile(`${WALLPAPER_DIRECTORY}/${file}`, "utf8"),
-          ),
+          JSON.parse(await fs.readFile(inDirectory(file), "utf8")),
         ),
     );
     return wallpapers
@@ -72,7 +82,7 @@ export class WallpaperService {
     const id = randomBytes(12).toString("base64url");
     const stored = `${id}.${extension}`;
     await fs.mkdir(WALLPAPER_DIRECTORY, { recursive: true });
-    await fs.writeFile(`${WALLPAPER_DIRECTORY}/${stored}`, file.buffer);
+    await fs.writeFile(inDirectory(stored), file.buffer);
 
     // the gallery shows a small copy instead of a picture of many megabytes
     if (kind === "image")
@@ -80,7 +90,7 @@ export class WallpaperService {
         .rotate()
         .resize(640)
         .webp({ quality: 75 })
-        .toFile(`${WALLPAPER_DIRECTORY}/${id}.thumb.webp`);
+        .toFile(inDirectory(`${id}.thumb.webp`));
 
     const wallpaper = {
       file: stored,
@@ -91,10 +101,7 @@ export class WallpaperService {
       size: file.size,
       createdAt: new Date().toISOString(),
     };
-    await fs.writeFile(
-      `${WALLPAPER_DIRECTORY}/${id}.json`,
-      JSON.stringify(wallpaper),
-    );
+    await fs.writeFile(inDirectory(`${id}.json`), JSON.stringify(wallpaper));
     return this.withUrls(wallpaper);
   }
 
@@ -103,16 +110,16 @@ export class WallpaperService {
       throw new NotFoundException("Wallpaper not found");
 
     const id = file.split(".")[0];
-    const metadata = `${WALLPAPER_DIRECTORY}/${id}.json`;
+    const metadata = inDirectory(`${id}.json`);
     if (!(await this.exists(metadata)))
       throw new NotFoundException("Wallpaper not found");
 
-    for (const path of [
-      `${WALLPAPER_DIRECTORY}/${file}`,
-      `${WALLPAPER_DIRECTORY}/${id}.thumb.webp`,
+    for (const target of [
+      inDirectory(file),
+      inDirectory(`${id}.thumb.webp`),
       metadata,
     ])
-      await fs.rm(path, { force: true });
+      await fs.rm(target, { force: true });
 
     // a deleted wallpaper in use would leave the page on a broken address
     if (this.config.get("appearance.glassBackgroundUrl") === this.url(file))
@@ -125,8 +132,8 @@ export class WallpaperService {
     if (!FILE_NAME.test(file))
       throw new NotFoundException("Wallpaper not found");
 
-    const path = `${WALLPAPER_DIRECTORY}/${file}`;
-    const stat = await fs.stat(path).catch(() => {
+    const target = inDirectory(file);
+    const stat = await fs.stat(target).catch(() => {
       throw new NotFoundException("Wallpaper not found");
     });
 
@@ -142,7 +149,7 @@ export class WallpaperService {
       size,
       part,
       mimeType: MIME_TYPES[file.split(".").pop() as keyof typeof MIME_TYPES],
-      stream: createReadStream(path, part),
+      stream: createReadStream(target, part),
     };
   }
 
@@ -189,9 +196,9 @@ export class WallpaperService {
     };
   }
 
-  private exists(path: string) {
+  private exists(target: string) {
     return fs
-      .access(path)
+      .access(target)
       .then(() => true)
       .catch(() => false);
   }
