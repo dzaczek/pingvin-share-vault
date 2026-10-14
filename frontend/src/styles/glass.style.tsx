@@ -318,14 +318,16 @@ export const joinComponents = (
 // other, day into dusk into night and back. Only opacity changes, and only
 // while a fade runs, so nothing is redrawn while a frame holds.
 export const LIVING: Record<string, string[]> = Object.fromEntries(
-  ["alpine-lake", "alpine-flight", "lake-voyage", "nordic-balloons"].map(
-    (scene) => [
-      `/wallpapers/${scene}.cycle`,
-      ["day", "dusk", "night"].map(
-        (mode) => `/wallpapers/${scene}-${mode}.webp`,
-      ),
-    ],
-  ),
+  [
+    "alpine-lake",
+    "alpine-flight",
+    "lake-voyage",
+    "nordic-balloons",
+    "landwasser-passage",
+  ].map((scene) => [
+    `/wallpapers/${scene}.cycle`,
+    ["day", "dusk", "night"].map((mode) => `/wallpapers/${scene}-${mode}.webp`),
+  ]),
 );
 // [frames shown, seconds held], a round takes about three minutes
 const CYCLE: [number, number][] = [
@@ -378,6 +380,12 @@ type Actor = {
   alternate?: boolean;
   scale?: number;
   opacity?: number;
+  // only on at dusk and at night, like the lit windows of a train
+  lights?: boolean;
+  // a fixed window it shows in, [x0, y0, x1, y1], fading out over the
+  // given width at both sides, so a train comes out of a tunnel and goes
+  // into the next one
+  window?: { clip: [number, number, number, number]; fade: number };
 };
 
 export const ACTORS: Record<string, Actor[]> = {
@@ -401,6 +409,16 @@ export const ACTORS: Record<string, Actor[]> = {
       delay: -90,
     },
   ],
+  "/wallpapers/landwasser-passage.cycle": [false, true].map((lights) => ({
+    src: `/wallpapers/landwasser-train${lights ? "-lights" : ""}.svg`,
+    box: [-20, -170, 1230, 190],
+    from: [-1250, 892.5],
+    to: [4040, 628],
+    seconds: 100,
+    delay: -44,
+    lights,
+    window: { clip: [525, 450, 3130, 850], fade: 91 },
+  })),
   "/wallpapers/nordic-balloons.cycle": [
     {
       src: "/wallpapers/nordic-balloons-balloon.svg",
@@ -452,8 +470,6 @@ const Actors = ({
       overflow: "hidden",
       zIndex: -1,
       pointerEvents: "none",
-      opacity: ACTOR_LIGHT[shown - 1],
-      transition: `opacity ${FADE}s ease-in-out`,
     }}
   >
     {actors.map((actor, i) => {
@@ -463,38 +479,55 @@ const Actors = ({
         from: { transform: at(actor.from) },
         to: { transform: at(actor.to) },
       });
+      const [x0, y0, x1, y1] = actor.window?.clip ?? [0, 0, 3840, 2160];
+      const fade = actor.window?.fade ?? 0;
+      const pct = (x: number) => `${(x / 3840) * 100}%`;
       return (
-        <Box
+        <div
           key={i}
-          sx={{
+          style={{
             position: "absolute",
             inset: 0,
-            willChange: "transform",
-            ...(moving
-              ? {
-                  animation: `${travel} ${actor.seconds}s ${actor.alternate ? "ease-in-out" : "linear"} ${actor.delay ?? 0}s infinite ${actor.alternate ? "alternate" : "normal"}`,
-                }
-              : // with reduced motion it rests halfway along its way
-                {
-                  transform: at([
-                    (actor.from[0] + actor.to[0]) / 2,
-                    (actor.from[1] + actor.to[1]) / 2,
-                  ]),
-                }),
+            opacity: actor.lights ? Number(shown > 1) : ACTOR_LIGHT[shown - 1],
+            transition: `opacity ${FADE}s ease-in-out`,
+            ...(actor.window && {
+              clipPath: `inset(${(y0 / 2160) * 100}% ${100 - (x1 / 3840) * 100}% ${100 - (y1 / 2160) * 100}% ${(x0 / 3840) * 100}%)`,
+              WebkitMaskImage: `linear-gradient(to right, transparent ${pct(x0)}, #000 ${pct(x0 + fade)}, #000 ${pct(x1 - fade)}, transparent ${pct(x1)})`,
+              maskImage: `linear-gradient(to right, transparent ${pct(x0)}, #000 ${pct(x0 + fade)}, #000 ${pct(x1 - fade)}, transparent ${pct(x1)})`,
+            }),
           }}
         >
-          <img
-            src={actor.src}
-            alt=""
-            style={{
+          <Box
+            sx={{
               position: "absolute",
-              left: `${((bx * scale) / 3840) * 100}%`,
-              top: `${((by * scale) / 2160) * 100}%`,
-              width: `${((bw * scale) / 3840) * 100}%`,
-              opacity: actor.opacity ?? 1,
+              inset: 0,
+              willChange: "transform",
+              ...(moving
+                ? {
+                    animation: `${travel} ${actor.seconds}s ${actor.alternate ? "ease-in-out" : "linear"} ${actor.delay ?? 0}s infinite ${actor.alternate ? "alternate" : "normal"}`,
+                  }
+                : // with reduced motion it rests halfway along its way
+                  {
+                    transform: at([
+                      (actor.from[0] + actor.to[0]) / 2,
+                      (actor.from[1] + actor.to[1]) / 2,
+                    ]),
+                  }),
             }}
-          />
-        </Box>
+          >
+            <img
+              src={actor.src}
+              alt=""
+              style={{
+                position: "absolute",
+                left: `${((bx * scale) / 3840) * 100}%`,
+                top: `${((by * scale) / 2160) * 100}%`,
+                width: `${((bw * scale) / 3840) * 100}%`,
+                opacity: actor.opacity ?? 1,
+              }}
+            />
+          </Box>
+        </div>
       );
     })}
   </div>
