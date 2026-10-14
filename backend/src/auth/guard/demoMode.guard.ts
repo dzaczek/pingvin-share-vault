@@ -27,17 +27,13 @@ export const EDITABLE_IN_DEMO = [
 
 // a wallpaper from anywhere would show a stranger's picture to the next
 // visitor, the ones that ship with the app are fine
-const EDITABLE_IN_DEMO_WHEN = new Map<string, (value: unknown) => boolean>([
-  [
-    "appearance.glassBackgroundUrl",
-    (value) =>
-      value === "" || /^\/wallpapers\/[a-z0-9-]+\.svg$/.test(`${value}`),
-  ],
-]);
+const isBuiltInWallpaper = (value: unknown) =>
+  value === "" || /^\/wallpapers\/[a-z0-9-]+\.svg$/.test(`${value}`);
 
 const editableInDemo = (setting?: { key?: string; value?: unknown }) =>
   EDITABLE_IN_DEMO.includes(setting?.key) ||
-  !!EDITABLE_IN_DEMO_WHEN.get(setting?.key)?.(setting?.value);
+  (setting?.key === "appearance.glassBackgroundUrl" &&
+    isBuiltInWallpaper(setting.value));
 
 // In the public demo anyone can be the admin, so nobody may change what the
 // next visitor sees or lock them out. Does nothing on a normal instance.
