@@ -24,9 +24,10 @@ const accepts = (key: string, value: unknown) =>
   ).not.toThrow();
 
 describe("validateConfigVariable, appearance style", () => {
-  it("accepts the two styles and nothing else", () => {
+  it("accepts the three styles and nothing else", () => {
     accepts("appearance.uiStyle", "standard");
     accepts("appearance.uiStyle", "glass");
+    accepts("appearance.uiStyle", "precision");
     rejects("appearance.uiStyle", "liquid");
   });
 

@@ -83,6 +83,7 @@ The demo setup itself lives in [dzaczek/pingvin-share-vault-demo](https://github
 - A second style, Glass, modeled on Apple's [Liquid Glass guidelines](https://developer.apple.com/documentation/technologyoverviews/liquid-glass): a floating header, translucent buttons, menus and dialogs, and separate cards for uploading files and folders
 - The admin sets the default style, glass variant, blur, background and tint under Appearance, and every user can pick their own style on the account page
 - Glass turns solid when the system asks for less transparency or more contrast, and the press animation stops when it asks for less motion
+- A third style, Precision, for people who work with a lot of data: crisp 1px borders, small radii, compact tables with a pinned header, monospace IPs and IDs, a red accent and colors that pass WCAG AA in light and dark mode
 
 **Privacy**
 - `ANONYMIZE_IP` keeps only a shortened (`203.0.113.0`) or masked (`203.*.*.57`) address of every visitor, in every log

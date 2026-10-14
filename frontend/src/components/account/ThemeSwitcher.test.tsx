@@ -18,7 +18,12 @@ describe("ThemeSwitcher style choice", () => {
     const setPreference = jest.fn();
     renderWithProviders(
       <UiStyleContext.Provider
-        value={{ glass: null, preference: "default", setPreference }}
+        value={{
+          name: "standard",
+          glass: null,
+          preference: "default",
+          setPreference,
+        }}
       >
         <ThemeSwitcher />
       </UiStyleContext.Provider>,
@@ -28,9 +33,9 @@ describe("ThemeSwitcher style choice", () => {
     expect(setPreference).toHaveBeenCalledWith("glass");
   });
 
-  it("offers the instance default and both styles", () => {
+  it("offers the instance default and every style", () => {
     renderWithProviders(<ThemeSwitcher />);
-    for (const label of ["Instance default", "Standard", "Glass"])
+    for (const label of ["Instance default", "Standard", "Glass", "Precision"])
       expect(screen.getByText(label)).toBeInTheDocument();
   });
 });

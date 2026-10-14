@@ -11,7 +11,7 @@ import { useColorScheme } from "@mantine/hooks";
 import { useState } from "react";
 import { TbDeviceLaptop, TbMoon, TbSun } from "react-icons/tb";
 import { FormattedMessage } from "react-intl";
-import useUiStyle from "../../hooks/uiStyle.hook";
+import useUiStyle, { UI_STYLES } from "../../hooks/uiStyle.hook";
 import userPreferences from "../../utils/userPreferences.util";
 
 const ThemeSwitcher = () => {
@@ -74,7 +74,7 @@ const ThemeSwitcher = () => {
       <SegmentedControl
         value={preference}
         onChange={setPreference}
-        data={["default", "standard", "glass"].map((value) => ({
+        data={["default", ...UI_STYLES].map((value) => ({
           label: <FormattedMessage id={`account.theme.style.${value}`} />,
           value,
         }))}

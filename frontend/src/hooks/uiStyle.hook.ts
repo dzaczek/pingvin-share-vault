@@ -8,14 +8,19 @@ export type GlassSettings = {
 };
 
 export type UiStyle = {
-  // null means the standard look
+  // the look in effect: standard, glass or precision
+  name: string;
+  // null unless the look is glass
   glass: GlassSettings | null;
-  // what the user picked on the account page: default, standard or glass
+  // what the user picked on the account page: default or one of the looks
   preference: string;
   setPreference: (value: string) => void;
 };
 
+export const UI_STYLES = ["standard", "glass", "precision"];
+
 export const UiStyleContext = createContext<UiStyle>({
+  name: "standard",
   glass: null,
   preference: "default",
   setPreference: () => {},

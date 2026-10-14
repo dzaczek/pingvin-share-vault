@@ -165,6 +165,7 @@ export default {
   "account.theme.style.default": "Instance default",
   "account.theme.style.standard": "Standard",
   "account.theme.style.glass": "Glass",
+  "account.theme.style.precision": "Precision",
 
   "account.button.delete": "Delete Account",
   "account.modal.delete.title": "Delete Account",
@@ -681,9 +682,10 @@ export default {
     "Percentage and time remaining",
   "admin.config.appearance.ui-style": "Style",
   "admin.config.appearance.ui-style.description":
-    "Standard keeps the classic look. Glass puts the navigation, buttons and menus on translucent glass, modeled on Apple's Liquid Glass guidelines. Each user can still pick their own style on the account page.",
+    "Standard keeps the classic look. Glass puts the navigation, buttons and menus on translucent glass, modeled on Apple's Liquid Glass guidelines. Precision is a calm, dense look for people who work with a lot of data, with crisp borders, compact tables and a red accent. Each user can still pick their own style on the account page.",
   "admin.config.appearance.ui-style.standard": "Standard",
   "admin.config.appearance.ui-style.glass": "Glass",
+  "admin.config.appearance.ui-style.precision": "Precision",
   "admin.config.appearance.glass-variant": "Glass variant",
   "admin.config.appearance.glass-variant.description":
     "Regular blurs more and keeps text easy to read. Clear is more transparent and works best over a colorful background. Menus and dialogs always use regular.",
