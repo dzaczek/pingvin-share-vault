@@ -1,5 +1,4 @@
 import {
-  Anchor,
   Button,
   Center,
   createStyles,
@@ -7,6 +6,7 @@ import {
   Text,
   Menu,
   SimpleGrid,
+  Stack,
   ThemeIcon,
   useMantineColorScheme,
 } from "@mantine/core";
@@ -293,6 +293,60 @@ const Dropzone = ({
     </MantineDropzone>
   );
 
+  const row = (kind: "files" | "folder") => (
+    <MantineDropzone
+      onReject={(e) => {
+        toast.error(e[0].errors[0].message);
+      }}
+      disabled={isUploading}
+      getFilesFromEvent={getFilesFromEvent}
+      onDrop={handleDrop}
+      sx={(theme) => ({
+        padding: 16,
+        borderRadius: 8,
+        border: `1px dashed ${precisionTokens(theme).border}`,
+        background: "transparent",
+        "&:hover": { background: precisionTokens(theme).hover },
+      })}
+      {...(kind === "files"
+        ? { openRef: openRef as ForwardedRef<() => void> }
+        : {
+            activateOnClick: false,
+            onClick: () => folderInputRef.current?.click(),
+            onKeyDown: (event: React.KeyboardEvent) => {
+              if (event.key !== "Enter" && event.key !== " ") return;
+              event.preventDefault();
+              folderInputRef.current?.click();
+            },
+          })}
+    >
+      <Group noWrap spacing="md" style={{ pointerEvents: "none" }}>
+        <ThemeIcon
+          size={44}
+          radius={999}
+          variant={kind === "files" ? "filled" : "light"}
+        >
+          {kind === "files" ? <TbPlus size={24} /> : <TbFolder size={22} />}
+        </ThemeIcon>
+        <div>
+          <Text weight={650} size="lg">
+            {kind === "files" && title ? (
+              title
+            ) : (
+              <FormattedMessage id={`upload.precision.add-${kind}`} />
+            )}
+          </Text>
+          <Text size="xs" color="dimmed">
+            <FormattedMessage
+              id={`upload.precision.${kind}-hint`}
+              values={{ maxSize: byteToHumanSizeString(maxShareSize) }}
+            />
+          </Text>
+        </div>
+      </Group>
+    </MantineDropzone>
+  );
+
   // Precision: one compact row inside the upload panel, and files can be
   // dropped anywhere on the page, the way WeTransfer does it
   if (name === "precision")
@@ -309,51 +363,10 @@ const Dropzone = ({
           multiple
           onChange={handleFolderSelect}
         />
-        <MantineDropzone
-          onReject={(e) => {
-            toast.error(e[0].errors[0].message);
-          }}
-          disabled={isUploading}
-          openRef={openRef as ForwardedRef<() => void>}
-          getFilesFromEvent={getFilesFromEvent}
-          onDrop={handleDrop}
-          sx={(theme) => ({
-            padding: 16,
-            borderRadius: 8,
-            border: `1px dashed ${precisionTokens(theme).border}`,
-            background: "transparent",
-            "&:hover": { background: precisionTokens(theme).hover },
-          })}
-        >
-          <Group noWrap spacing="md" style={{ pointerEvents: "none" }}>
-            <ThemeIcon size={44} radius={999}>
-              <TbPlus size={24} />
-            </ThemeIcon>
-            <div>
-              <Text weight={650} size="lg">
-                {title || <FormattedMessage id="upload.precision.add-files" />}
-              </Text>
-              <Text size="xs" color="dimmed">
-                <FormattedMessage
-                  id="upload.precision.limit"
-                  values={{ maxSize: byteToHumanSizeString(maxShareSize) }}
-                />
-              </Text>
-            </div>
-          </Group>
-        </MantineDropzone>
-        {isFolderUploadSupported && (
-          <Anchor
-            component="button"
-            type="button"
-            size="sm"
-            mt={8}
-            disabled={isUploading}
-            onClick={() => folderInputRef.current?.click()}
-          >
-            <FormattedMessage id="upload.precision.add-folder" />
-          </Anchor>
-        )}
+        <Stack spacing="xs">
+          {row("files")}
+          {isFolderUploadSupported && row("folder")}
+        </Stack>
         <MantineDropzone.FullScreen
           active={!isUploading}
           onReject={(e) => {

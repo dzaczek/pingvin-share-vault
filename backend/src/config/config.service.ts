@@ -284,10 +284,33 @@ export class ConfigService extends EventEmitter {
       {
         key: "appearance.glassBackground",
         condition: (value: string) =>
-          ["gradient", "aurora", "none"].includes(value),
+          ["gradient", "aurora", "color", "image", "video", "none"].includes(
+            value,
+          ),
         message: this.t(
           "config.glassBackgroundValidation",
-          "The glass background must be gradient, aurora or none",
+          "The glass background must be gradient, aurora, color, image, video or none",
+        ),
+      },
+      {
+        key: "appearance.glassBackgroundColor",
+        // clearing a setting arrives here as null
+        condition: (value: string | null) =>
+          !value || /^#[0-9a-fA-F]{6}$/.test(value),
+        message: this.t(
+          "config.glassBackgroundColorValidation",
+          "The glass background color must be a hex color like #4c6ef5",
+        ),
+      },
+      {
+        // the address ends up inside a CSS url(), so quotes, brackets and
+        // whitespace are refused instead of escaped
+        key: "appearance.glassBackgroundUrl",
+        condition: (value: string | null) =>
+          !value || /^(https?:\/\/|\/)[^\s"'()\\]+$/.test(value),
+        message: this.t(
+          "config.glassBackgroundUrlValidation",
+          "The wallpaper must be an http(s) address or a path starting with /",
         ),
       },
       {

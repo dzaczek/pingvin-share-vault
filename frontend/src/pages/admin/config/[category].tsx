@@ -245,6 +245,9 @@ export default function AppShellDemo() {
                   );
                 };
 
+                const glassBackground = getEffectiveConfigValue(
+                  "appearance.glassBackground",
+                );
                 const shouldShowPrimaryColorOverride =
                   getEffectiveConfigValue("appearance.themePrimaryColor") ===
                   "custom";
@@ -307,6 +310,12 @@ export default function AppShellDemo() {
                           (configVariable.key ===
                             "appearance.themePrimaryColorOverride" &&
                             !shouldShowPrimaryColorOverride) ||
+                          (configVariable.key ===
+                            "appearance.glassBackgroundColor" &&
+                            glassBackground !== "color") ||
+                          (configVariable.key ===
+                            "appearance.glassBackgroundUrl" &&
+                            !["image", "video"].includes(glassBackground)) ||
                           (configVariable.key === "security.minLength" &&
                             !shouldShowCustomPasswordPolicies) ||
                           (configVariable.key === "security.requireLowercase" &&

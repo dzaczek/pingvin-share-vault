@@ -1,9 +1,11 @@
 import {
+  Box,
   CSSObject,
   Global,
   MantineTheme,
   MantineThemeOverride,
 } from "@mantine/core";
+import { useReducedMotion } from "@mantine/hooks";
 import { GlassSettings } from "../hooks/uiStyle.hook";
 
 // The glass look follows Apple's Liquid Glass guidance: glass is for the
@@ -89,11 +91,11 @@ export const glassTheme = (glass: GlassSettings): MantineThemeOverride => ({
     Button: {
       styles: (theme, params: { color?: string }, { variant }) => {
         if (!["filled", "default", "light", "outline"].includes(variant ?? ""))
-          return { root: { borderRadius: 999, ...press } };
+          return { root: { borderRadius: theme.radius.xl, ...press } };
         const tinted = variant === "filled" && glass.tint;
         return {
           root: {
-            borderRadius: 999,
+            borderRadius: theme.radius.xl,
             ...press,
             "&:not([data-disabled])": {
               ...glassSurface(theme, glass, {
@@ -112,7 +114,11 @@ export const glassTheme = (glass: GlassSettings): MantineThemeOverride => ({
         };
       },
     },
-    ActionIcon: { styles: { root: { borderRadius: 999, ...press } } },
+    ActionIcon: {
+      styles: (theme) => ({
+        root: { borderRadius: theme.radius.xl, ...press },
+      }),
+    },
     Avatar: {
       styles: {
         root: { borderRadius: 999 },
@@ -192,11 +198,13 @@ export const glassTheme = (glass: GlassSettings): MantineThemeOverride => ({
         root: {
           ...glassSurface(theme, glass),
           background: "rgba(118, 118, 128, 0.16)",
-          borderRadius: 999,
+          borderRadius: theme.radius.xl,
           padding: 4,
         },
+        // inset by the padding, so the thumb follows the track's curve on a
+        // short control and a wide one alike
         indicator: {
-          borderRadius: 999,
+          borderRadius: `calc(${theme.radius.xl} - 4px)`,
           background:
             theme.colorScheme === "dark"
               ? "rgba(255, 255, 255, 0.2)"
@@ -204,7 +212,10 @@ export const glassTheme = (glass: GlassSettings): MantineThemeOverride => ({
           boxShadow:
             "inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 2px 8px rgba(0, 0, 0, 0.15)",
         },
-        control: { border: "none !important" },
+        control: {
+          border: "none !important",
+          borderRadius: `calc(${theme.radius.xl} - 4px)`,
+        },
       }),
     },
     Menu: {
@@ -301,7 +312,8 @@ export const joinComponents = (
   return joined;
 };
 
-// the color the glass picks up from below, drawn in CSS so nothing is loaded
+// the color the glass picks up from below. Gradients are drawn in CSS, a
+// wallpaper comes from the address the admin set
 const backgroundLayers = (theme: MantineTheme, glass: GlassSettings) => {
   const dark = theme.colorScheme === "dark";
   const primary = theme.colors[theme.primaryColor];
@@ -310,19 +322,40 @@ const backgroundLayers = (theme: MantineTheme, glass: GlassSettings) => {
   const shade = (light: number, darker: number) =>
     primary[dark ? darker : light];
 
+  const gradient = [
+    blob("15%", "10%", shade(3, 7), dark ? 0.5 : 0.45),
+    blob("85%", "25%", shade(5, 8), dark ? 0.45 : 0.3),
+    blob("50%", "100%", shade(2, 6), dark ? 0.35 : 0.5),
+  ];
+  // a photo or video under glass needs a veil, or text on the page itself
+  // gets lost in a busy picture
+  const veil = dark
+    ? "linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45))"
+    : "linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4))";
+  const color = glass.color || primary[6];
+
   const layers = {
     none: [],
-    gradient: [
-      blob("15%", "10%", shade(3, 7), dark ? 0.5 : 0.45),
-      blob("85%", "25%", shade(5, 8), dark ? 0.45 : 0.3),
-      blob("50%", "100%", shade(2, 6), dark ? 0.35 : 0.5),
-    ],
+    gradient,
     aurora: [
       blob("10%", "15%", theme.colors.cyan[dark ? 8 : 3], dark ? 0.45 : 0.5),
       blob("90%", "10%", shade(4, 7), dark ? 0.55 : 0.45),
       blob("70%", "90%", theme.colors.pink[dark ? 8 : 3], dark ? 0.4 : 0.45),
       blob("20%", "85%", theme.colors.teal[dark ? 8 : 2], dark ? 0.35 : 0.4),
     ],
+    // one color like the macOS solid wallpapers, kept light in light mode
+    // and deep in dark mode so text on the page stays readable
+    color: [
+      `radial-gradient(circle at 20% 0%, ${theme.fn.rgba(theme.white, dark ? 0.06 : 0.35)} 0, transparent 60%)`,
+      dark
+        ? `linear-gradient(160deg, ${theme.fn.darken(color, 0.35)}, ${theme.fn.darken(color, 0.7)})`
+        : `linear-gradient(160deg, ${theme.fn.lighten(color, 0.75)}, ${theme.fn.lighten(color, 0.4)})`,
+    ],
+    image: glass.url
+      ? [veil, `url("${glass.url}") center / cover no-repeat`]
+      : gradient,
+    // the video itself is an element, this is what shows until it plays
+    video: glass.url ? [veil, ...gradient] : gradient,
   }[glass.background];
 
   return [...layers, dark ? theme.colors.dark[8] : theme.colors.gray[0]].join(
@@ -330,25 +363,67 @@ const backgroundLayers = (theme: MantineTheme, glass: GlassSettings) => {
   );
 };
 
-export const GlassGlobalStyle = ({ glass }: { glass: GlassSettings }) => (
-  <Global
-    styles={(theme) => ({
-      html: {
-        background: backgroundLayers(theme, glass),
-        backgroundAttachment: "fixed",
-        minHeight: "100%",
-        // a white scrollbar track shows as a stripe down the right edge
-        colorScheme: theme.colorScheme,
-        scrollbarColor: `rgba(118, 118, 128, 0.5) transparent`,
-      },
-      "html body": { background: "transparent" },
-      // the scroll box around a table becomes its card, so a wide table
-      // scrolls inside a visible frame instead of being cut off
-      "div:not(.mantine-Paper-root):has(> table)": {
-        ...contentSurface(theme),
-        padding: "4px 6px",
-        overflowX: "auto",
-      },
-    })}
-  />
-);
+export const GlassGlobalStyle = ({ glass }: { glass: GlassSettings }) => {
+  const reducedMotion = useReducedMotion();
+  return (
+    <>
+      <Global
+        styles={(theme) => ({
+          html: {
+            background: backgroundLayers(theme, glass),
+            backgroundAttachment: "fixed",
+            minHeight: "100%",
+            // a white scrollbar track shows as a stripe down the right edge
+            colorScheme: theme.colorScheme,
+            scrollbarColor: `rgba(118, 118, 128, 0.5) transparent`,
+          },
+          "html body": { background: "transparent" },
+          // the scroll box around a table becomes its card, so a wide table
+          // scrolls inside a visible frame instead of being cut off
+          "div:not(.mantine-Paper-root):has(> table)": {
+            ...contentSurface(theme),
+            padding: "4px 6px",
+            overflowX: "auto",
+          },
+        })}
+      />
+      {glass.background === "video" && glass.url && (
+        // muted and inline, otherwise browsers refuse to autoplay it; with
+        // reduced motion it stays on its first frame
+        <video
+          src={glass.url}
+          autoPlay={!reducedMotion}
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden
+          style={{
+            position: "fixed",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            zIndex: -1,
+            pointerEvents: "none",
+          }}
+        />
+      )}
+      {glass.background === "video" && glass.url && (
+        <Box
+          aria-hidden
+          sx={(theme) => ({
+            position: "fixed",
+            inset: 0,
+            zIndex: -1,
+            pointerEvents: "none",
+            background:
+              theme.colorScheme === "dark"
+                ? "rgba(0, 0, 0, 0.45)"
+                : "rgba(255, 255, 255, 0.4)",
+          })}
+        />
+      )}
+    </>
+  );
+};

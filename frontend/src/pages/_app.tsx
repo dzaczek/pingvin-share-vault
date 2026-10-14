@@ -235,11 +235,15 @@ function App({ Component, pageProps }: AppProps) {
               ? "clear"
               : "regular",
           blur: glassBlur >= 0 && glassBlur <= 40 ? glassBlur : 20,
-          background: (["gradient", "aurora", "none"].includes(
-            getStringConfigValue("appearance.glassBackground"),
-          )
-            ? getStringConfigValue("appearance.glassBackground")
-            : "gradient") as GlassSettings["background"],
+          background: (
+            ["gradient", "aurora", "color", "image", "video", "none"].includes(
+              getStringConfigValue("appearance.glassBackground"),
+            )
+              ? getStringConfigValue("appearance.glassBackground")
+              : "gradient"
+          ) as GlassSettings["background"],
+          color: getStringConfigValue("appearance.glassBackgroundColor"),
+          url: getStringConfigValue("appearance.glassBackgroundUrl"),
           tint: getStringConfigValue("appearance.glassTint", "true") === "true",
         }
       : null;

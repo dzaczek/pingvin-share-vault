@@ -57,6 +57,8 @@ describe("DemoModeGuard", () => {
         { key: "appearance.customCss", value: "body{}" },
       ],
       [{ key: "share.maxSize", value: "999999999" }],
+      // every visitor would see a wallpaper picked by a stranger
+      [{ key: "appearance.glassBackgroundUrl", value: "https://x.com/a.jpg" }],
       [],
       { key: "appearance.uiStyle", value: "glass" },
     ])

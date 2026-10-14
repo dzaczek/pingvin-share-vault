@@ -14,5 +14,7 @@
   "uiStyleValidation": "Styl musi mieć wartość standard, glass albo precision",
   "glassVariantValidation": "Wariant szkła musi mieć wartość regular albo clear",
   "glassBlurValidation": "Rozmycie szkła musi być w zakresie od 0 do 40",
-  "glassBackgroundValidation": "Tło szkła musi mieć wartość gradient, aurora albo none"
+  "glassBackgroundValidation": "Tło szkła musi mieć wartość gradient, aurora, color, image, video albo none",
+  "glassBackgroundColorValidation": "Kolor tła szkła musi być kolorem hex, np. #4c6ef5",
+  "glassBackgroundUrlValidation": "Tapeta musi być adresem http(s) albo ścieżką zaczynającą się od /"
 }
