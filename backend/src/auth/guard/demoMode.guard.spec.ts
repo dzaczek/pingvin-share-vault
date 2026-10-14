@@ -49,6 +49,16 @@ describe("DemoModeGuard", () => {
     ).toBe(true);
   });
 
+  it("lets the wallpapers that ship with the app be picked", () => {
+    demoMode = true;
+    for (const value of ["/wallpapers/dunes.svg", ""])
+      expect(
+        guard.canActivate(
+          saving([{ key: "appearance.glassBackgroundUrl", value }]),
+        ),
+      ).toBe(true);
+  });
+
   it("refuses a save that mixes in anything else", () => {
     demoMode = true;
     for (const body of [
@@ -59,6 +69,12 @@ describe("DemoModeGuard", () => {
       [{ key: "share.maxSize", value: "999999999" }],
       // every visitor would see a wallpaper picked by a stranger
       [{ key: "appearance.glassBackgroundUrl", value: "https://x.com/a.jpg" }],
+      [
+        {
+          key: "appearance.glassBackgroundUrl",
+          value: "/wallpapers/../api/x.svg",
+        },
+      ],
       [],
       { key: "appearance.uiStyle", value: "glass" },
     ])
