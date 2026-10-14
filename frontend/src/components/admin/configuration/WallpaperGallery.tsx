@@ -24,7 +24,7 @@ import wallpaperService, {
 import { byteToHumanSizeString } from "../../../utils/fileSize.util";
 import toast from "../../../utils/toast.util";
 
-const BUILT_IN = ["dunes", "lagoon", "meadow", "midnight"];
+const BUILT_IN = ["alps", "dunes", "lagoon", "meadow", "midnight"];
 const MAX_SIZE = { image: 20 * 1024 * 1024, video: 60 * 1024 * 1024 };
 const REQUIREMENTS = { image: 4, video: 5 };
 
