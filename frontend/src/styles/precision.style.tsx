@@ -134,6 +134,22 @@ export const precisionTheme: MantineThemeOverride = {
     Anchor: {
       styles: (theme) => ({ root: { color: precisionTokens(theme).info } }),
     },
+    Header: {
+      styles: (theme) => ({
+        root: {
+          background: precisionTokens(theme).surface,
+          borderColor: precisionTokens(theme).border,
+        },
+      }),
+    },
+    Navbar: {
+      styles: (theme) => ({
+        root: {
+          background: precisionTokens(theme).surface,
+          borderColor: precisionTokens(theme).border,
+        },
+      }),
+    },
     ActionIcon: { styles: { root: { borderRadius: 6, ...motion } } },
     Paper: {
       styles: (theme) => ({
