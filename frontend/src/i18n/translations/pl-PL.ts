@@ -705,6 +705,9 @@ export default {
   "admin.wallpapers.requirements.video.3": "Długość: krótka pętla 10 do 30 sekund, której koniec płynnie przechodzi w początek, najlepiej poniżej 15 MB, bo każdy odwiedzający ją pobiera.",
   "admin.wallpapers.requirements.video.4": "Ruch: powolny i spokojny. Szybkie albo migające wideo rozprasza i może być trudne dla części osób. Osoby, które proszą o mniej ruchu, widzą tylko pierwszą klatkę.",
   "admin.wallpapers.requirements.video.5": "Kształt: jak przy zdjęciach, poziomo 16:9 z motywem blisko środka.",
+  "admin.config.appearance.glass-upload-panel": "Wysyłanie jak WeTransfer",
+  "admin.config.appearance.glass-upload-panel.description":
+    "Strona wysyłki staje się jednym szklanym panelem: dodawanie plików albo folderu, lista plików i opcje udziału w jednym miejscu, upuszczanie plików w dowolnym miejscu strony, duży pierścień postępu i link w tym samym panelu. Strona pobierania dostaje jeden panel z dużym przyciskiem Pobierz wszystko. Precision zawsze działa w ten sposób.",
   "admin.config.appearance.glass-tint": "Kolor głównych akcji",
   "admin.config.appearance.glass-tint.description":
     "Wypełnione przyciski, np. Udostępnij, dostają kolor główny. Po wyłączeniu wszystkie przyciski są neutralnym szkłem.",

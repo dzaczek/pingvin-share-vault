@@ -9,6 +9,8 @@ export type GlassSettings = {
   // the wallpaper for the image and video backgrounds
   url: string;
   tint: boolean;
+  // the one panel upload and download that Precision always has
+  uploadPanel: boolean;
 };
 
 export type UiStyle = {
@@ -31,5 +33,11 @@ export const UiStyleContext = createContext<UiStyle>({
 });
 
 const useUiStyle = () => useContext(UiStyleContext);
+
+// whether upload and download use the single panel instead of the modals
+export const useUploadPanel = () => {
+  const { name, glass } = useUiStyle();
+  return name === "precision" || !!glass?.uploadPanel;
+};
 
 export default useUiStyle;

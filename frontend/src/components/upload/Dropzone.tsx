@@ -21,7 +21,10 @@ import {
 } from "react-icons/tb";
 import { FormattedMessage } from "react-intl";
 import { fromEvent } from "file-selector";
-import useUiStyle, { GlassSettings } from "../../hooks/uiStyle.hook";
+import useUiStyle, {
+  GlassSettings,
+  useUploadPanel,
+} from "../../hooks/uiStyle.hook";
 import { useIsHydrated } from "../../hooks/useIsHydrated.hook";
 import useTranslate from "../../hooks/useTranslate.hook";
 import { FileUpload } from "../../types/File.type";
@@ -184,7 +187,8 @@ const Dropzone = ({
   onFilesChanged: (files: FileUpload[]) => void;
 }) => {
   const t = useTranslate();
-  const { glass, name } = useUiStyle();
+  const { glass } = useUiStyle();
+  const uploadPanel = useUploadPanel();
   const { classes } = useStyles(glass);
   const openRef = useRef<() => void>();
   const folderInputRef = useRef<HTMLInputElement>(null);
@@ -301,13 +305,24 @@ const Dropzone = ({
       disabled={isUploading}
       getFilesFromEvent={getFilesFromEvent}
       onDrop={handleDrop}
-      sx={(theme) => ({
-        padding: 16,
-        borderRadius: 8,
-        border: `1px dashed ${precisionTokens(theme).border}`,
-        background: "transparent",
-        "&:hover": { background: precisionTokens(theme).hover },
-      })}
+      sx={(theme) => {
+        const dark = theme.colorScheme === "dark";
+        return {
+          padding: 16,
+          borderRadius: glass ? theme.radius.lg : 8,
+          border: glass
+            ? `1px dashed rgba(255, 255, 255, ${dark ? 0.25 : 0.8})`
+            : `1px dashed ${precisionTokens(theme).border}`,
+          background: glass
+            ? `rgba(255, 255, 255, ${dark ? 0.04 : 0.25})`
+            : "transparent",
+          "&:hover": {
+            background: glass
+              ? `rgba(255, 255, 255, ${dark ? 0.1 : 0.45})`
+              : precisionTokens(theme).hover,
+          },
+        };
+      }}
       {...(kind === "files"
         ? { openRef: openRef as ForwardedRef<() => void> }
         : {
@@ -347,9 +362,9 @@ const Dropzone = ({
     </MantineDropzone>
   );
 
-  // Precision: one compact row inside the upload panel, and files can be
-  // dropped anywhere on the page, the way WeTransfer does it
-  if (name === "precision")
+  // the upload panel (Precision, or Glass when asked): compact rows, and
+  // files can be dropped anywhere on the page, the way WeTransfer does it
+  if (uploadPanel)
     return (
       <div>
         <input

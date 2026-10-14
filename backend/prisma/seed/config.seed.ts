@@ -170,6 +170,11 @@ export const configVariables = {
       defaultValue: "true",
       secret: false,
     },
+    glassUploadPanel: {
+      type: "boolean",
+      defaultValue: "false",
+      secret: false,
+    },
   },
   share: {
     enableShareEmailRecipients: {
