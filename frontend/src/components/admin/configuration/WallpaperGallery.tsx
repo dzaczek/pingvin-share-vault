@@ -24,12 +24,20 @@ import wallpaperService, {
 import { byteToHumanSizeString } from "../../../utils/fileSize.util";
 import toast from "../../../utils/toast.util";
 
-// the detailed landscapes are 4K pictures, as vectors with that many shapes
-// they would take the browser seconds to draw behind every page
-const BUILT_IN: { file: string; width?: number; height?: number }[] = [
-  { file: "alpine-lake-day.webp", width: 3840, height: 2160 },
-  { file: "alpine-lake-dusk.webp", width: 3840, height: 2160 },
-  { file: "alpine-lake-night.webp", width: 3840, height: 2160 },
+// the Alpine lake is a living wallpaper: 4K frames of day, dusk and night
+// that fade into each other, see LIVING in the glass style
+const BUILT_IN: {
+  file: string;
+  preview?: string;
+  width?: number;
+  height?: number;
+}[] = [
+  {
+    file: "alpine-lake.cycle",
+    preview: "alpine-lake-day.webp",
+    width: 3840,
+    height: 2160,
+  },
   { file: "dunes.svg" },
   { file: "lagoon.svg" },
   { file: "meadow.svg" },
@@ -106,9 +114,9 @@ const WallpaperGallery = ({
 
   const tiles: Tile[] = [
     ...(kind === "image"
-      ? BUILT_IN.map(({ file, width, height }) => ({
+      ? BUILT_IN.map(({ file, preview, width, height }) => ({
           url: `/wallpapers/${file}`,
-          preview: `/wallpapers/${file}`,
+          preview: `/wallpapers/${preview ?? file}`,
           name: t(`admin.wallpapers.built-in.${file.split(".")[0]}`),
           width,
           height,
