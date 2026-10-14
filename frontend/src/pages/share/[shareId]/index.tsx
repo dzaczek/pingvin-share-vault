@@ -4,11 +4,13 @@ import {
   Button,
   Center,
   Group,
+  Paper,
   Stack,
   Text,
   Title,
 } from "@mantine/core";
 import { useModals } from "@mantine/modals";
+import moment from "moment";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -24,6 +26,7 @@ import showErrorModal from "../../../components/share/showErrorModal";
 import showShareInformationsModal from "../../../components/share/showShareInformationsModal";
 import useConfig from "../../../hooks/config.hook";
 import useTranslate from "../../../hooks/useTranslate.hook";
+import useUiStyle from "../../../hooks/uiStyle.hook";
 import useUser from "../../../hooks/user.hook";
 import shareService from "../../../services/share.service";
 import { MyShare, Share as ShareType } from "../../../types/share.type";
@@ -44,6 +47,7 @@ const Share = ({ shareId }: { shareId: string }) => {
   const [share, setShare] = useState<ShareType>();
   const [isRestricted, setIsRestricted] = useState(false);
   const { user } = useUser();
+  const precision = useUiStyle().name === "precision";
   const config = useConfig();
   const t = useTranslate();
 
@@ -203,71 +207,170 @@ const Share = ({ shareId }: { shareId: string }) => {
 
       {showAnonymousWarning && <AnonymousShareWarning />}
 
-      <Group position="apart" mb="lg">
-        <Box style={{ maxWidth: "70%" }}>
-          <Title order={3}>{share?.name || share?.id}</Title>
-          <Text size="sm">{share?.description}</Text>
-          {share?.files?.length > 0 && (
-            <Text size="sm" color="dimmed" mt={5}>
-              <FormattedMessage
-                id="share.fileCount"
-                values={{
-                  count: share?.files?.length || 0,
-                  size: byteToHumanSizeString(
-                    share?.files?.reduce(
-                      (total: number, file: { size: string }) =>
-                        total + parseInt(file.size),
-                      0,
-                    ) || 0,
-                  ),
-                }}
-              />
-            </Text>
-          )}
-        </Box>
+      {precision ? (
+        <Paper p="lg" mx="auto" sx={{ maxWidth: 900 }}>
+          <Group position="apart" mb="lg">
+            <Box style={{ maxWidth: "70%" }}>
+              <Title order={3}>{share?.name || share?.id}</Title>
+              <Text size="sm">{share?.description}</Text>
+              {share?.files?.length > 0 && (
+                <Text size="sm" color="dimmed" mt={5}>
+                  <FormattedMessage
+                    id="share.fileCount"
+                    values={{
+                      count: share?.files?.length || 0,
+                      size: byteToHumanSizeString(
+                        share?.files?.reduce(
+                          (total: number, file: { size: string }) =>
+                            total + parseInt(file.size),
+                          0,
+                        ) || 0,
+                      ),
+                    }}
+                  />
+                </Text>
+              )}
+            </Box>
 
-        <Group spacing="xs">
-          {isOwner && (
-            <HoverTip label={t("account.shares.button.edit")}>
-              <Link href={`/share/${shareId}/edit`}>
-                <ActionIcon variant="light" color="orange" size="lg">
-                  <TbPlusMinus />
-                </ActionIcon>
-              </Link>
-            </HoverTip>
-          )}
-          {isOwnerOrAdmin && (
-            <HoverTip label={t("common.button.edit")}>
-              <ActionIcon
-                variant="light"
-                color="blue"
-                size="lg"
-                onClick={handleEditClick}
-              >
-                <TbEdit />
-              </ActionIcon>
-            </HoverTip>
-          )}
+            <Group spacing="xs">
+              {isOwner && (
+                <HoverTip label={t("account.shares.button.edit")}>
+                  <Link href={`/share/${shareId}/edit`}>
+                    <ActionIcon variant="light" color="orange" size="lg">
+                      <TbPlusMinus />
+                    </ActionIcon>
+                  </Link>
+                </HoverTip>
+              )}
+              {isOwnerOrAdmin && (
+                <HoverTip label={t("common.button.edit")}>
+                  <ActionIcon
+                    variant="light"
+                    color="blue"
+                    size="lg"
+                    onClick={handleEditClick}
+                  >
+                    <TbEdit />
+                  </ActionIcon>
+                </HoverTip>
+              )}
+              {share?.files.length > 1 && !precision && (
+                <DownloadAllButton
+                  shareId={shareId}
+                  files={share!.files}
+                  recipientId={recipientId}
+                  warnAnonymous={showAnonymousWarning}
+                />
+              )}
+            </Group>
+          </Group>
+          <Text size="xs" color="dimmed" mt={-8} mb="md">
+            {share?.creator?.username && (
+              <>
+                <FormattedMessage
+                  id="share.precision.from"
+                  values={{ name: share.creator.username }}
+                />
+                {" · "}
+              </>
+            )}
+            {share &&
+              (moment(share.expiration).unix() === 0
+                ? t("upload.modal.completed.never-expires")
+                : t("upload.modal.completed.expires-on", {
+                    expiration: moment(share.expiration).format("LLL"),
+                  }))}
+          </Text>
+          <FileList
+            files={share?.files}
+            setShare={setShare}
+            share={share!}
+            isLoading={!share}
+            recipientId={recipientId}
+            warnAnonymous={showAnonymousWarning}
+            isAdmin={!!user?.isAdmin}
+          />
           {share?.files.length > 1 && (
-            <DownloadAllButton
-              shareId={shareId}
-              files={share!.files}
-              recipientId={recipientId}
-              warnAnonymous={showAnonymousWarning}
-            />
+            <Box mt="lg">
+              <DownloadAllButton
+                prominent
+                shareId={shareId}
+                files={share!.files}
+                recipientId={recipientId}
+                warnAnonymous={showAnonymousWarning}
+              />
+            </Box>
           )}
-        </Group>
-      </Group>
+        </Paper>
+      ) : (
+        <>
+          <Group position="apart" mb="lg">
+            <Box style={{ maxWidth: "70%" }}>
+              <Title order={3}>{share?.name || share?.id}</Title>
+              <Text size="sm">{share?.description}</Text>
+              {share?.files?.length > 0 && (
+                <Text size="sm" color="dimmed" mt={5}>
+                  <FormattedMessage
+                    id="share.fileCount"
+                    values={{
+                      count: share?.files?.length || 0,
+                      size: byteToHumanSizeString(
+                        share?.files?.reduce(
+                          (total: number, file: { size: string }) =>
+                            total + parseInt(file.size),
+                          0,
+                        ) || 0,
+                      ),
+                    }}
+                  />
+                </Text>
+              )}
+            </Box>
 
-      <FileList
-        files={share?.files}
-        setShare={setShare}
-        share={share!}
-        isLoading={!share}
-        recipientId={recipientId}
-        warnAnonymous={showAnonymousWarning}
-        isAdmin={!!user?.isAdmin}
-      />
+            <Group spacing="xs">
+              {isOwner && (
+                <HoverTip label={t("account.shares.button.edit")}>
+                  <Link href={`/share/${shareId}/edit`}>
+                    <ActionIcon variant="light" color="orange" size="lg">
+                      <TbPlusMinus />
+                    </ActionIcon>
+                  </Link>
+                </HoverTip>
+              )}
+              {isOwnerOrAdmin && (
+                <HoverTip label={t("common.button.edit")}>
+                  <ActionIcon
+                    variant="light"
+                    color="blue"
+                    size="lg"
+                    onClick={handleEditClick}
+                  >
+                    <TbEdit />
+                  </ActionIcon>
+                </HoverTip>
+              )}
+              {share?.files.length > 1 && !precision && (
+                <DownloadAllButton
+                  shareId={shareId}
+                  files={share!.files}
+                  recipientId={recipientId}
+                  warnAnonymous={showAnonymousWarning}
+                />
+              )}
+            </Group>
+          </Group>
+
+          <FileList
+            files={share?.files}
+            setShare={setShare}
+            share={share!}
+            isLoading={!share}
+            recipientId={recipientId}
+            warnAnonymous={showAnonymousWarning}
+            isAdmin={!!user?.isAdmin}
+          />
+        </>
+      )}
     </>
   );
 };

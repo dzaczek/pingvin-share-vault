@@ -14,11 +14,14 @@ const DownloadAllButton = ({
   files,
   recipientId,
   warnAnonymous,
+  prominent,
 }: {
   shareId: string;
   files: { id: string }[];
   recipientId?: string;
   warnAnonymous?: boolean;
+  // the one big action at the bottom of the Precision download panel
+  prominent?: boolean;
 }) => {
   const [isZipReady, setIsZipReady] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -75,8 +78,9 @@ const DownloadAllButton = ({
 
   return (
     <Button
-      variant="light"
-      color="cyan"
+      {...(prominent
+        ? { size: "md", fullWidth: true }
+        : { variant: "light", color: "cyan" })}
       loading={isLoading}
       onClick={() => {
         if (mode === "zip-prebuilt" && !isZipReady) {

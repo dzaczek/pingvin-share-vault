@@ -237,11 +237,15 @@ export const precisionTheme: MantineThemeOverride = {
               fontSize: 12,
               fontWeight: 600,
               borderBottom: `1px solid ${t.border}`,
+              whiteSpace: "nowrap",
             },
             "&& tbody tr td": {
               borderTop: `1px solid ${t.border}`,
               paddingTop: 9,
               paddingBottom: 9,
+              // keeps short values like "60.0 KB" on one line, a narrow
+              // screen scrolls the table instead
+              minWidth: 76,
             },
             "&& tbody tr:nth-of-type(even)": { background: t.zebra },
             "&& tbody tr:hover": { background: t.hover },

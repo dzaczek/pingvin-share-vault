@@ -442,6 +442,15 @@ export default {
     "Kliknij, aby wybrać cały folder, albo upuść go tutaj.",
   "upload.dropzone.glass.folder.description.mobile":
     "Stuknij, aby wybrać cały folder.",
+  "share.precision.from": "Udostępnia {name}",
+  "upload.precision.add-files": "Dodaj pliki",
+  "upload.precision.add-folder": "Albo dodaj cały folder",
+  "upload.precision.limit": "Upuść pliki w dowolnym miejscu strony. Do {maxSize} na udział.",
+  "upload.precision.drop": "Upuść, żeby dodać pliki",
+  "upload.precision.summary": "{count, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}, {size} z {max}",
+  "upload.precision.uploading": "Wysyłanie plików",
+  "upload.precision.progress": "{done} z {total}",
+  "upload.precision.done": "Gotowe!",
   "upload.dropzone.glass.hint":
     "Naciśnij {shortcut}, aby przesłać tekst ze schowka. Maksymalny łączny rozmiar: {maxSize}.",
   "upload.dropzone.glass.hint.mobile": "Maksymalny łączny rozmiar: {maxSize}.",

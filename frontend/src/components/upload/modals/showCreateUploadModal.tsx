@@ -98,7 +98,7 @@ const generateAvailableLink = async (
   }
 };
 
-const CreateUploadModalBody = ({
+export const CreateUploadModalBody = ({
   uploadCallback,
   files,
   options,
@@ -492,7 +492,7 @@ const CreateUploadModalBody = ({
   );
 };
 
-const SimplifiedCreateUploadModalModal = ({
+export const SimplifiedCreateUploadModalModal = ({
   uploadCallback,
   files,
   options,
