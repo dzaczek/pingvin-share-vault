@@ -1,4 +1,12 @@
 :3000 {
+	# safe defaults for every answer, pages and api alike, unless the app
+	# set its own. One directive each: in a single block, one header the app
+	# already set would skip all of them.
+	header ?X-Frame-Options SAMEORIGIN
+	header ?X-Content-Type-Options nosniff
+	header ?Referrer-Policy strict-origin-when-cross-origin
+	header ?Permissions-Policy "camera=(), microphone=(), geolocation=()"
+
 	# Reverse proxy for /api
 	reverse_proxy /api/* http://localhost:{$BACKEND_PORT:8080}
 

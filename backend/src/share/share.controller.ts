@@ -219,6 +219,8 @@ export class ShareController {
     response.cookie(`share_${id}_token`, token, {
       path: "/",
       httpOnly: true,
+      sameSite: "lax",
+      secure: this.config.get("security.secureCookies"),
     });
 
     return { token };
