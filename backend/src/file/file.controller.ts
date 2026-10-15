@@ -123,6 +123,14 @@ export class FileController {
     );
   }
 
+  // every request builds a zip of the whole share, so it gets a limit of its
+  // own instead of the generous one of single files
+  @Throttle({
+    default: {
+      limit: 10,
+      ttl: 60 * 1000,
+    },
+  })
   @Get("zip")
   @UseGuards(FileSecurityGuard)
   async getZip(

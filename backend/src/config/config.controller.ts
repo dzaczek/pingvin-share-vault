@@ -6,6 +6,7 @@ import {
   GatewayTimeoutException,
   InternalServerErrorException,
   Param,
+  ParseArrayPipe,
   ParseFilePipe,
   Patch,
   Post,
@@ -53,7 +54,11 @@ export class ConfigController {
 
   @Patch("admin")
   @UseGuards(JwtGuard, AdministratorGuard, DemoModeGuard)
-  async updateMany(@Body() data: UpdateConfigDTO[]) {
+  async updateMany(
+    // the global pipe skips arrays, so the items are checked here
+    @Body(new ParseArrayPipe({ items: UpdateConfigDTO, whitelist: true }))
+    data: UpdateConfigDTO[],
+  ) {
     return new AdminConfigDTO().fromList(
       await this.configService.updateMany(data),
     );
