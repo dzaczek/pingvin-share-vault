@@ -16,5 +16,11 @@
   "glassBlurValidation": "The glass blur must be between 0 and 40",
   "glassBackgroundValidation": "The glass background must be gradient, aurora, color, image, video or none",
   "glassBackgroundColorValidation": "The glass background color must be a hex color like #4c6ef5",
-  "glassBackgroundUrlValidation": "The wallpaper must be an http(s) address or a path starting with /"
+  "glassBackgroundUrlValidation": "The wallpaper must be an http(s) address or a path starting with /",
+  "rangeValidation": "{key} must be a whole number from {min} to {max}",
+  "optionValidation": "{key} must be one of {options}",
+  "colorValidation": "{key} must be a hex color like #4c6ef5",
+  "languageValidation": "The language must be a code like en-US",
+  "appUrlValidation": "The app URL must start with http:// or https://",
+  "minValidation": "{key} must be a whole number of at least {min}"
 }

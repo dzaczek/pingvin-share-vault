@@ -16,12 +16,16 @@ import { resolve, sep } from "path";
 import { ConfigService } from "src/config/config.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { byteToHumanSizeString } from "src/utils/fileSize.util";
-import { getUserActiveStorageUsage } from "src/utils/storageQuota.util";
+import {
+  getShareSizeLimit,
+  getUserActiveStorageUsage,
+} from "src/utils/storageQuota.util";
 import { validate as isValidUUID } from "uuid";
 import { SHARE_DIRECTORY } from "../constants";
 import { Readable } from "stream";
 import * as rangeParser from "range-parser";
 import { File } from "./file.service";
+import { streamedZipLevel } from "./zipLevel";
 
 @Injectable()
 export class LocalFileService {
@@ -94,13 +98,7 @@ export class LocalFileService {
 
     const shareSizeSum = fileSizeSum + diskFileSize + buffer.byteLength;
 
-    let limit = parseInt(this.config.get("share.maxSize"));
-    if (share.reverseShare?.maxShareSize) {
-      limit = parseInt(share.reverseShare.maxShareSize);
-    } else if (share.creator?.shareSizeLimit) {
-      limit = parseInt(share.creator.shareSizeLimit);
-    }
-
+    const limit = getShareSizeLimit(share, this.config.get("share.maxSize"));
     if (shareSizeSum > limit) {
       throw new HttpException(
         this.i18n.t("file.maxSizeExceeded"),
@@ -264,7 +262,9 @@ export class LocalFileService {
       });
 
       const archive = archiver("zip", {
-        zlib: { level: this.config.get("share.zipCompressionLevel") },
+        zlib: {
+          level: streamedZipLevel(this.config.get("share.zipCompressionLevel")),
+        },
       });
       // a missing file is only a warning to archiver, the download would then
       // look fine and be a zip without it

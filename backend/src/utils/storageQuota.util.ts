@@ -28,3 +28,19 @@ export async function getUserActiveStorageUsage(
 
   return files.reduce((sum, file) => sum + parseInt(file.size), 0);
 }
+
+// The most one share may hold: the reverse share's own limit first, then the
+// creator's, then the instance wide maximum
+export function getShareSizeLimit(
+  share: {
+    reverseShare?: { maxShareSize: string } | null;
+    creator?: { shareSizeLimit: string | null } | null;
+  },
+  maxSize: number,
+): number {
+  if (share.reverseShare?.maxShareSize)
+    return parseInt(share.reverseShare.maxShareSize);
+  if (share.creator?.shareSizeLimit)
+    return parseInt(share.creator.shareSizeLimit);
+  return maxSize;
+}
