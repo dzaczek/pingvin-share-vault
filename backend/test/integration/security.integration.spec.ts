@@ -121,31 +121,68 @@ describeAdmin("with an administrator", () => {
   describe("received shares", () => {
     let owner: Awaited<ReturnType<typeof signUp>>;
     let recipient: Awaited<ReturnType<typeof signUp>>;
+    let stranger: Awaited<ReturnType<typeof signUp>>;
     const shareId = `${RUN_ID}-received`;
+    const restrictedId = `${RUN_ID}-restricted`;
+    // a recipient address nobody has an account for yet
+    const unclaimed = `${RUN_ID}-unclaimed@integration.invalid`;
     let restore: () => Promise<void>;
 
     beforeAll(async () => {
+      // Recipients are only matched by a confirmed address. Accounts made
+      // before verification was switched on count as confirmed, which is the
+      // only way to get one here without following a mail link.
+      owner = await signUp("sender");
+      recipient = await signUp("receiver");
+      stranger = await signUp("stranger");
       restore = await withConfig(adminJar, {
         "share.enableUserRecipients": "true",
         "share.enableShareEmailRecipients": "true",
+        "security.enableEmailVerification": "true",
         "smtp.enabled": "true",
         "smtp.host": SMTP_HOST,
         "smtp.port": SMTP_PORT,
         "smtp.email": "noreply@integration.invalid",
       });
-      owner = await signUp("sender");
-      recipient = await signUp("receiver");
       await createShareWithFile(owner.jar, shareId, randomBytes(512), {
         recipients: [recipient.email],
         security: { password: "share password" },
+      });
+      // a password and the recipient restriction exclude each other
+      await createShareWithFile(owner.jar, restrictedId, randomBytes(512), {
+        recipients: [recipient.email, unclaimed],
+        security: { restrictToRecipients: true },
       });
     });
 
     afterAll(async () => {
       await removeShare(owner.jar, shareId);
+      await removeShare(owner.jar, restrictedId);
       await deleteAccount(owner.jar);
       await deleteAccount(recipient.jar);
+      await deleteAccount(stranger.jar);
       await restore();
+    });
+
+    it("still asks the recipient for the share password", async () => {
+      const res = await api(`/shares/${shareId}`, { jar: recipient.jar });
+      expect(res.status).toBe(403);
+      expect(res.body.toString("utf8")).toContain("share_password_required");
+    });
+
+    it("does not let anyone in by renaming their account to a recipient", async () => {
+      const renamed = await api("/users/me", {
+        method: "PATCH",
+        jar: stranger.jar,
+        body: { email: unclaimed },
+      });
+      expect(renamed.status).toBe(200);
+
+      const res = await api(`/shares/${restrictedId}`, { jar: stranger.jar });
+      expect(res.status).toBe(403);
+      expect(res.body.toString("utf8")).toContain(
+        "share_restricted_to_recipients",
+      );
     });
 
     it("lists the share for the recipient", async () => {

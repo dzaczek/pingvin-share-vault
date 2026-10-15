@@ -29,6 +29,7 @@ import { getUserActiveStorageUsage } from "src/utils/storageQuota.util";
 import { SHARE_DIRECTORY } from "../constants";
 import { CreateShareDTO } from "./dto/createShare.dto";
 import { UpdateShareDTO } from "./dto/updateShare.dto";
+import { hasConfirmedEmail } from "./recipientEmail.util";
 
 @Injectable()
 export class ShareService {
@@ -333,6 +334,8 @@ export class ShareService {
               email: true,
               displayName: true,
               username: true,
+              isActivated: true,
+              activationToken: true,
             },
           })
         : [];
@@ -354,16 +357,22 @@ export class ShareService {
     }
 
     // Auto-link email recipients who are registered users so the share appears in their dashboard
+    const verificationEnabled = this.configService.get(
+      "security.enableEmailVerification",
+    );
+    const confirmedUsers = matchedUsers.filter((u) =>
+      hasConfirmedEmail(u, verificationEnabled),
+    );
     if (
       this.configService.get("share.enableUserRecipients") &&
-      matchedUsers.length > 0
+      confirmedUsers.length > 0
     ) {
       // Batch upserts inside a transaction to improve performance and maintain correctness.
       // This reduces transaction overhead, although it does not completely eliminate N+1 statements.
       // A true bulk findMany + createMany would be unsafe here due to potential unique constraint
       // violations during concurrent requests (as skipDuplicates is not supported by SQLite in Prisma).
       await this.prisma.$transaction(
-        matchedUsers.map((matchedUser) =>
+        confirmedUsers.map((matchedUser) =>
           this.prisma.shareUserRecipient.upsert({
             where: {
               userId_shareId: { userId: matchedUser.id, shareId: share.id },
