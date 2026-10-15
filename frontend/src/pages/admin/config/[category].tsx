@@ -31,6 +31,8 @@ import useUiStyle from "../../../hooks/uiStyle.hook";
 import useTranslate from "../../../hooks/useTranslate.hook";
 import configService from "../../../services/config.service";
 import { AdminConfig, UpdateConfig } from "../../../types/config.type";
+import { getConfigWarnings } from "../../../utils/configWarnings.util";
+import { REPOSITORY_URL } from "../../../utils/repository.util";
 import { camelToKebab } from "../../../utils/string.util";
 import toast from "../../../utils/toast.util";
 
@@ -267,9 +269,28 @@ export default function AppShellDemo() {
                     !anonymousWarningMessageKeys.includes(configVariable.key),
                 );
 
+                // settings of other categories come from the public config
+                const warnings = getConfigWarnings((key) =>
+                  configVariables.some((item) => item.key === key)
+                    ? getEffectiveConfigValue(key)
+                    : String(config.get(key) ?? ""),
+                ).filter((warning) =>
+                  warning.categories.includes(categoryId.toLowerCase()),
+                );
+
                 return (
                   <>
                     <Stack>
+                      {warnings.map((warning) => (
+                        <Alert
+                          key={warning.id}
+                          variant="light"
+                          color="orange"
+                          icon={<TbInfoCircle />}
+                        >
+                          <FormattedMessage id={warning.id} />
+                        </Alert>
+                      ))}
                       {!isEditingAllowed() && (
                         <Alert
                           mb={"lg"}
@@ -294,7 +315,7 @@ export default function AppShellDemo() {
                             values={{
                               wikiLink: (
                                 <Anchor
-                                  href="https://smp46.github.io/pingvin-share-x/v2/setup/s3#cors-configuration"
+                                  href={`${REPOSITORY_URL}/blob/main/docs/docs/setup/s3.md#cors-configuration`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                 >
