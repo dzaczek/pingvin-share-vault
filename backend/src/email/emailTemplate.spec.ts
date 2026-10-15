@@ -52,7 +52,10 @@ describe("share recipient mail", () => {
     expect(mail.text).toBe(
       "Hey Anna Nowak!\nJacek Załęski shared: Quarterly report\nhttps://share.example.com/s/abc?recipient=r1",
     );
-    expect(mail.to).toEqual({ name: "Anna Nowak", address: "anna@example.com" });
+    expect(mail.to).toEqual({
+      name: "Anna Nowak",
+      address: "anna@example.com",
+    });
   });
 
   it("falls back to the username without a display name", async () => {
@@ -86,5 +89,47 @@ describe("share recipient mail", () => {
     expect(sendMail.mock.calls[0][0].text).toContain(
       "shared: see {shareUrl}, {creatorEmail} and {expires}",
     );
+  });
+});
+
+describe("html mail and the app name", () => {
+  afterEach(() => {
+    settings["email.sendHtmlEmails"] = false;
+    settings["email.shareRecipientsSubject"] = "Files from {creator}";
+  });
+
+  it("escapes what users typed when the mail is html", async () => {
+    settings["email.sendHtmlEmails"] = true;
+    const { service, sendMail } = build();
+
+    await service.sendMailToShareRecipients(
+      "anna@example.com",
+      "r1",
+      "abc",
+      { ...creator, displayName: '<a href="https://evil.example">Bank</a>' },
+      "<img src=x onerror=alert(1)>",
+      new Date(Date.now() + 86_400_000),
+    );
+
+    const html = sendMail.mock.calls[0][0].html;
+    expect(html).not.toContain("<a href");
+    expect(html).not.toContain("<img");
+    expect(html).toContain("&lt;a href=&quot;https://evil.example&quot;&gt;");
+  });
+
+  it("fills in {appName} in every template", async () => {
+    settings["email.shareRecipientsSubject"] = "Files on {appName}";
+    const { service, sendMail } = build();
+
+    await service.sendMailToShareRecipients(
+      "anna@example.com",
+      "r1",
+      "abc",
+      creator,
+      "x",
+      new Date(Date.now() + 86_400_000),
+    );
+
+    expect(sendMail.mock.calls[0][0].subject).toBe("Files on Share");
   });
 });

@@ -226,6 +226,12 @@ export function getDefaultConfig(): Config[] {
       type: "string",
     },
     {
+      key: "share.enableShareDownloadNotifications",
+      value: "false",
+      defaultValue: "false",
+      type: "boolean",
+    },
+    {
       key: "share.enableShareEmailRecipients",
       value: "false",
       defaultValue: "false",

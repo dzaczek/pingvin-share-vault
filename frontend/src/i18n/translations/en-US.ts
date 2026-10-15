@@ -641,6 +641,10 @@ export default {
   // END /privacy
 
   // /admin/config
+  "admin.config.warning.smtp-off":
+    "A mail feature is on but SMTP is off. Recipients get no mail, and with email verification new accounts cannot be activated.",
+  "admin.config.warning.default-over-max":
+    "The default expiration is longer than the maximum expiration, so new shares start with a value they cannot keep.",
   "admin.config.config-file-warning.title": "Configuration file present",
   "admin.config.config-file-warning.description":
     "As you have configured Pingvin Share Vault with a configuration file, these settings cannot be changed through the UI.",
@@ -654,7 +658,8 @@ export default {
   "admin.config.category.smtp": "SMTP",
   "admin.config.category.oauth": "Social Login",
   "admin.config.general.app-name": "App name",
-  "admin.config.general.app-name.description": "Name of the application",
+  "admin.config.general.app-name.description":
+    "Name of the application, also available as {appName} in every mail template",
   "admin.config.general.show-auth-buttons": "Show auth buttons",
   "admin.config.general.show-auth-buttons.description":
     "Whether to show sign-in and sign-up buttons on share and upload pages.",
