@@ -1,3 +1,46 @@
+## [2026.10.3](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.2...v2026.10.3) (2026-10-15)
+
+### Features
+
+* **audit:** audit log retention as a setting on the admin page ([0afb9d0](https://github.com/dzaczek/pingvin-share-vault/commit/0afb9d0e31ebd3a548c00eeac70426ff04f849ea))
+* **appearance:** a living Landwasser viaduct with a passing train ([712dc7b](https://github.com/dzaczek/pingvin-share-vault/commit/712dc7b2d466d7a2af8a29e74cbbd2a5870c090b))
+* **appearance:** slow motion in the living scenes ([243ac42](https://github.com/dzaczek/pingvin-share-vault/commit/243ac428d85c0455938753d3402c279a0e26b258))
+* **appearance:** three more living scenes and a space wallpaper ([0d66cb6](https://github.com/dzaczek/pingvin-share-vault/commit/0d66cb67cb71d8d55d02975ab7cc617ba284922c))
+* **appearance:** a more detailed Alpine lake ([a734c15](https://github.com/dzaczek/pingvin-share-vault/commit/a734c1576e28e66508716d6b87d85765ef5c40d1))
+* **appearance:** a living Alpine lake wallpaper that turns from day to night ([207e772](https://github.com/dzaczek/pingvin-share-vault/commit/207e772c12c11585b989a681e8c9ade9c355c699))
+* **appearance:** the Alpine lake wallpapers replace the Alps one ([3fbaad6](https://github.com/dzaczek/pingvin-share-vault/commit/3fbaad63f5d81efcdc817a0b0bd51d6fe0798584))
+* **appearance:** a detailed Alps landscape instead of the simple one ([12e9159](https://github.com/dzaczek/pingvin-share-vault/commit/12e9159561ba6e484b8ba93a72a2442957522725))
+* **appearance:** add an Alps wallpaper to the built in ones ([6396602](https://github.com/dzaczek/pingvin-share-vault/commit/6396602982fea7a30728a8a638d1a9c7226da78b))
+* **appearance:** let Glass use the WeTransfer style upload ([f6d9aa0](https://github.com/dzaczek/pingvin-share-vault/commit/f6d9aa057be97603e3ac0ec70ccc0c98efecca3d))
+* **appearance:** a wallpaper gallery for Glass ([cfab646](https://github.com/dzaczek/pingvin-share-vault/commit/cfab64692597068aff4bc7499f9888c82983a2fd))
+* **appearance:** wallpapers for Glass, rounder controls, a folder row in Precision ([4d7296e](https://github.com/dzaczek/pingvin-share-vault/commit/4d7296ed987f16b384d23b9075030f09ce381b6c))
+* **appearance:** bring a WeTransfer style upload and download to Precision ([15d7815](https://github.com/dzaczek/pingvin-share-vault/commit/15d78156a6a98caff5b23ca1861f99488da971c6))
+* **appearance:** give Precision a sidebar layout ([42b0def](https://github.com/dzaczek/pingvin-share-vault/commit/42b0defe6fa0343582a18970789f69637d079046))
+* **appearance:** add Precision, a dense style for data heavy work ([9fcd3ff](https://github.com/dzaczek/pingvin-share-vault/commit/9fcd3ff6f708ff79d1920edf6cba649225a96394))
+* **appearance:** add a Glass style modeled on Apple's Liquid Glass ([52fb957](https://github.com/dzaczek/pingvin-share-vault/commit/52fb957d2f6b47c30193b6f707d1509904b4d182))
+* add ANONYMIZE_IP=mask to keep only the first and last part of an IP ([be9a44e](https://github.com/dzaczek/pingvin-share-vault/commit/be9a44e4eecc62183562d372a01eed6dcd7e6faf))
+* **backend:** add DEMO_MODE for a demo whose admin anyone may use ([57509d4](https://github.com/dzaczek/pingvin-share-vault/commit/57509d48653e491a7802fd2edcc2dd430e8e6edc))
+* **backend:** add ANONYMIZE_IP to keep only shortened visitor addresses ([998d70a](https://github.com/dzaczek/pingvin-share-vault/commit/998d70a22626f67d7a997101b0165a5bd2fe1093))
+* **share:** let the admin choose how download all works ([ddd26be](https://github.com/dzaczek/pingvin-share-vault/commit/ddd26bedd6f0292016066d50d50fafcdc720a82d))
+* **admin:** add an append only audit log for logins, uploads, downloads and share views ([1cc3b40](https://github.com/dzaczek/pingvin-share-vault/commit/1cc3b409479c9ed3ee1423dd5bb7e00538ddd3be))
+
+### Bug Fixes
+
+* **deps:** braces out of the production trees ([b7c19ce](https://github.com/dzaczek/pingvin-share-vault/commit/b7c19ce3f316574d196c733fc447907f6c863339))
+* saved secrets stay on the server, reverse share uses and S3 names ([302504d](https://github.com/dzaczek/pingvin-share-vault/commit/302504dd5a57cc69ec962d5c372b1246438bbe3d))
+* escaped html mails, the app name in mail templates, settings warnings ([691b555](https://github.com/dzaczek/pingvin-share-vault/commit/691b55547d504809fbd8f8a55124493be6401ea6))
+* **security:** security headers in the bundled proxy, flags on the share cookie ([d08748c](https://github.com/dzaczek/pingvin-share-vault/commit/d08748ca8f8d948abf15627cb0d7e9c425d5781d))
+* errors no longer vanish in user, OAuth and config updates ([5d6892d](https://github.com/dzaczek/pingvin-share-vault/commit/5d6892d34584f3749ac4a3df99e63c01cba50622))
+* **security:** size limits on S3, a lighter streamed zip and checked settings ([11be25f](https://github.com/dzaczek/pingvin-share-vault/commit/11be25fd4dbb2bac6c14d9edeac708e59234f8fb))
+* **security:** recipients no longer get around passwords or claim addresses ([75102c3](https://github.com/dzaczek/pingvin-share-vault/commit/75102c3d936f208ab74a6ac002ebf26e5321b19a))
+* **demo:** check the wallpaper key directly instead of looking it up ([ff7f4e8](https://github.com/dzaczek/pingvin-share-vault/commit/ff7f4e8ad796f99d1e5b784f28c3510fb29c20a0))
+* **wallpaper:** keep resolved paths inside the wallpaper directory ([d3209d0](https://github.com/dzaczek/pingvin-share-vault/commit/d3209d04017c5d9cfe358ca98a6cf2903c2f7383))
+* **appearance:** let the wallpaper address and color be cleared again ([765e720](https://github.com/dzaczek/pingvin-share-vault/commit/765e720d118ff06b73abd1649e95ac736e711537))
+* **appearance:** put Glass tables in cards and drop the white scrollbar stripe ([bb0e0af](https://github.com/dzaczek/pingvin-share-vault/commit/bb0e0afd1aa0b66013c7c483d282890cd18635e4))
+* **appearance:** finish Glass on the admin pages and let the demo try it ([93a951e](https://github.com/dzaczek/pingvin-share-vault/commit/93a951e2fdd15f6d21e8feac54535cc595a1f201))
+* **auth:** keep session tokens out of calls that handle a password ([baaa607](https://github.com/dzaczek/pingvin-share-vault/commit/baaa60793a9e99e167e00e01fb235ccf8eb2c3b7))
+* **frontend:** link the source code and the star to this fork ([d7c9755](https://github.com/dzaczek/pingvin-share-vault/commit/d7c9755845bdb64146916ee2fd293982bfd27361))
+
 ## [2026.10.2](https://github.com/dzaczek/pingvin-share-x/compare/v2026.10.1...v2026.10.2) (2026-10-11)
 
 ### Features
