@@ -161,9 +161,10 @@ export class OAuthService {
       ]);
     }
 
+    // sign up stores the address in lower case, so look for it that way
     const existingUser: User = await this.prisma.user.findFirst({
       where: {
-        email: user.email,
+        email: user.email.toLowerCase().trim(),
       },
     });
 

@@ -83,6 +83,7 @@ export class UserSevice {
           );
         }
       }
+      throw e;
     }
   }
 
@@ -125,6 +126,7 @@ export class UserSevice {
           );
         }
       }
+      throw e;
     }
   }
 
@@ -313,6 +315,7 @@ export class UserSevice {
           );
         }
       }
+      throw e;
     }
   }
 
