@@ -31,7 +31,3 @@ export const LOG_LEVEL_ENV = `${process.env.PV_LOG_LEVEL || ""}`;
 // Which node wrote an audit entry. One instance means one shard, so the
 // default is fine until there is more than one.
 export const SHARD_ID = process.env.SHARD_ID || "main-node";
-// 0 keeps audit entries forever
-export const AUDIT_LOG_RETENTION_DAYS = parseInt(
-  process.env.AUDIT_LOG_RETENTION_DAYS ?? "90",
-);

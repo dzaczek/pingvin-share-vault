@@ -20,7 +20,7 @@ const build = (create: (args: any) => Promise<unknown> = async () => ({})) => {
     },
   };
 
-  const service = new AuditLogService(prisma as any);
+  const service = new AuditLogService(prisma as any, { get: () => 90 } as any);
   (service as any).logger = { warn: (m: string) => void warnings.push(m) };
 
   return {

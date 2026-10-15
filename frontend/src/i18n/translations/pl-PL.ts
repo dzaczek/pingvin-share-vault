@@ -728,6 +728,9 @@ export default {
   "admin.config.general.app-url": "Adres URL aplikacji",
   "admin.config.general.app-url.description":
     "Pod którym adresem URL Pingvin Share jest dostępny",
+  "admin.config.security.audit-log-retention-days": "Przechowywanie dziennika audytu",
+  "admin.config.security.audit-log-retention-days.description":
+    "Liczba dni przechowywania dziennika audytu, starsze wpisy są usuwane co noc. 0 przechowuje go zawsze.",
   "admin.config.security.secure-cookies": "Bezpieczne pliki cookie",
   "admin.config.security.secure-cookies.description":
     "Czy ustawić flagę bezpieczeństwa dla plików cookie. Jeśli jest włączona, strona nie będzie działać po uzyskaniu dostępu przez HTTP.",

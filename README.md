@@ -72,7 +72,7 @@ The demo setup itself lives in [dzaczek/pingvin-share-vault-demo](https://github
 - An append only log of logins (including failed ones), uploads, downloads, previews and share views, for users and anonymous visitors
 - Follows one visitor across requests through a browser fingerprint, even without an account
 - Admin page with a live timeline, the trail of one user, visitor or IP, and traffic per shard
-- Passwords and tokens are redacted, entries older than `AUDIT_LOG_RETENTION_DAYS` are deleted every night
+- Passwords and tokens are redacted, entries older than the retention set in Configuration → Security are deleted every night
 
 **Shares**
 - Optional warning before downloading a share created without an account, with a custom message per language
@@ -173,7 +173,7 @@ The ones this fork adds or relies on most. All of them are optional.
 | `TRUST_PROXY` | `false` | Set to `true` behind a reverse proxy, otherwise every IP in the logs is the proxy's |
 | `TRUST_PROXY_FROM` | private networks | Addresses of the proxies to trust when `TRUST_PROXY` is on |
 | `ANONYMIZE_IP` | off | `true` keeps a shortened address (`203.0.113.0`), `mask` a masked one (`203.*.*.57`) |
-| `AUDIT_LOG_RETENTION_DAYS` | `90` | Days the audit log is kept, `0` keeps it forever |
+| `AUDIT_LOG_RETENTION_DAYS` | `90` | Default for the audit log retention in Configuration → Security, `0` keeps it forever. A value set there wins. |
 | `SHARD_ID` | `main-node` | Name of this instance in the audit log, when several share one database |
 | `DEMO_MODE` | off | `true` for a public demo: the admin cannot change settings, the logo, passwords or accounts |
 | `BUILD_COMMIT` | none | Commit shown next to the version on the admin page, set at build time |

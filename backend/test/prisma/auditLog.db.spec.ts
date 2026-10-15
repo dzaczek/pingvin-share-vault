@@ -29,7 +29,7 @@ beforeAll(async () => {
     adapter: new PrismaBetterSqlite3({ url: DB_PATH }),
   });
   await prisma.$connect();
-  service = new AuditLogService(prisma as any);
+  service = new AuditLogService(prisma as any, { get: () => 90 } as any);
   (service as any).logger = { log: () => undefined, warn: () => undefined };
 });
 

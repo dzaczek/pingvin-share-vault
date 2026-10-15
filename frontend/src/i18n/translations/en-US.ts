@@ -776,6 +776,9 @@ export default {
   "admin.config.general.app-url": "App URL",
   "admin.config.general.app-url.description":
     "URL where Pingvin Share Vault is available.",
+  "admin.config.security.audit-log-retention-days": "Audit log retention",
+  "admin.config.security.audit-log-retention-days.description":
+    "Days the audit log is kept, entries older than that are deleted every night. 0 keeps it forever.",
   "admin.config.security.secure-cookies": "Secure cookies",
   "admin.config.security.secure-cookies.description":
     "Whether to set the secure flag on cookies. If enabled, the site will not function when accessed over HTTP.",
