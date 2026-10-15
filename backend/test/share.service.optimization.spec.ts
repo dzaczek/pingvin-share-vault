@@ -41,6 +41,7 @@ describe('ShareService Optimization', () => {
           useValue: {
             get: jest.fn().mockImplementation((key) => {
               if (key === 'share.enableUserRecipients') return true;
+              if (key === 'security.enableEmailVerification') return true;
               return false;
             }),
           },
@@ -50,6 +51,7 @@ describe('ShareService Optimization', () => {
           useValue: {
             get: jest.fn().mockImplementation((key) => {
               if (key === 'share.enableUserRecipients') return true;
+              if (key === 'security.enableEmailVerification') return true;
               return false;
             }),
           },
@@ -90,8 +92,8 @@ describe('ShareService Optimization', () => {
       (prismaService.share.findUnique as jest.Mock).mockResolvedValue(shareMock);
 
       const matchedUsers = [
-        { id: 'u1', email: 'user1@example.com' },
-        { id: 'u2', email: 'user2@example.com' },
+        { id: 'u1', email: 'user1@example.com', isActivated: true, activationToken: null },
+        { id: 'u2', email: 'user2@example.com', isActivated: true, activationToken: null },
       ];
       (prismaService.user.findMany as jest.Mock).mockResolvedValue(matchedUsers);
 

@@ -159,7 +159,16 @@ const Account = () => {
                   username: values.username,
                   email: values.email,
                 })
-                .then(() => toast.success(t("account.notify.info.success")))
+                .then(() =>
+                  toast.success(
+                    t(
+                      values.email !== user?.email &&
+                        config.get("security.enableEmailVerification")
+                        ? "account.notify.info.confirm-email"
+                        : "account.notify.info.success",
+                    ),
+                  ),
+                )
                 .catch(toast.axiosError),
             )}
           >

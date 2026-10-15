@@ -107,6 +107,8 @@ export default {
   "account.card.info.username": "Nazwa użytkownika",
   "account.card.info.email": "Adres e-mail",
   "account.notify.info.success": "Konto zostało zaktualizowane",
+  "account.notify.info.confirm-email":
+    "Konto zaktualizowane. Otwórz link wysłany na nowy adres, żeby go potwierdzić",
   "account.card.password.title": "Hasło",
   "account.card.password.old": "Dotychczasowe hasło",
   "account.card.password.new": "Nowe hasło",

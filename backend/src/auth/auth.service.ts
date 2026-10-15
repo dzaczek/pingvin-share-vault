@@ -315,7 +315,8 @@ export class AuthService {
 
     if (!user) return;
 
-    if (user.isActivated) {
+    // an activated account with a token is confirming a changed address
+    if (user.isActivated && !user.activationToken) {
       throw new BadRequestException(this.i18n.t("auth.userAlreadyActivated"));
     }
 
