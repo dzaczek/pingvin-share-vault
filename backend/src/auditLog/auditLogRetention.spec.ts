@@ -13,13 +13,15 @@ const build = (days: number) => {
 };
 
 describe("AuditLogService.deleteExpired", () => {
+  afterEach(() => jest.restoreAllMocks());
+
   it("deletes what is older than the configured number of days", async () => {
     const { service, deleteMany } = build(30);
-    const before = Date.now();
+    const now = Date.UTC(2026, 9, 15);
+    jest.spyOn(Date, "now").mockReturnValue(now);
     await service.deleteExpired();
     const cutoff = deleteMany.mock.calls[0][0].where.createdAt.lt.getTime();
-    expect(before - cutoff).toBeGreaterThanOrEqual(30 * 86_400_000);
-    expect(before - cutoff).toBeLessThan(30 * 86_400_000 + 5_000);
+    expect(cutoff).toBe(now - 30 * 86_400_000);
   });
 
   it("keeps everything when set to 0", async () => {
