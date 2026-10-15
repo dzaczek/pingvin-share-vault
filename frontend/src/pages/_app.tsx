@@ -458,7 +458,12 @@ function App({ Component, pageProps }: AppProps) {
                         >
                           <div>
                             <Header />
-                            <Container fluid={route === "/admin/shares"}>
+                            <Container
+                              fluid={[
+                                "/admin/shares",
+                                "/admin/audit-logs",
+                              ].includes(route)}
+                            >
                               <Component {...pageProps} />
                             </Container>
                           </div>
