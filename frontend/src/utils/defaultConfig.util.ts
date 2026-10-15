@@ -112,6 +112,12 @@ export function getDefaultConfig(): Config[] {
     // deliberately stricter than the seed, which defaults this to true: an
     // instance whose config we cannot read should not be accepting signups
     {
+      key: "security.enableEmailVerification",
+      value: "false",
+      defaultValue: "false",
+      type: "boolean",
+    },
+    {
       key: "security.allowRegistration",
       value: "false",
       defaultValue: "false",

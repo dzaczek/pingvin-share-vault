@@ -12,6 +12,7 @@ import { ShareService } from "src/share/share.service";
 import { ConfigService } from "src/config/config.service";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { User } from "@prisma/client";
+import { hasConfirmedEmail } from "../recipientEmail.util";
 
 @Injectable()
 export class ShareSecurityGuard extends JwtGuard {
@@ -47,11 +48,15 @@ export class ShareSecurityGuard extends JwtGuard {
     const isLinked = share.userRecipients.some((r) => r.userId === user.id);
     if (isLinked) return true;
 
-    // Otherwise, if the user's (account-verified) email matches one of the
-    // share's recipients, grant access and link them
+    // Otherwise, if the user's confirmed email matches one of the share's
+    // recipients, grant access and link them
     const userEmail = user.email?.toLowerCase();
     const isEmailRecipient =
       !!userEmail &&
+      hasConfirmedEmail(
+        user,
+        this.configService.get("security.enableEmailVerification"),
+      ) &&
       share.recipients.some((r) => r.email.toLowerCase() === userEmail);
     if (isEmailRecipient) {
       await this.prisma.shareUserRecipient.upsert({
@@ -114,14 +119,15 @@ export class ShareSecurityGuard extends JwtGuard {
       throw new NotFoundException(this.i18n.t("share.notFound"));
     }
 
-    // If user sharing is enabled, check if the authenticated user is a recipient
-    if (await this.isRecipient(share, user)) {
-      return true;
-    }
+    // Called for everyone, since it also links the share to the recipient's
+    // dashboard. Being a recipient only gets past the recipient restriction,
+    // the password and the share token still apply.
+    const isRecipient = await this.isRecipient(share, user);
 
     // If share is restricted to named recipients, block everyone else (excluding the creator)
     if (
       share.security?.restrictToRecipients &&
+      !isRecipient &&
       (!user || share.creatorId !== user.id)
     ) {
       throw new ForbiddenException(

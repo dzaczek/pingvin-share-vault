@@ -46,7 +46,7 @@ export class UserController {
     @GetUser() user: User,
     @Body() data: UpdateOwnUserDTO,
   ) {
-    return new UserDTO().from(await this.userService.update(user.id, data));
+    return new UserDTO().from(await this.userService.updateOwn(user, data));
   }
 
   @Delete("me")
