@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -26,8 +28,12 @@ import { I18nService } from "nestjs-i18n";
 import * as crypto from "crypto";
 import * as mime from "mime-types";
 import { byteToHumanSizeString } from "src/utils/fileSize.util";
-import { getUserActiveStorageUsage } from "src/utils/storageQuota.util";
+import {
+  getShareSizeLimit,
+  getUserActiveStorageUsage,
+} from "src/utils/storageQuota.util";
 import { File } from "./file.service";
+import { streamedZipLevel } from "./zipLevel";
 import { Readable } from "stream";
 import { validate as isValidUUID } from "uuid";
 import * as archiver from "archiver";
@@ -70,10 +76,30 @@ export class S3FileService {
     const share = await this.prisma.share.findUnique({
       where: { id: shareId },
       include: {
+        files: true,
         creator: true,
         reverseShare: { include: { creator: true } },
       },
     });
+
+    if (share.uploadLocked)
+      throw new BadRequestException(this.i18n.t("file.alreadyCompleted"));
+
+    // same limit as a local upload, checked before anything goes to the bucket
+    const shareSizeSum =
+      share.files.reduce((n, { size }) => n + parseInt(size), 0) +
+      (chunk.index === 0
+        ? 0
+        : (this.multipartUploads[file.id]?.uploadedBytes ?? 0)) +
+      buffer.byteLength;
+    if (
+      shareSizeSum > getShareSizeLimit(share, this.config.get("share.maxSize"))
+    ) {
+      throw new HttpException(
+        this.i18n.t("file.maxSizeExceeded"),
+        HttpStatus.PAYLOAD_TOO_LARGE,
+      );
+    }
 
     try {
       // Initialize multipart upload if it's the first chunk
@@ -396,7 +422,7 @@ export class S3FileService {
     const s3Path = this.getS3Path();
 
     const archive = archiver("zip", {
-      zlib: { level: parseInt(compressionLevel) },
+      zlib: { level: streamedZipLevel(parseInt(compressionLevel)) },
     });
 
     archive.on("error", (err) => {

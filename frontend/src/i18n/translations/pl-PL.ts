@@ -868,7 +868,7 @@ export default {
   "admin.config.share.download-all.files": "Osobne pliki, jeden po drugim",
   "admin.config.share.zip-compression-level": "Poziom kompresji Zip",
   "admin.config.share.zip-compression-level.description":
-    "Dostosuj poziom do równowagi między rozmiarem pliku a szybkością kompresji. Prawidłowe wartości mieszczą się w zakresie od 0 do 9, przy czym 0 to brak kompresji a 9 maksymalną kompresją. ",
+    "Dostosuj poziom do równowagi między rozmiarem pliku a szybkością kompresji. Prawidłowe wartości mieszczą się w zakresie od 0 do 9, przy czym 0 to brak kompresji a 9 maksymalną kompresją. Zip tworzony w trakcie pobierania nigdy nie przekracza poziomu 4.",
   "admin.config.share.chunk-size": "Rozmiar fragmentu",
   "admin.config.share.chunk-size.description":
     "Dostosuj rozmiar fragmentu przesyłanych plików, aby zrównoważyć wydajność i niezawodność w zależności od połączenia internetowego. Mniejsze fragmenty mogą zwiększyć skuteczność przy niestabilnych połączeniach, podczas gdy większe przyspieszają przesyłanie przy stabilnych połączeniach.",

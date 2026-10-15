@@ -913,7 +913,7 @@ export default {
   "admin.config.share.download-all.files": "Separate files, one after another",
   "admin.config.share.zip-compression-level": "Zip compression level",
   "admin.config.share.zip-compression-level.description":
-    "Adjust the level to balance file size and compression speed. Valid values range from 0 to 9, with 0 being no compression and 9 being maximum compression. ",
+    "Adjust the level to balance file size and compression speed. Valid values range from 0 to 9, with 0 being no compression and 9 being maximum compression. A zip built while it downloads never goes above 4.",
   "admin.config.share.chunk-size": "Chunk size",
   "admin.config.share.chunk-size.description":
     "Adjust the chunk size for your uploads to balance efficiency and reliability according to your internet connection. Smaller chunks can enhance success rates for unstable connections, while larger chunks make uploads faster for stable connections.",

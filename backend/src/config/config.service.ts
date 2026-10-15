@@ -56,9 +56,8 @@ export class ConfigService extends EventEmitter {
 
       if (this.yamlConfig) {
         for (const configVariable of this.configVariables) {
-          const value = this.yamlConfig[configVariable.category]?.[
-            configVariable.name
-          ];
+          const value =
+            this.yamlConfig[configVariable.category]?.[configVariable.name];
           // a key the file leaves out keeps the value set in the UI
           if (value === undefined) continue;
           // yaml hands over real booleans and numbers, get() expects strings
@@ -236,7 +235,103 @@ export class ConfigService extends EventEmitter {
   }
 
   validateConfigVariable(key: string, value: string | number | boolean) {
-    const validations = [
+    // null clears a setting back to its default, which is always fine
+    const range = (key: string, min: number, max?: number) => ({
+      key,
+      condition: (value: number | null) =>
+        value === null ||
+        (Number.isInteger(value) && value >= min && value <= (max ?? value)),
+      message:
+        max === undefined
+          ? this.t(
+              "config.minValidation",
+              "{key} must be a whole number of at least {min}",
+              { key, min },
+            )
+          : this.t(
+              "config.rangeValidation",
+              "{key} must be a whole number from {min} to {max}",
+              { key, min, max },
+            ),
+    });
+    const oneOf = (key: string, options: string[]) => ({
+      key,
+      condition: (value: string | null) => !value || options.includes(value),
+      message: this.t(
+        "config.optionValidation",
+        "{key} must be one of {options}",
+        {
+          key,
+          options: options.join(", "),
+        },
+      ),
+    });
+
+    const validations: {
+      key: string;
+      condition: (value: any) => boolean;
+      message: unknown;
+    }[] = [
+      range("share.chunkSize", 1),
+      range("share.maxSize", 1),
+      range("security.minLength", 1, 128),
+      range("cache.ttl", 0),
+      range("cache.maxItems", 1),
+      range("smtp.port", 0, 65535),
+      oneOf("appearance.themeRadius", ["xs", "sm", "md", "lg", "xl"]),
+      oneOf("appearance.themeColorScheme", ["light", "dark", "system"]),
+      oneOf("appearance.uploadProgressStyle", [
+        "circle",
+        "circle-percentage",
+        "percentage-time",
+      ]),
+      oneOf("appearance.themePrimaryColor", [
+        "victoria",
+        "blue",
+        "teal",
+        "green",
+        "cyan",
+        "indigo",
+        "violet",
+        "grape",
+        "pink",
+        "red",
+        "orange",
+        "yellow",
+        "lime",
+        "gray",
+        "dark",
+        "custom",
+      ]),
+      {
+        key: "appearance.themePrimaryColorOverride",
+        condition: (value: string | null) =>
+          !value || /^#[0-9a-fA-F]{6}$/.test(value),
+        message: this.t(
+          "config.colorValidation",
+          "{key} must be a hex color like #4c6ef5",
+          { key: "appearance.themePrimaryColorOverride" },
+        ),
+      },
+      {
+        key: "general.defaultLanguage",
+        condition: (value: string | null) =>
+          !value || /^[a-z]{2}-[A-Z]{2}$/.test(value),
+        message: this.t(
+          "config.languageValidation",
+          "The language must be a code like en-US",
+        ),
+      },
+      {
+        // links in every mail are built from it
+        key: "general.appUrl",
+        condition: (value: string | null) =>
+          !value || /^https?:\/\/[^\s"'<>]+$/.test(value),
+        message: this.t(
+          "config.appUrlValidation",
+          "The app URL must start with http:// or https://",
+        ),
+      },
       {
         key: "share.shareIdLength",
         condition: (value: number) => value >= 2 && value <= 50,
@@ -324,7 +419,7 @@ export class ConfigService extends EventEmitter {
     ];
 
     const validation = validations.find((validation) => validation.key == key);
-    if (validation && !validation.condition(value as any)) {
+    if (validation && !validation.condition(value)) {
       throw new BadRequestException(validation.message);
     }
 

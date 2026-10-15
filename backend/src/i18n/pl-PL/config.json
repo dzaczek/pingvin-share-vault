@@ -16,5 +16,11 @@
   "glassBlurValidation": "Rozmycie szkła musi być w zakresie od 0 do 40",
   "glassBackgroundValidation": "Tło szkła musi mieć wartość gradient, aurora, color, image, video albo none",
   "glassBackgroundColorValidation": "Kolor tła szkła musi być kolorem hex, np. #4c6ef5",
-  "glassBackgroundUrlValidation": "Tapeta musi być adresem http(s) albo ścieżką zaczynającą się od /"
+  "glassBackgroundUrlValidation": "Tapeta musi być adresem http(s) albo ścieżką zaczynającą się od /",
+  "rangeValidation": "{key} musi być liczbą całkowitą od {min} do {max}",
+  "optionValidation": "{key} musi mieć jedną z wartości: {options}",
+  "colorValidation": "{key} musi być kolorem hex, np. #4c6ef5",
+  "languageValidation": "Język musi być kodem, np. pl-PL",
+  "appUrlValidation": "Adres aplikacji musi zaczynać się od http:// lub https://",
+  "minValidation": "{key} musi być liczbą całkowitą nie mniejszą niż {min}"
 }
