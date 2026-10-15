@@ -596,6 +596,7 @@ export default {
     "Funkcja mailowa jest włączona, ale SMTP jest wyłączone. Odbiorcy nie dostaną maili, a przy weryfikacji e-mail nowych kont nie da się aktywować.",
   "admin.config.warning.default-over-max":
     "Domyślny czas wygaśnięcia jest dłuższy niż maksymalny, więc nowe share zaczynają z wartością, której nie mogą zachować.",
+  "admin.config.secret-saved": "Zapisane, wpisz, żeby zastąpić",
   "admin.config.config-file-warning.title": "Obecny plik konfiguracyjny",
   "admin.config.config-file-warning.description":
     "Ponieważ masz skonfigurowane Pingvin Share z plikiem konfiguracyjnym, nie możesz zmienić konfiguracji za pomocą interfejsu użytkownika.",

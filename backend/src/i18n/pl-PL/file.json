@@ -14,5 +14,6 @@
   "s3SessionNotFound": "Nie znaleziono sesji przesyłania wieloczęściowego.",
   "s3UploadFailed": "Przesyłanie wieloczęściowe nie powiodło się. Przesyłanie zostało przerwane.",
   "s3SizeError": "Nie można pobrać rozmiaru pliku",
-  "s3NotSupported": "Wstępnie podpisane operacje są obsługiwane tylko dla pamięci S3."
+  "s3NotSupported": "Wstępnie podpisane operacje są obsługiwane tylko dla pamięci S3.",
+  "nameInUse": "Plik o tej nazwie jest już w tym udostępnieniu"
 }

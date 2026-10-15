@@ -704,7 +704,6 @@ async function seedConfigVariables() {
 
 async function migrateConfigVariables() {
   const existingConfigVariables = await prisma.config.findMany();
-  const orderMap: { [category: string]: number } = {};
 
   for (const existingConfigVariable of existingConfigVariables) {
     const configVariable =
@@ -743,7 +742,6 @@ async function migrateConfigVariables() {
           order: variableOrder,
         },
       });
-      orderMap[existingConfigVariable.category] = variableOrder + 1;
     }
   }
 }

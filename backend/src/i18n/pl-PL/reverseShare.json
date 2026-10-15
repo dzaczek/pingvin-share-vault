@@ -3,5 +3,6 @@
   "maxShareSizeExceeded": "Maksymalny rozmiar udostępnienia nie może być większy niż {maxSize} bajtów.",
   "tokenInUse": "Token udziału odwrotnego jest już w użyciu",
   "notAllowedToCreate": "Nie masz uprawnień do tworzenia udziałów odwrotnych",
-  "maxReverseSharesExceeded": "Osiągnięto maksymalny limit aktywnych udziałów odwrotnych ({max})"
+  "maxReverseSharesExceeded": "Osiągnięto maksymalny limit aktywnych udziałów odwrotnych ({max})",
+  "usedUp": "Ten link do odwrotnego udostępniania nie ma już wolnych użyć"
 }

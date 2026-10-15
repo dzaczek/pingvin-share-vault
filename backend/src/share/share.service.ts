@@ -275,7 +275,7 @@ export class ShareService {
     }
   }
 
-  async complete(id: string, reverseShareToken?: string) {
+  async complete(id: string) {
     const share = await this.prisma.share.findUnique({
       where: { id },
       include: {
@@ -318,6 +318,17 @@ export class ShareService {
           );
         }
       }
+    }
+
+    // A use is taken before anything else happens, in one conditional write,
+    // so two uploads finishing at the same time cannot both get the last one
+    if (share.reverseShare) {
+      const { count } = await this.prisma.reverseShare.updateMany({
+        where: { id: share.reverseShare.id, remainingUses: { gt: 0 } },
+        data: { remainingUses: { decrement: 1 } },
+      });
+      if (count === 0)
+        throw new BadRequestException(this.i18n.t("reverseShare.usedUp"));
     }
 
     // Asynchronously create a zip of all files
@@ -400,13 +411,6 @@ export class ShareService {
 
     // Check if any file is malicious with ClamAV
     void this.clamScanService.checkAndRemove(share.id);
-
-    if (share.reverseShare) {
-      await this.prisma.reverseShare.update({
-        where: { token: reverseShareToken },
-        data: { remainingUses: { decrement: 1 } },
-      });
-    }
 
     const updatedShare = await this.prisma.share.update({
       where: { id },
