@@ -58,3 +58,21 @@ describe("UserSevice.updateOwn", () => {
     expect(email.sendVerificationEmail).not.toHaveBeenCalled();
   });
 });
+
+describe("UserSevice.update errors", () => {
+  it("passes on errors other than a duplicate", async () => {
+    const prisma = {
+      user: { update: jest.fn().mockRejectedValue(new Error("db down")) },
+    };
+    const service = new UserSevice(
+      prisma as any,
+      {} as any,
+      {} as any,
+      { get: () => false } as any,
+      { t: (key: string) => key } as any,
+    );
+    await expect(service.update("u1", { displayName: "A" })).rejects.toThrow(
+      "db down",
+    );
+  });
+});

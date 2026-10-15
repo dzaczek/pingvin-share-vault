@@ -62,3 +62,38 @@ describe("OAuthService.signIn admin role", () => {
     expect(prisma.user.update).not.toHaveBeenCalled();
   });
 });
+
+describe("OAuthService sign up of a new provider account", () => {
+  it("finds an existing account whatever the case of the address", async () => {
+    const prisma = {
+      oAuthUser: { findFirst: jest.fn().mockResolvedValue(null) },
+      user: {
+        findFirst: jest.fn(async ({ where }) =>
+          where.email === "someone@example.com" ? { id: "u1" } : null,
+        ),
+      },
+    };
+    const auth = { signUp: jest.fn() };
+    const service = new OAuthService(
+      prisma as any,
+      { get: () => true } as any,
+      auth as any,
+      [],
+      {},
+      { log: jest.fn() } as any,
+    );
+
+    await expect(
+      service.signIn(
+        {
+          provider: "oidc",
+          providerId: "p2",
+          providerUsername: "someone",
+          email: "Someone@Example.com",
+        } as any,
+        "127.0.0.1",
+      ),
+    ).rejects.toMatchObject({ key: "email_already_exists" });
+    expect(auth.signUp).not.toHaveBeenCalled();
+  });
+});
