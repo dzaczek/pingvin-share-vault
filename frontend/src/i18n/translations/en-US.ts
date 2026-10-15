@@ -113,6 +113,8 @@ export default {
   "account.card.info.username": "Username",
   "account.card.info.email": "Email",
   "account.notify.info.success": "Account updated successfully",
+  "account.notify.info.confirm-email":
+    "Account updated. Open the link we sent to the new address to confirm it",
 
   "account.card.password.title": "Password",
   "account.card.password.old": "Old password",

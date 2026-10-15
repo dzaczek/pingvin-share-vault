@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable, Logger } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
+import { Prisma, User } from "@prisma/client";
 import * as argon from "argon2";
 import * as crypto from "crypto";
 import { Entry } from "ldapts";
+import * as moment from "moment";
 import { I18nService } from "nestjs-i18n";
 import { AuthSignInDTO } from "src/auth/dto/authSignIn.dto";
 import { EmailService } from "src/email/email.service";
@@ -12,6 +13,7 @@ import { inspect } from "util";
 import { ConfigService } from "../config/config.service";
 import { FileService } from "../file/file.service";
 import { CreateUserDTO } from "./dto/createUser.dto";
+import { UpdateOwnUserDTO } from "./dto/updateOwnUser.dto";
 import { UpdateUserDto } from "./dto/updateUser.dto";
 
 @Injectable()
@@ -84,7 +86,11 @@ export class UserSevice {
     }
   }
 
-  async update(id: string, user: UpdateUserDto) {
+  async update(
+    id: string,
+    user: UpdateUserDto,
+    extra: Prisma.UserUpdateInput = {},
+  ) {
     try {
       if (user.password && !(await this.enforcePasswordPolicy(user.password))) {
         throw new BadRequestException(this.i18n.t("auth.passwordPolicyNotMet"));
@@ -100,7 +106,12 @@ export class UserSevice {
           ...(displayName !== undefined && {
             displayName: displayName?.trim() || null,
           }),
+          // sign up stores addresses this way, recipients are matched on it
+          ...(rest.email !== undefined && {
+            email: rest.email.toLowerCase().trim(),
+          }),
           password: hash,
+          ...extra,
         },
       });
     } catch (e) {
@@ -115,6 +126,32 @@ export class UserSevice {
         }
       }
     }
+  }
+
+  // A new address has to be confirmed before it counts as the user's, see
+  // hasConfirmedEmail. The token is set together with the address, so a mail
+  // that fails to go out leaves it unconfirmed rather than trusted.
+  async updateOwn(current: User, dto: UpdateOwnUserDTO) {
+    const email = dto.email?.toLowerCase().trim();
+    const needsConfirmation =
+      !!email &&
+      email !== current.email &&
+      this.configService.get("security.enableEmailVerification");
+    if (!needsConfirmation) return this.update(current.id, dto);
+
+    const activationToken = crypto.randomUUID();
+    const user = await this.update(current.id, dto, {
+      activationToken,
+      activationTokenExpiresAt: moment().add(1, "day").toDate(),
+    });
+    if (user) {
+      await this.emailService.sendVerificationEmail(
+        user.email,
+        activationToken,
+        user.displayName || user.username,
+      );
+    }
+    return user;
   }
 
   async delete(id: string) {
