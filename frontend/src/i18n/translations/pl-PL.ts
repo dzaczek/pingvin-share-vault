@@ -592,6 +592,10 @@ export default {
   // END /privacy
 
   // /admin/config
+  "admin.config.warning.smtp-off":
+    "Funkcja mailowa jest włączona, ale SMTP jest wyłączone. Odbiorcy nie dostaną maili, a przy weryfikacji e-mail nowych kont nie da się aktywować.",
+  "admin.config.warning.default-over-max":
+    "Domyślny czas wygaśnięcia jest dłuższy niż maksymalny, więc nowe share zaczynają z wartością, której nie mogą zachować.",
   "admin.config.config-file-warning.title": "Obecny plik konfiguracyjny",
   "admin.config.config-file-warning.description":
     "Ponieważ masz skonfigurowane Pingvin Share z plikiem konfiguracyjnym, nie możesz zmienić konfiguracji za pomocą interfejsu użytkownika.",
@@ -605,7 +609,8 @@ export default {
   "admin.config.category.smtp": "SMTP",
   "admin.config.category.oauth": "Logowanie za pomocą konta społecznościowego",
   "admin.config.general.app-name": "Nazwa aplikacji",
-  "admin.config.general.app-name.description": "Nazwa aplikacji",
+  "admin.config.general.app-name.description":
+    "Nazwa aplikacji, dostępna też jako {appName} w każdym szablonie maila",
   "admin.config.general.show-auth-buttons": "Pokaż przyciski uwierzytelniania",
   "admin.config.general.show-auth-buttons.description": "Czy wyświetlać przyciski logowania i rejestracji na stronach udziałów i przesyłania.",
   "admin.config.general.default-language": "Język domyślny",

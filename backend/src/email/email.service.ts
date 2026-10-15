@@ -9,6 +9,14 @@ import * as nodemailer from "nodemailer";
 import { I18nService } from "nestjs-i18n";
 import { ConfigService } from "src/config/config.service";
 
+const escapeHtml = (text: string) =>
+  text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+
 @Injectable()
 export class EmailService {
   constructor(
@@ -48,9 +56,17 @@ export class EmailService {
     template: string,
     vars: Record<string, string | undefined>,
   ): string {
+    // names and descriptions are typed by users, in an html mail they would
+    // otherwise be markup sent from this server
+    const isHtml = this.config.get("email.sendHtmlEmails");
+    const all = { appName: this.config.get("general.appName"), ...vars };
     return template
       .replaceAll("\\n", "\n")
-      .replace(/\{([a-zA-Z0-9_-]+)\}/g, (match, key) => vars[key] ?? match);
+      .replace(/\{([a-zA-Z0-9_-]+)\}/g, (match, key) => {
+        const value = all[key];
+        if (value === undefined || value === null) return match;
+        return isHtml ? escapeHtml(String(value)) : value;
+      });
   }
 
   private async sendMail(
