@@ -1,3 +1,9 @@
+## [2026.10.4](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.3...v2026.10.4) (2026-10-15)
+
+### Bug Fixes
+
+* **admin:** the audit log table uses the full width like the share table ([908274f](https://github.com/dzaczek/pingvin-share-vault/commit/908274f70dd3f1677a34b671510a627ca34aacec))
+
 ## [2026.10.3](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.2...v2026.10.3) (2026-10-15)
 
 ### Features
