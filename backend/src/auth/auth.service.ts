@@ -105,6 +105,7 @@ export class AuthService {
           );
         }
       }
+      throw e;
     }
   }
 

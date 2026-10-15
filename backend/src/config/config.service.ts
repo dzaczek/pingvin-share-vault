@@ -168,24 +168,44 @@ export class ConfigService extends EventEmitter {
         ),
       );
 
-    const response: Config[] = [];
-
+    // every value is checked before anything is written, so a bad one halfway
+    // through the list no longer leaves the ones before it saved
+    const checked: { key: string; value: string | number | boolean }[] = [];
     for (const variable of data) {
-      response.push(await this.update(variable.key, variable.value));
+      checked.push({
+        key: variable.key,
+        value: await this.checkUpdate(variable.key, variable.value),
+      });
     }
+
+    const response = await this.prisma.$transaction(
+      checked.map(({ key, value }) =>
+        this.prisma.config.update({
+          where: {
+            name_category: {
+              category: key.split(".")[0],
+              name: key.split(".")[1],
+            },
+          },
+          data: { value: value === null ? null : value.toString() },
+        }),
+      ),
+    );
+
+    this.configVariables = await this.prisma.config.findMany();
+
+    for (const { key, value } of checked) this.emit("update", key, value);
 
     return response;
   }
 
   async update(key: string, value: string | number | boolean) {
-    if (!this.isEditAllowed())
-      throw new BadRequestException(
-        this.t(
-          "config.editNotAllowed",
-          "You are only allowed to update config variables via the config.yaml file",
-        ),
-      );
+    const [updatedVariable] = await this.updateMany([{ key, value }]);
+    return updatedVariable;
+  }
 
+  // the value as it will be stored, "" becomes null, or an exception
+  private async checkUpdate(key: string, value: string | number | boolean) {
     const configVariable = await this.prisma.config.findUnique({
       where: {
         name_category: {
@@ -216,22 +236,7 @@ export class ConfigService extends EventEmitter {
     }
 
     this.validateConfigVariable(key, value);
-
-    const updatedVariable = await this.prisma.config.update({
-      where: {
-        name_category: {
-          category: key.split(".")[0],
-          name: key.split(".")[1],
-        },
-      },
-      data: { value: value === null ? null : value.toString() },
-    });
-
-    this.configVariables = await this.prisma.config.findMany();
-
-    this.emit("update", key, value);
-
-    return updatedVariable;
+    return value;
   }
 
   validateConfigVariable(key: string, value: string | number | boolean) {
