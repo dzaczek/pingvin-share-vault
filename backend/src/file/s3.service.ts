@@ -85,6 +85,11 @@ export class S3FileService {
     if (share.uploadLocked)
       throw new BadRequestException(this.i18n.t("file.alreadyCompleted"));
 
+    // the object key is the file name, so a second file of the same name
+    // would silently replace the first one in the bucket
+    if (chunk.index === 0 && share.files.some((f) => f.name === file.name))
+      throw new BadRequestException(this.i18n.t("file.nameInUse"));
+
     // same limit as a local upload, checked before anything goes to the bucket
     const shareSizeSum =
       share.files.reduce((n, { size }) => n + parseInt(size), 0) +

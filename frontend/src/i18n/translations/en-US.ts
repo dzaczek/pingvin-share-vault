@@ -645,6 +645,7 @@ export default {
     "A mail feature is on but SMTP is off. Recipients get no mail, and with email verification new accounts cannot be activated.",
   "admin.config.warning.default-over-max":
     "The default expiration is longer than the maximum expiration, so new shares start with a value they cannot keep.",
+  "admin.config.secret-saved": "Saved, type to replace it",
   "admin.config.config-file-warning.title": "Configuration file present",
   "admin.config.config-file-warning.description":
     "As you have configured Pingvin Share Vault with a configuration file, these settings cannot be changed through the UI.",

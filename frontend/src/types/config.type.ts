@@ -16,6 +16,8 @@ export type AdminConfig = Config & {
   secret: boolean;
   description: string;
   obscured: boolean;
+  // for an obscured setting, whether a value is saved
+  isSet?: boolean;
   allowEdit: boolean;
 };
 

@@ -138,10 +138,14 @@ export class ConfigService extends EventEmitter {
       .sort((a, b) => a.order - b.order);
 
     return configVariables.map((variable) => {
+      const value = variable.value ?? variable.defaultValue;
       return {
         ...variable,
         key: `${variable.category}.${variable.name}`,
-        value: variable.value ?? variable.defaultValue,
+        // a password or client secret never leaves the server again, the
+        // page only learns that one is saved
+        value: variable.obscured ? "" : value,
+        isSet: variable.obscured ? !!value : undefined,
         allowEdit: this.isEditAllowed(),
       };
     });

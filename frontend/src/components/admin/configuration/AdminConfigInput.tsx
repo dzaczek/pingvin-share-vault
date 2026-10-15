@@ -127,6 +127,9 @@ const AdminConfigInput = ({
               width: "100%",
             }}
             disabled={!configVariable.allowEdit}
+            placeholder={
+              configVariable.isSet ? t("admin.config.secret-saved") : undefined
+            }
             {...form.getInputProps("stringValue")}
             onChange={(e) => onValueChange(configVariable, e.target.value)}
           />

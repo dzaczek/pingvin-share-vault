@@ -10,6 +10,7 @@ import { I18nService } from "nestjs-i18n";
 import { ConfigService } from "src/config/config.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { JwtGuard } from "../../auth/guard/jwt.guard";
+import { isValidShareId } from "./shareIdValidation.guard";
 
 @Injectable()
 export class ShareOwnerGuard extends JwtGuard {
@@ -21,12 +22,6 @@ export class ShareOwnerGuard extends JwtGuard {
     super(configService);
   }
 
-  isBase64(toCheck: string) {
-    // has to accept everything the create share validation allows, underscore included
-    const isBase64 = /^[a-zA-Z0-9_-]*={0,2}$/.test(toCheck);
-    return isBase64;
-  }
-
   async canActivate(context: ExecutionContext) {
     const request: Request = context.switchToHttp().getRequest();
     const shareId = Object.prototype.hasOwnProperty.call(
@@ -36,7 +31,7 @@ export class ShareOwnerGuard extends JwtGuard {
       ? request.params.shareId
       : request.params.id;
 
-    if (!this.isBase64(shareId)) {
+    if (!isValidShareId(shareId)) {
       throw new BadRequestException(this.i18n.t("file.invalidIdFormat"));
     }
 

@@ -14,5 +14,6 @@
   "s3SessionNotFound": "Multipart upload session not found.",
   "s3UploadFailed": "Multipart upload failed. The upload has been aborted.",
   "s3SizeError": "Could not retrieve file size",
-  "s3NotSupported": "Pre-signed operations are only supported for S3 storage."
+  "s3NotSupported": "Pre-signed operations are only supported for S3 storage.",
+  "nameInUse": "A file with this name is already in the share"
 }
