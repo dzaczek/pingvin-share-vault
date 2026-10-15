@@ -1,7 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { Prisma } from "@prisma/client";
-import { AUDIT_LOG_RETENTION_DAYS, SHARD_ID } from "src/constants";
+import { ConfigService } from "src/config/config.service";
+import { SHARD_ID } from "src/constants";
 import { PrismaService } from "src/prisma/prisma.service";
 import { auditRequestStore, requestContext } from "./auditLog.context";
 
@@ -52,7 +53,10 @@ export function redact(value: unknown): unknown {
 export class AuditLogService {
   private readonly logger = new Logger(AuditLogService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private config: ConfigService,
+  ) {}
 
   // Fire and forget. The request context is read right here, before anything
   // is awaited, and a failed write only ends up as a warning.
@@ -146,14 +150,14 @@ export class AuditLogService {
 
   @Cron("30 3 * * *")
   async deleteExpired() {
-    if (!(AUDIT_LOG_RETENTION_DAYS > 0)) return;
-    const cutoff = new Date(Date.now() - AUDIT_LOG_RETENTION_DAYS * 86_400_000);
+    // 0 keeps audit entries forever
+    const days = this.config.get("security.auditLogRetentionDays");
+    if (!(days > 0)) return;
+    const cutoff = new Date(Date.now() - days * 86_400_000);
     const { count } = await this.prisma.auditLog.deleteMany({
       where: { createdAt: { lt: cutoff } },
     });
     if (count)
-      this.logger.log(
-        `Deleted ${count} audit entries older than ${AUDIT_LOG_RETENTION_DAYS} days`,
-      );
+      this.logger.log(`Deleted ${count} audit entries older than ${days} days`);
   }
 }

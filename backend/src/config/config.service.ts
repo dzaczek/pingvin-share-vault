@@ -287,6 +287,7 @@ export class ConfigService extends EventEmitter {
       range("cache.ttl", 0),
       range("cache.maxItems", 1),
       range("smtp.port", 0, 65535),
+      range("security.auditLogRetentionDays", 0, 36500),
       oneOf("appearance.themeRadius", ["xs", "sm", "md", "lg", "xl"]),
       oneOf("appearance.themeColorScheme", ["light", "dark", "system"]),
       oneOf("appearance.uploadProgressStyle", [

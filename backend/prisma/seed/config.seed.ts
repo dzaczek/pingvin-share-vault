@@ -103,6 +103,11 @@ export const configVariables = {
       defaultValue: "false",
       secret: false,
     },
+    auditLogRetentionDays: {
+      type: "number",
+      // the environment variable used before this setting is still the default
+      defaultValue: process.env.AUDIT_LOG_RETENTION_DAYS || "90",
+    },
   },
   appearance: {
     themePrimaryColor: {
