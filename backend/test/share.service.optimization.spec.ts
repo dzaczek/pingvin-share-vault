@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ShareService } from '../src/share/share.service';
 import { PrismaService } from '../src/prisma/prisma.service';
@@ -28,6 +29,9 @@ describe('ShareService Optimization', () => {
             },
             shareUserRecipient: {
               upsert: jest.fn(),
+            },
+            reverseShare: {
+              updateMany: jest.fn(),
             },
             share: {
               findUnique: jest.fn(),
@@ -145,5 +149,29 @@ describe('ShareService Optimization', () => {
       expect(prismaService.$transaction).not.toHaveBeenCalled();
     });
 
+  });
+
+  describe('reverse share uses', () => {
+    it('takes a use in one conditional write and stops when none is left', async () => {
+      jest.spyOn(shareService, 'isShareCompleted').mockResolvedValue(false);
+      (prismaService.share.findUnique as jest.Mock).mockResolvedValue({
+        id: 'share1',
+        files: [{ id: 'f1' }],
+        recipients: [],
+        creator: null,
+        reverseShare: { id: 'rs1', creator: {} },
+      });
+      const updateMany = (prismaService as any).reverseShare.updateMany as jest.Mock;
+      updateMany.mockResolvedValue({ count: 0 });
+
+      await expect(shareService.complete('share1')).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
+      expect(updateMany).toHaveBeenCalledWith({
+        where: { id: 'rs1', remainingUses: { gt: 0 } },
+        data: { remainingUses: { decrement: 1 } },
+      });
+      expect(prismaService.share.update).not.toHaveBeenCalled();
+    });
   });
 });

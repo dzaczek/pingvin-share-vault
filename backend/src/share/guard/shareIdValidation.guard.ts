@@ -7,6 +7,9 @@ import {
 import { Observable } from "rxjs";
 import { I18nService } from "nestjs-i18n";
 
+// has to accept everything the create share validation allows, underscore included
+export const isValidShareId = (id: string) => /^[a-zA-Z0-9_-]*={0,2}$/.test(id);
+
 @Injectable()
 export class IdValidation implements CanActivate {
   constructor(private readonly i18n: I18nService) {}
@@ -30,10 +33,7 @@ export class IdValidation implements CanActivate {
       return true;
     }
 
-    // has to accept everything the create share validation allows, underscore included
-    const isBase64 = /^[a-zA-Z0-9_-]*={0,2}$/.test(id);
-
-    if (!isBase64) {
+    if (!isValidShareId(id)) {
       throw new BadRequestException(this.i18n.t("file.invalidIdFormat"));
     }
 

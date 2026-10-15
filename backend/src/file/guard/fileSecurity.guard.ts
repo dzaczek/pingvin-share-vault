@@ -12,6 +12,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { ShareSecurityGuard } from "src/share/guard/shareSecurity.guard";
 import { ShareService } from "src/share/share.service";
 import { ConfigService } from "src/config/config.service";
+import { isValidShareId } from "src/share/guard/shareIdValidation.guard";
 
 @Injectable()
 export class FileSecurityGuard extends ShareSecurityGuard {
@@ -24,11 +25,6 @@ export class FileSecurityGuard extends ShareSecurityGuard {
     super(_shareService, _prisma, _config, _i18n);
   }
 
-  isBase64(toCheck: string) {
-    const isBase64 = /^[a-zA-Z0-9_-]*={0,2}$/.test(toCheck);
-    return isBase64;
-  }
-
   async canActivate(context: ExecutionContext) {
     const request: Request = context.switchToHttp().getRequest();
 
@@ -39,7 +35,7 @@ export class FileSecurityGuard extends ShareSecurityGuard {
       ? request.params.shareId
       : request.params.id;
 
-    if (!this.isBase64(shareId)) {
+    if (!isValidShareId(shareId)) {
       throw new BadRequestException(this._i18n.t("file.invalidIdFormat"));
     }
 

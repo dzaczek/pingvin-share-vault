@@ -56,6 +56,12 @@ describe("S3FileService share limits", () => {
     expect(send).not.toHaveBeenCalled();
   });
 
+  it("refuses a second file of the same name", async () => {
+    share.files = [{ size: "10", name: "a.bin" }];
+    await expect(upload(10)).rejects.toBeInstanceOf(BadRequestException);
+    expect(send).not.toHaveBeenCalled();
+  });
+
   it("does not add files to a completed share", async () => {
     share.uploadLocked = true;
     await expect(upload(10)).rejects.toBeInstanceOf(BadRequestException);
