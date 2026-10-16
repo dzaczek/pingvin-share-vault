@@ -33,7 +33,7 @@
     "axios": "^1.19.0",
     "cookies-next": "^4.2.1",
     "file-saver": "^2.0.5",
-    "jose": "^5.9.2",
+    "jose": "^6.2.12",
     "jwt-decode": "^4.0.0",
     "markdown-to-jsx": "^9.10.3",
     "mime-types": "^3.0.2",
