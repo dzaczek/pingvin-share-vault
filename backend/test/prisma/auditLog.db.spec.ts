@@ -90,6 +90,39 @@ describe("AuditLogService against sqlite", () => {
     expect(page.entries).toHaveLength(1);
   });
 
+  it("follows a file and everything that happened in its share", async () => {
+    await entry({ action: "SHARE_VIEW", resourceId: "s1" });
+    await entry({
+      action: "FILE_UPLOAD",
+      resourceId: "f1",
+      metadata: { shareId: "s1" },
+    });
+    await entry({
+      action: "FILE_DOWNLOAD",
+      resourceId: "f1",
+      metadata: { shareId: "s1" },
+    });
+    await entry({
+      action: "FILE_DOWNLOAD",
+      resourceId: "s1",
+      metadata: { shareId: "s1", zip: true },
+    });
+    await entry({
+      action: "FILE_DOWNLOAD",
+      resourceId: "f2",
+      metadata: { shareId: "s2" },
+    });
+
+    const file = await service.find({ resourceId: "f1" });
+    const share = await service.find({ shareId: "s1" });
+
+    expect(file.entries.map((e) => e.action).sort()).toEqual([
+      "FILE_DOWNLOAD",
+      "FILE_UPLOAD",
+    ]);
+    expect(share.entries).toHaveLength(4);
+  });
+
   it("sums traffic per shard, action and storage", async () => {
     await entry({
       action: "FILE_UPLOAD",

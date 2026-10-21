@@ -35,6 +35,16 @@ export class AuditLogQueryDTO {
   @IsOptional()
   @IsString()
   @MaxLength(64)
+  resourceId?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  shareId?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
   cursor?: string;
 
   @IsOptional()
