@@ -40,7 +40,8 @@ const AuditLogs = () => {
   // no request per keystroke while an ip is typed in
   const [debouncedIdentity] = useDebouncedValue(identity, 400);
 
-  // clicking a user, visitor or ip anywhere opens its own trail
+  // clicking a user, visitor, ip, file, share or shard anywhere opens its
+  // own trail
   const selectIdentity = (kind: IdentityKind, value: string) => {
     setIdentityKind(kind);
     setIdentity(value);
@@ -104,6 +105,12 @@ const AuditLogs = () => {
                 },
                 { value: "userId", label: t("admin.auditLogs.table.user") },
                 { value: "ipAddress", label: t("admin.auditLogs.table.ip") },
+                {
+                  value: "resourceId",
+                  label: t("admin.auditLogs.table.resource"),
+                },
+                { value: "shareId", label: t("admin.auditLogs.table.share") },
+                { value: "shardId", label: t("admin.auditLogs.table.shard") },
               ]}
             />
             <TextInput
@@ -124,7 +131,7 @@ const AuditLogs = () => {
         </Tabs.Panel>
 
         <Tabs.Panel value="shards">
-          {tab === "shards" && <ShardSummary />}
+          {tab === "shards" && <ShardSummary onSelectShard={selectIdentity} />}
         </Tabs.Panel>
       </Tabs>
       <Space h="xl" />

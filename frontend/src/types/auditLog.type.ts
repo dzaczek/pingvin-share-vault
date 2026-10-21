@@ -24,6 +24,8 @@ export type AuditLogFilter = {
   ipAddress?: string;
   shardId?: string;
   action?: string;
+  resourceId?: string;
+  shareId?: string;
   cursor?: string;
   take?: number;
   order?: "asc" | "desc";

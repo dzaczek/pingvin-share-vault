@@ -160,6 +160,20 @@ describe("AuditLogService.find", () => {
     expect(page.nextCursor).toBe("2");
   });
 
+  it("matches a share by its own id or by the share of a file", async () => {
+    const { service, findManyCalls } = build();
+
+    await service.find({ shareId: "s1", resourceId: "f1" });
+
+    expect(findManyCalls[0].where).toEqual({
+      resourceId: "f1",
+      OR: [
+        { resourceId: "s1" },
+        { metadata: { path: "$.shareId", equals: "s1" } },
+      ],
+    });
+  });
+
   it("continues after the cursor and reports the end", async () => {
     const { service, findManyCalls, setRows } = build();
     setRows([{ id: "3" }]);

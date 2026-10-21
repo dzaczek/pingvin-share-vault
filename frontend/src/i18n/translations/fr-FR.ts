@@ -214,6 +214,7 @@ export default {
   "admin.button.users": "Gestion des utilisateurs",
   "admin.button.shares": "Gestion des partages",
   "admin.button.config": "Paramètres",
+  "admin.button.auditLogs": "Journal d'audit",
   "admin.version": "Version",
   // END /admin
 
@@ -251,6 +252,31 @@ export default {
   "admin.users.modal.create.admin": "Privilèges d’admin",
   "admin.users.modal.create.admin.description": "Si coché, l’utilisateur pourra accéder au panneau d'administration.",
   // END /admin/users
+
+  // /admin/auditLogs
+  "admin.auditLogs.title": "Journal d'audit",
+  "admin.auditLogs.tab.timeline": "Chronologie",
+  "admin.auditLogs.tab.identity": "Piste",
+  "admin.auditLogs.tab.shards": "Shards",
+  "admin.auditLogs.filter.action": "Toutes les actions",
+  "admin.auditLogs.filter.identity": "ID ou adresse IP",
+  "admin.auditLogs.live": "En direct",
+  "admin.auditLogs.loadMore": "Charger plus",
+  "admin.auditLogs.empty": "Aucune entrée",
+  "admin.auditLogs.table.time": "Heure",
+  "admin.auditLogs.table.action": "Action",
+  "admin.auditLogs.table.user": "Utilisateur",
+  "admin.auditLogs.table.visitor": "Visiteur",
+  "admin.auditLogs.table.ip": "IP",
+  "admin.auditLogs.table.resource": "Ressource",
+  "admin.auditLogs.table.share": "Partage",
+  "admin.auditLogs.table.shard": "Shard",
+  "admin.auditLogs.table.details": "Détails",
+  "admin.auditLogs.shards.storage": "Stockage",
+  "admin.auditLogs.shards.count": "Événements",
+  "admin.auditLogs.shards.bytes": "Données",
+  "admin.auditLogs.shards.lastSeen": "Dernier événement",
+  // END /admin/auditLogs
 
   // /admin/shares
   "admin.shares.title": "Gestion des partages",
@@ -511,6 +537,8 @@ export default {
   "admin.config.share.reverse-share-simple-only": "Forcer le mode simple de partage inversé",
   "admin.config.share.reverse-share-simple-only.description": "Forcer la création des partages inversés en mode simple. Si désactivé, le créateur du partage inversé peut choisir entre les modes simple et avancé.",
   "admin.config.security.allow-admin-access-all-shares.description": "Autoriser les administrateurs à accéder à tous les partages, même s'ils sont protégés par un mot de passe, expirés ou supprimés.",
+  "admin.config.security.audit-log-retention-days": "Conservation du journal d'audit",
+  "admin.config.security.audit-log-retention-days.description": "Nombre de jours de conservation du journal d'audit, les entrées plus anciennes sont supprimées chaque nuit. 0 le conserve indéfiniment.",
   "admin.config.share.enable-user-recipients": "Activer le partage avec les utilisateurs enregistrés",
   "admin.config.share.enable-user-recipients.description": "Lorsqu'il est activé, les partages envoyés à l'adresse e-mail d'un utilisateur enregistré apparaîtront automatiquement dans son compte. Les utilisateurs peuvent également restreindre l'accès au partage aux destinataires nommés uniquement.",
   "admin.config.share.file-retention-period": "Période de conservation des fichiers",

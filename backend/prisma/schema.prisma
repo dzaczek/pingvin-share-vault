@@ -249,4 +249,5 @@ model AuditLog {
   @@index([visitorId])
   @@index([ipAddress])
   @@index([shardId])
+  @@index([resourceId])
 }

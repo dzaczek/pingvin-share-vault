@@ -29,6 +29,8 @@ export type AuditLogFilter = {
   ipAddress?: string;
   shardId?: string;
   action?: string;
+  resourceId?: string;
+  shareId?: string;
   cursor?: string;
   take?: string | number;
   order?: "asc" | "desc";
@@ -101,9 +103,17 @@ export class AuditLogService {
       "ipAddress",
       "shardId",
       "action",
+      "resourceId",
     ] as const) {
       if (filter[key]) where[key] = filter[key];
     }
+    // a share shows up as the resource of views and zips, and as the parent
+    // in the metadata of every single file
+    if (filter.shareId)
+      where.OR = [
+        { resourceId: filter.shareId },
+        { metadata: { path: "$.shareId", equals: filter.shareId } },
+      ];
 
     const rows = await this.prisma.auditLog.findMany({
       where,
