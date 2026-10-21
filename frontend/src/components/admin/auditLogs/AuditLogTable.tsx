@@ -17,7 +17,8 @@ import auditLogService from "../../../services/auditLog.service";
 import { AuditLogEntry, AuditLogFilter } from "../../../types/auditLog.type";
 import toast from "../../../utils/toast.util";
 
-export type IdentityKind = "userId" | "visitorId" | "ipAddress";
+export type IdentityKind =
+  "userId" | "visitorId" | "ipAddress" | "resourceId" | "shareId" | "shardId";
 
 const POLL_MS = 10_000;
 
@@ -28,6 +29,12 @@ const actionColor = (action: string) => {
   if (action === "FILE_DOWNLOAD") return "violet";
   return "gray";
 };
+
+// share views and zips log the share itself as their resource
+const resourceKind = (entry: AuditLogEntry): IdentityKind =>
+  entry.action === "SHARE_VIEW" || entry.metadata?.zip
+    ? "shareId"
+    : "resourceId";
 
 const Identity = ({
   kind,
@@ -46,7 +53,12 @@ const Identity = ({
       <Anchor
         component="button"
         size="sm"
-        data-mono={kind === "userId" ? undefined : true}
+        // emails and file or share names read better in the normal font
+        data-mono={
+          kind === "userId" || (label && kind !== "ipAddress")
+            ? undefined
+            : true
+        }
         onClick={() => onSelect?.(kind, value)}
       >
         {label ?? (value.length > 12 ? `${value.slice(0, 12)}…` : value)}
@@ -203,7 +215,12 @@ const AuditLogTable = ({
                   />
                 </td>
                 <td style={{ minWidth: 160 }}>
-                  {entry.resourceName ?? entry.resourceId ?? "-"}
+                  <Identity
+                    kind={resourceKind(entry)}
+                    value={entry.resourceId}
+                    label={entry.resourceName}
+                    onSelect={onSelectIdentity}
+                  />
                 </td>
                 <td style={{ minWidth: 220 }}>
                   {entry.metadata && (
@@ -211,9 +228,19 @@ const AuditLogTable = ({
                       {JSON.stringify(entry.metadata)}
                     </Code>
                   )}{" "}
-                  <Text span size="xs" color="dimmed">
-                    {entry.shardId}
-                  </Text>
+                  {typeof entry.metadata?.shareId === "string" &&
+                    entry.metadata.shareId !== entry.resourceId && (
+                      <Identity
+                        kind="shareId"
+                        value={entry.metadata.shareId}
+                        onSelect={onSelectIdentity}
+                      />
+                    )}{" "}
+                  <Identity
+                    kind="shardId"
+                    value={entry.shardId}
+                    onSelect={onSelectIdentity}
+                  />
                 </td>
               </tr>
             ))}

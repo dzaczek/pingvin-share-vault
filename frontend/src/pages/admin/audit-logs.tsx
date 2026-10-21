@@ -37,10 +37,16 @@ const AuditLogs = () => {
 
   const [identityKind, setIdentityKind] = useState<IdentityKind>("visitorId");
   const [identity, setIdentity] = useState("");
-  // no request per keystroke while an ip is typed in
-  const [debouncedIdentity] = useDebouncedValue(identity, 400);
+  // no request per keystroke while an ip is typed in. Kind and value settle
+  // together, otherwise a click briefly asks for the new kind with the old
+  // value and finds nothing
+  const [trail] = useDebouncedValue(`${identityKind}:${identity}`, 400);
+  const sep = trail.indexOf(":");
+  const trailKind = trail.slice(0, sep) as IdentityKind;
+  const trailValue = trail.slice(sep + 1);
 
-  // clicking a user, visitor or ip anywhere opens its own trail
+  // clicking a user, visitor, ip, file, share or shard anywhere opens its
+  // own trail
   const selectIdentity = (kind: IdentityKind, value: string) => {
     setIdentityKind(kind);
     setIdentity(value);
@@ -104,6 +110,12 @@ const AuditLogs = () => {
                 },
                 { value: "userId", label: t("admin.auditLogs.table.user") },
                 { value: "ipAddress", label: t("admin.auditLogs.table.ip") },
+                {
+                  value: "resourceId",
+                  label: t("admin.auditLogs.table.resource"),
+                },
+                { value: "shareId", label: t("admin.auditLogs.table.share") },
+                { value: "shardId", label: t("admin.auditLogs.table.shard") },
               ]}
             />
             <TextInput
@@ -113,18 +125,18 @@ const AuditLogs = () => {
               onChange={(e) => setIdentity(e.currentTarget.value.trim())}
             />
           </Group>
-          {tab === "identity" && debouncedIdentity && (
+          {tab === "identity" && trailValue && (
             // oldest first, so the trail reads from entry to the last download
             <AuditLogTable
-              key={`${identityKind}:${debouncedIdentity}`}
-              filter={{ [identityKind]: debouncedIdentity, order: "asc" }}
+              key={trail}
+              filter={{ [trailKind]: trailValue, order: "asc" }}
               onSelectIdentity={selectIdentity}
             />
           )}
         </Tabs.Panel>
 
         <Tabs.Panel value="shards">
-          {tab === "shards" && <ShardSummary />}
+          {tab === "shards" && <ShardSummary onSelectShard={selectIdentity} />}
         </Tabs.Panel>
       </Tabs>
       <Space h="xl" />

@@ -214,6 +214,7 @@ export default {
   "admin.button.users": "Benutzerverwaltung",
   "admin.button.shares": "Freigaben Verwaltung",
   "admin.button.config": "Konfiguration",
+  "admin.button.auditLogs": "Audit-Protokoll",
   "admin.version": "Version",
   // END /admin
 
@@ -251,6 +252,31 @@ export default {
   "admin.users.modal.create.admin": "Administratorrechte",
   "admin.users.modal.create.admin.description": "Wenn aktiviert, kann der Benutzer auf das Administrator-Panel zugreifen.",
   // END /admin/users
+
+  // /admin/auditLogs
+  "admin.auditLogs.title": "Audit-Protokoll",
+  "admin.auditLogs.tab.timeline": "Zeitachse",
+  "admin.auditLogs.tab.identity": "Spur",
+  "admin.auditLogs.tab.shards": "Shards",
+  "admin.auditLogs.filter.action": "Alle Aktionen",
+  "admin.auditLogs.filter.identity": "ID oder IP-Adresse",
+  "admin.auditLogs.live": "Live",
+  "admin.auditLogs.loadMore": "Mehr laden",
+  "admin.auditLogs.empty": "Keine Einträge",
+  "admin.auditLogs.table.time": "Zeit",
+  "admin.auditLogs.table.action": "Aktion",
+  "admin.auditLogs.table.user": "Benutzer",
+  "admin.auditLogs.table.visitor": "Besucher",
+  "admin.auditLogs.table.ip": "IP",
+  "admin.auditLogs.table.resource": "Ressource",
+  "admin.auditLogs.table.share": "Freigabe",
+  "admin.auditLogs.table.shard": "Shard",
+  "admin.auditLogs.table.details": "Details",
+  "admin.auditLogs.shards.storage": "Speicher",
+  "admin.auditLogs.shards.count": "Ereignisse",
+  "admin.auditLogs.shards.bytes": "Daten",
+  "admin.auditLogs.shards.lastSeen": "Letztes Ereignis",
+  // END /admin/auditLogs
 
   // /admin/shares
   "admin.shares.title": "Freigaben Verwaltung",
@@ -511,6 +537,8 @@ export default {
   "admin.config.share.reverse-share-simple-only": "Einfachen Modus für Datei-Anfragen erzwingen",
   "admin.config.share.reverse-share-simple-only.description": "Erzwingt, dass Datei-Anfragen im einfachen Modus erstellt werden. Wenn deaktiviert, kann der Ersteller der Datei-Anfrage zwischen einfachem und erweitertem Modus wählen.",
   "admin.config.security.allow-admin-access-all-shares.description": "Administratoren erlauben, auf alle Freigaben zuzugreifen, selbst wenn sie passwortgeschützt, abgelaufen oder gelöscht sind.",
+  "admin.config.security.audit-log-retention-days": "Aufbewahrung des Audit-Protokolls",
+  "admin.config.security.audit-log-retention-days.description": "Tage, die das Audit-Protokoll aufbewahrt wird. Ältere Einträge werden jede Nacht gelöscht. 0 bewahrt es für immer auf.",
   "admin.config.share.enable-user-recipients": "Teilen mit registrierten Benutzern aktivieren",
   "admin.config.share.enable-user-recipients.description": "Wenn aktiviert, erscheinen Freigaben, die an die E-Mail-Adresse eines registrierten Benutzers gesendet wurden, automatisch in dessen Konto. Benutzer können den Freigabezugriff auch nur auf benannte Empfänger beschränken.",
   "admin.config.share.file-retention-period": "Aufbewahrungsfrist für Dateien",

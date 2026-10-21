@@ -1,13 +1,26 @@
-import { Center, Loader, Paper, Table, Text, Title } from "@mantine/core";
+import {
+  Anchor,
+  Center,
+  Loader,
+  Paper,
+  Table,
+  Text,
+  Title,
+} from "@mantine/core";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import auditLogService from "../../../services/auditLog.service";
 import { ShardSummaryRow } from "../../../types/auditLog.type";
+import { IdentityKind } from "./AuditLogTable";
 import { byteToHumanSizeString } from "../../../utils/fileSize.util";
 import toast from "../../../utils/toast.util";
 
-const ShardSummary = () => {
+const ShardSummary = ({
+  onSelectShard,
+}: {
+  onSelectShard?: (kind: IdentityKind, value: string) => void;
+}) => {
   const [rows, setRows] = useState<ShardSummaryRow[] | null>(null);
 
   useEffect(() => {
@@ -39,7 +52,13 @@ const ShardSummary = () => {
       {[...byShard.entries()].map(([shardId, shardRows]) => (
         <Paper withBorder p="md" mb="md" key={shardId}>
           <Title order={5} mb="xs">
-            {shardId}
+            <Anchor
+              component="button"
+              inherit
+              onClick={() => onSelectShard?.("shardId", shardId)}
+            >
+              {shardId}
+            </Anchor>
           </Title>
           <Table fontSize="sm" verticalSpacing="xs">
             <thead>
