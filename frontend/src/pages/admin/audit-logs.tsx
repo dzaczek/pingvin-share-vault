@@ -37,8 +37,13 @@ const AuditLogs = () => {
 
   const [identityKind, setIdentityKind] = useState<IdentityKind>("visitorId");
   const [identity, setIdentity] = useState("");
-  // no request per keystroke while an ip is typed in
-  const [debouncedIdentity] = useDebouncedValue(identity, 400);
+  // no request per keystroke while an ip is typed in. Kind and value settle
+  // together, otherwise a click briefly asks for the new kind with the old
+  // value and finds nothing
+  const [trail] = useDebouncedValue(`${identityKind}:${identity}`, 400);
+  const sep = trail.indexOf(":");
+  const trailKind = trail.slice(0, sep) as IdentityKind;
+  const trailValue = trail.slice(sep + 1);
 
   // clicking a user, visitor, ip, file, share or shard anywhere opens its
   // own trail
@@ -120,11 +125,11 @@ const AuditLogs = () => {
               onChange={(e) => setIdentity(e.currentTarget.value.trim())}
             />
           </Group>
-          {tab === "identity" && debouncedIdentity && (
+          {tab === "identity" && trailValue && (
             // oldest first, so the trail reads from entry to the last download
             <AuditLogTable
-              key={`${identityKind}:${debouncedIdentity}`}
-              filter={{ [identityKind]: debouncedIdentity, order: "asc" }}
+              key={trail}
+              filter={{ [trailKind]: trailValue, order: "asc" }}
               onSelectIdentity={selectIdentity}
             />
           )}
