@@ -1,3 +1,13 @@
+## [2026.10.5](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.4...v2026.10.5) (2026-10-21)
+
+### Features
+
+* **audit:** open the trail of a file, share or shard from the audit log ([bd695fd](https://github.com/dzaczek/pingvin-share-vault/commit/bd695fda9f53b87102f1e5e7891f81badc8addbd))
+
+### Bug Fixes
+
+* **audit:** no empty flash when a click switches the trail kind ([37b6b14](https://github.com/dzaczek/pingvin-share-vault/commit/37b6b1431a9c0f9696145bd35acfb8b87514e38a))
+
 ## [2026.10.4](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.3...v2026.10.4) (2026-10-15)
 
 ### Bug Fixes
