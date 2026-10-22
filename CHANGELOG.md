@@ -1,3 +1,9 @@
+## [2026.10.7](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.6...v2026.10.7) (2026-10-22)
+
+### Features
+
+* **audit:** add a device id next to the browser fingerprint ([d365990](https://github.com/dzaczek/pingvin-share-vault/commit/d3659905cc4924b2307fa1ab8ebf363e5c66f180))
+
 ## [2026.10.6](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.5...v2026.10.6) (2026-10-22)
 
 ### Features
