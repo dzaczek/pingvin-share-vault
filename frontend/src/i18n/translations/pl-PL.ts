@@ -355,15 +355,15 @@ export default {
   "admin.userOverview.stat.shares":
     "Aktywne udostępnienia",
   "admin.userOverview.stat.shares.hint":
-    "{expired} wygasłych, {reverse} odwrotnych",
+    "{expired, plural, one {# wygasłe} few {# wygasłe} other {# wygasłych}}, {reverse, plural, one {# odwrotne} few {# odwrotne} other {# odwrotnych}}",
   "admin.userOverview.stat.last-login":
     "Ostatnie logowanie",
   "admin.userOverview.stat.last-login.hint":
-    "{failed} nieudanych logowań w 30 dni",
+    "{failed, plural, one {# nieudane logowanie} few {# nieudane logowania} other {# nieudanych logowań}} w 30 dni",
   "admin.userOverview.stat.devices":
     "Urządzenia",
   "admin.userOverview.stat.devices.hint":
-    "{ips} adresów IP, {sessions} aktywnych sesji",
+    "{ips, plural, one {# adres IP} few {# adresy IP} other {# adresów IP}}, {sessions, plural, one {# aktywna sesja} few {# aktywne sesje} other {# aktywnych sesji}}",
   "admin.userOverview.permissions":
     "Udostępnienia {share} · Odwrotne {reverse} · Maks. udostępnień {maxShares} · Maks. odwrotnych {maxReverseShares} · Maks. rozmiar {shareSize}",
   "admin.userOverview.tab.shares":
@@ -447,7 +447,7 @@ export default {
   "admin.userOverview.sessions.revoke.description":
     "Wszystkie sesje tego konta kończą się od razu, na każdym urządzeniu. Konto zostaje i może zalogować się ponownie.",
   "admin.userOverview.sessions.revoke.done":
-    "Zakończono sesji: {count}",
+    "{count, plural, one {Zakończono # sesję} few {Zakończono # sesje} other {Zakończono # sesji}}",
   // END /admin/users/[id]
 
   // /admin/auditLogs

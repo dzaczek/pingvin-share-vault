@@ -388,15 +388,15 @@ export default {
   "admin.userOverview.stat.shares":
     "Active shares",
   "admin.userOverview.stat.shares.hint":
-    "{expired} expired, {reverse} reverse shares",
+    "{expired, plural, other {# expired}}, {reverse, plural, one {# reverse share} other {# reverse shares}}",
   "admin.userOverview.stat.last-login":
     "Last login",
   "admin.userOverview.stat.last-login.hint":
-    "{failed} failed logins in 30 days",
+    "{failed, plural, one {# failed login} other {# failed logins}} in 30 days",
   "admin.userOverview.stat.devices":
     "Devices",
   "admin.userOverview.stat.devices.hint":
-    "{ips} IP addresses, {sessions} active sessions",
+    "{ips, plural, one {# IP address} other {# IP addresses}}, {sessions, plural, one {# active session} other {# active sessions}}",
   "admin.userOverview.permissions":
     "Shares {share} · Reverse shares {reverse} · Max shares {maxShares} · Max reverse shares {maxReverseShares} · Max share size {shareSize}",
   "admin.userOverview.tab.shares":
@@ -480,7 +480,7 @@ export default {
   "admin.userOverview.sessions.revoke.description":
     "Every session of this account ends right away, on every device. The account itself stays, and it can sign in again.",
   "admin.userOverview.sessions.revoke.done":
-    "{count} sessions ended",
+    "{count, plural, one {# session ended} other {# sessions ended}}",
   // END /admin/users/[id]
 
   // /admin/auditLogs
