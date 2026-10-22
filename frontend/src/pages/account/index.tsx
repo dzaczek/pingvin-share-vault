@@ -28,6 +28,10 @@ import useUser from "../../hooks/user.hook";
 import authService from "../../services/auth.service";
 import userService from "../../services/user.service";
 import { getOAuthIcon, getOAuthUrl, unlinkOAuth } from "../../utils/oauth.util";
+import {
+  passwordSchema,
+  resolvePasswordPolicy,
+} from "../../utils/passwordPolicy.util";
 import toast from "../../utils/toast.util";
 
 const Account = () => {
@@ -44,6 +48,7 @@ const Account = () => {
   const modals = useModals();
   const t = useTranslate();
   const config = useConfig();
+  const passwordPolicy = resolvePasswordPolicy(config.get);
 
   const accountForm = useForm({
     initialValues: {
@@ -73,16 +78,12 @@ const Account = () => {
       yup.object().shape({
         oldPassword: yup.string().when([], {
           is: () => !!user?.hasPassword,
-          then: (schema) =>
-            schema
-              .min(8, t("common.error.too-short", { length: 8 }))
-              .required(t("common.error.field-required")),
+          then: (schema) => schema.required(t("common.error.field-required")),
           otherwise: (schema) => schema.notRequired(),
         }),
-        password: yup
-          .string()
-          .min(8, t("common.error.too-short", { length: 8 }))
-          .required(t("common.error.field-required")),
+        password: passwordSchema(passwordPolicy, t).required(
+          t("common.error.field-required"),
+        ),
       }),
     ),
   });
@@ -93,10 +94,7 @@ const Account = () => {
     },
     validate: yupResolver(
       yup.object().shape({
-        password: yup
-          .string()
-          .min(8, t("common.error.too-short", { length: 8 }))
-          .required(t("common.error.field-required")),
+        password: yup.string().required(t("common.error.field-required")),
       }),
     ),
   });
@@ -108,7 +106,7 @@ const Account = () => {
     },
     validate: yupResolver(
       yup.object().shape({
-        password: yup.string().min(8),
+        password: yup.string().required(t("common.error.field-required")),
         code: yup
           .string()
           .min(6, t("common.error.exact-length", { length: 6 }))
