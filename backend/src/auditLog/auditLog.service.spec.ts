@@ -82,6 +82,7 @@ describe("AuditLogService.log", () => {
       headers: {
         "user-agent": "curl/8",
         "x-browser-fingerprint": "a".repeat(32),
+        "x-device-id": "b".repeat(32),
       },
       user: { id: "u1", email: "u1@example.invalid" },
     });
@@ -96,6 +97,7 @@ describe("AuditLogService.log", () => {
       ipAddress: "203.0.113.7",
       userAgent: "curl/8",
       visitorId: "a".repeat(32),
+      deviceId: "b".repeat(32),
       userId: "u1",
       userEmail: "u1@example.invalid",
       resourceId: "s1",
@@ -127,6 +129,7 @@ describe("AuditLogService.log", () => {
       ipAddress: "",
       userAgent: "",
       visitorId: null,
+      deviceId: null,
       userId: null,
     });
   });

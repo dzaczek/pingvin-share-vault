@@ -349,12 +349,29 @@ export default {
   "admin.auditLogs.table.time": "Czas",
   "admin.auditLogs.table.action": "Akcja",
   "admin.auditLogs.table.user": "Użytkownik",
-  "admin.auditLogs.table.visitor": "Odwiedzający",
+  "admin.auditLogs.table.visitor": "Fingerprint",
+  "admin.auditLogs.table.device": "Urządzenie",
   "admin.auditLogs.table.ip": "IP",
   "admin.auditLogs.table.resource": "Zasób",
   "admin.auditLogs.table.share": "Udostępnienie",
   "admin.auditLogs.table.shard": "Shard",
   "admin.auditLogs.table.details": "Szczegóły",
+  "admin.auditLogs.table.time.description":
+    "Kiedy serwer zapisał wpis. Najedź na czas, żeby zobaczyć user agent przeglądarki.",
+  "admin.auditLogs.table.action.description":
+    "Co się stało: logowanie, wysłanie, pobranie, podgląd albo otwarcie udostępnienia.",
+  "admin.auditLogs.table.user.description":
+    "Zalogowane konto. Puste dla gości. Email zostaje nawet po usunięciu konta.",
+  "admin.auditLogs.table.visitor.description":
+    "Hash wyglądu przeglądarki: ekran, języki, strefa czasowa, GPU i sposób rysowania tekstu. Przetrwa wyczyszczenie ciasteczek, ale zmienia się po aktualizacji przeglądarki, a dwa urządzenia tego samego modelu mają ten sam.",
+  "admin.auditLogs.table.device.description":
+    "Losowe ID nadane tej przeglądarce przy pierwszej wizycie, trzymane w ciasteczku. Odróżnia dwa urządzenia tego samego modelu, ale znika po wyczyszczeniu ciasteczek.",
+  "admin.auditLogs.table.ip.description":
+    "Adres, z którego przyszło żądanie, widziany za proxy.",
+  "admin.auditLogs.table.resource.description":
+    "Plik albo udostępnienie, którego dotyczy akcja.",
+  "admin.auditLogs.table.details.description":
+    "Dodatkowe dane akcji, np. rozmiar i magazyn, oraz udostępnienie i shard, który ją obsłużył.",
   "admin.auditLogs.shards.storage": "Magazyn",
   "admin.auditLogs.shards.count": "Zdarzenia",
   "admin.auditLogs.shards.bytes": "Dane",

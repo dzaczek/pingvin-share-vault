@@ -4,6 +4,7 @@ export type AuditLogEntry = {
   userId: string | null;
   userEmail: string | null;
   visitorId: string | null;
+  deviceId: string | null;
   ipAddress: string;
   userAgent: string;
   shardId: string;
@@ -21,6 +22,7 @@ export type AuditLogPage = {
 export type AuditLogFilter = {
   userId?: string;
   visitorId?: string;
+  deviceId?: string;
   ipAddress?: string;
   shardId?: string;
   action?: string;

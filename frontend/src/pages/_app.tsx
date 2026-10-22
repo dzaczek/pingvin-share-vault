@@ -52,7 +52,7 @@ import {
   GLASS_PREFERENCE_KEYS,
 } from "../utils/glassPreferences.util";
 import userPreferences from "../utils/userPreferences.util";
-import { getVisitorId } from "../utils/visitorId.util";
+import { getDeviceId, getVisitorId } from "../utils/visitorId.util";
 import Footer from "../components/footer/Footer";
 import { getDefaultConfig } from "../utils/defaultConfig.util";
 import AdminNoticeModal, {
@@ -306,9 +306,12 @@ function App({ Component, pageProps }: AppProps) {
   // again once the new worker takes over
   useEffect(() => watchForNewServiceWorker(), []);
 
-  // sets the visitor cookie before anything is downloaded, a download link
-  // is not an api call and would otherwise go out without it
-  useEffect(() => void getVisitorId(), []);
+  // sets the visitor and device cookies before anything is downloaded, a
+  // download link is not an api call and would otherwise go out without them
+  useEffect(() => {
+    getVisitorId();
+    getDeviceId();
+  }, []);
 
   useEffect(() => {
     if (!pageProps.language) return;

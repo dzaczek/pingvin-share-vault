@@ -39,6 +39,29 @@ describe("requestContext", () => {
     ).toBeNull();
   });
 
+  it("reads the device id from the header or the cookie", () => {
+    expect(
+      requestContext(
+        request(
+          { "x-device-id": "12".repeat(16) },
+          { device_id: "34".repeat(16) },
+        ),
+      ).deviceId,
+    ).toBe("12".repeat(16));
+    expect(
+      requestContext(request({}, { device_id: "34".repeat(16) })).deviceId,
+    ).toBe("34".repeat(16));
+    expect(
+      requestContext(request({ "x-device-id": "<script>" })).deviceId,
+    ).toBeNull();
+  });
+
+  it("keeps the visitor and the device apart", () => {
+    const ctx = requestContext(request({}, { visitor_id: "ab".repeat(16) }));
+    expect(ctx.visitorId).toBe("ab".repeat(16));
+    expect(ctx.deviceId).toBeNull();
+  });
+
   it("cuts a long user agent", () => {
     const ctx = requestContext(request({ "user-agent": "x".repeat(5000) }));
     expect(ctx.userAgent).toHaveLength(512);
@@ -49,6 +72,7 @@ describe("requestContext", () => {
       ipAddress: "",
       userAgent: "",
       visitorId: null,
+      deviceId: null,
       user: undefined,
     });
   });
