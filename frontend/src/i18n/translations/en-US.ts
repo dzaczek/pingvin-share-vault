@@ -168,6 +168,8 @@ export default {
   "account.theme.style.standard": "Standard",
   "account.theme.style.glass": "Glass",
   "account.theme.style.precision": "Precision",
+  "account.theme.glass.upload-panel.on": "On",
+  "account.theme.glass.upload-panel.off": "Off",
 
   "account.button.delete": "Delete Account",
   "account.modal.delete.title": "Delete Account",
@@ -714,6 +716,13 @@ export default {
   "precision.nav.expand": "Expand sidebar",
   "precision.nav.color-scheme": "Switch light and dark mode",
   "precision.nav.breadcrumbs": "Breadcrumbs",
+  "admin.config.appearance.tab.general": "General",
+  "admin.config.appearance.tab.style": "Style",
+  "admin.config.appearance.tab.brand": "Branding",
+  "admin.config.appearance.tab.advanced": "Advanced",
+  "admin.config.appearance.tab.default": "default",
+  "admin.config.appearance.tab.standard.empty": "Standard has no settings of its own, it follows the general tab.",
+  "admin.config.appearance.tab.precision.empty": "Precision has no settings of its own yet, it follows the general tab.",
   "admin.config.appearance.glass-variant": "Glass variant",
   "admin.config.appearance.glass-variant.description":
     "Regular blurs more and keeps text easy to read. Clear is more transparent and works best over a colorful background. Menus and dialogs always use regular.",

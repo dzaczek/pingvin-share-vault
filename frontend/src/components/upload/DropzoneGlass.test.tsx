@@ -29,6 +29,8 @@ const render = (withGlass = true) =>
         glass: withGlass ? glass : null,
         preference: "default",
         setPreference: jest.fn(),
+        glassPreferences: {},
+        setGlassPreference: jest.fn(),
       }}
     >
       <Dropzone

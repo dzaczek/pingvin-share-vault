@@ -21,6 +21,9 @@ export type UiStyle = {
   // what the user picked on the account page: default or one of the looks
   preference: string;
   setPreference: (value: string) => void;
+  // the user's own glass choices, see applyGlassPreferences
+  glassPreferences: Record<string, string>;
+  setGlassPreference: (key: string, value: string) => void;
 };
 
 export const UI_STYLES = ["standard", "glass", "precision"];
@@ -30,6 +33,8 @@ export const UiStyleContext = createContext<UiStyle>({
   glass: null,
   preference: "default",
   setPreference: () => {},
+  glassPreferences: {},
+  setGlassPreference: () => {},
 });
 
 const useUiStyle = () => useContext(UiStyleContext);

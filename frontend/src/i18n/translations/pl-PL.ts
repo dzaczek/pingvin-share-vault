@@ -157,6 +157,8 @@ export default {
   "account.theme.style.standard": "Standardowy",
   "account.theme.style.glass": "Glass",
   "account.theme.style.precision": "Precision",
+  "account.theme.glass.upload-panel.on": "Włączone",
+  "account.theme.glass.upload-panel.off": "Wyłączone",
   "account.button.delete": "Usuń Konto",
   "account.modal.delete.title": "Usuń Konto",
   "account.modal.delete.description":
@@ -666,6 +668,13 @@ export default {
   "precision.nav.expand": "Rozwiń panel boczny",
   "precision.nav.color-scheme": "Przełącz tryb jasny i ciemny",
   "precision.nav.breadcrumbs": "Ścieżka",
+  "admin.config.appearance.tab.general": "Ogólne",
+  "admin.config.appearance.tab.style": "Styl",
+  "admin.config.appearance.tab.brand": "Marka",
+  "admin.config.appearance.tab.advanced": "Zaawansowane",
+  "admin.config.appearance.tab.default": "domyślny",
+  "admin.config.appearance.tab.standard.empty": "Standard nie ma własnych ustawień, korzysta z zakładki Ogólne.",
+  "admin.config.appearance.tab.precision.empty": "Precision nie ma jeszcze własnych ustawień, korzysta z zakładki Ogólne.",
   "admin.config.appearance.glass-variant": "Wariant szkła",
   "admin.config.appearance.glass-variant.description":
     "Regular mocniej rozmywa i zachowuje czytelność tekstu. Clear jest bardziej przezroczysty i najlepiej wygląda na kolorowym tle. Menu i okna dialogowe zawsze używają regular.",

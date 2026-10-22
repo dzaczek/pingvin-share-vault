@@ -23,33 +23,8 @@ import wallpaperService, {
 } from "../../../services/wallpaper.service";
 import { byteToHumanSizeString } from "../../../utils/fileSize.util";
 import toast from "../../../utils/toast.util";
+import { BUILT_IN_WALLPAPERS } from "../../../utils/wallpapers.util";
 
-// the Alpine lake is a living wallpaper: 4K frames of day, dusk and night
-// that fade into each other, see LIVING in the glass style
-const BUILT_IN: {
-  file: string;
-  preview?: string;
-  width?: number;
-  height?: number;
-}[] = [
-  ...[
-    "alpine-lake",
-    "alpine-flight",
-    "lake-voyage",
-    "nordic-balloons",
-    "landwasser-passage",
-  ].map((scene) => ({
-    file: `${scene}.cycle`,
-    preview: `${scene}-day.webp`,
-    width: 3840,
-    height: 2160,
-  })),
-  { file: "orbital-quiet.webp", width: 3840, height: 2160 },
-  { file: "dunes.svg" },
-  { file: "lagoon.svg" },
-  { file: "meadow.svg" },
-  { file: "midnight.svg" },
-];
 const MAX_SIZE = { image: 20 * 1024 * 1024, video: 60 * 1024 * 1024 };
 const REQUIREMENTS = { image: 4, video: 5 };
 
@@ -97,11 +72,14 @@ const WallpaperGallery = ({
   value,
   onChange,
   disabled,
+  builtInOnly,
 }: {
   kind: "image" | "video";
   value: string;
   onChange: (url: string) => void;
   disabled?: boolean;
+  // the account page: pick from what ships, no uploads and no addresses
+  builtInOnly?: boolean;
 }) => {
   const t = useTranslate();
   const modals = useModals();
@@ -113,15 +91,16 @@ const WallpaperGallery = ({
   >({});
 
   useEffect(() => {
+    if (builtInOnly) return;
     wallpaperService
       .list()
       .then(setWallpapers)
       .catch(() => undefined);
-  }, []);
+  }, [builtInOnly]);
 
   const tiles: Tile[] = [
     ...(kind === "image"
-      ? BUILT_IN.map(({ file, preview, width, height }) => ({
+      ? BUILT_IN_WALLPAPERS.map(({ file, preview, width, height }) => ({
           url: `/wallpapers/${file}`,
           preview: `/wallpapers/${preview ?? file}`,
           name: t(`admin.wallpapers.built-in.${file.split(".")[0]}`),
@@ -302,49 +281,53 @@ const WallpaperGallery = ({
           {t("admin.wallpapers.empty")}
         </Text>
       )}
-      <FileButton
-        accept={
-          kind === "image"
-            ? "image/jpeg,image/png,image/webp"
-            : "video/mp4,video/webm"
-        }
-        onChange={upload}
-      >
-        {(props) => (
-          <Button
-            {...props}
-            variant="default"
-            leftIcon={<TbUpload size={16} />}
-            loading={uploading}
-            disabled={disabled}
+      {!builtInOnly && (
+        <>
+          <FileButton
+            accept={
+              kind === "image"
+                ? "image/jpeg,image/png,image/webp"
+                : "video/mp4,video/webm"
+            }
+            onChange={upload}
           >
-            {t(`admin.wallpapers.upload.${kind}`)}
-          </Button>
-        )}
-      </FileButton>
-      <TextInput
-        label={t("admin.wallpapers.address")}
-        placeholder="https://"
-        value={value}
-        disabled={disabled}
-        onChange={(event) => onChange(event.currentTarget.value)}
-      />
-      <Accordion variant="contained">
-        <Accordion.Item value="requirements">
-          <Accordion.Control>
-            {t("admin.wallpapers.requirements.title")}
-          </Accordion.Control>
-          <Accordion.Panel>
-            <List size="sm" spacing={6}>
-              {Array.from({ length: REQUIREMENTS[kind] }, (_, i) => (
-                <List.Item key={i}>
-                  {t(`admin.wallpapers.requirements.${kind}.${i + 1}`)}
-                </List.Item>
-              ))}
-            </List>
-          </Accordion.Panel>
-        </Accordion.Item>
-      </Accordion>
+            {(props) => (
+              <Button
+                {...props}
+                variant="default"
+                leftIcon={<TbUpload size={16} />}
+                loading={uploading}
+                disabled={disabled}
+              >
+                {t(`admin.wallpapers.upload.${kind}`)}
+              </Button>
+            )}
+          </FileButton>
+          <TextInput
+            label={t("admin.wallpapers.address")}
+            placeholder="https://"
+            value={value}
+            disabled={disabled}
+            onChange={(event) => onChange(event.currentTarget.value)}
+          />
+          <Accordion variant="contained">
+            <Accordion.Item value="requirements">
+              <Accordion.Control>
+                {t("admin.wallpapers.requirements.title")}
+              </Accordion.Control>
+              <Accordion.Panel>
+                <List size="sm" spacing={6}>
+                  {Array.from({ length: REQUIREMENTS[kind] }, (_, i) => (
+                    <List.Item key={i}>
+                      {t(`admin.wallpapers.requirements.${kind}.${i + 1}`)}
+                    </List.Item>
+                  ))}
+                </List>
+              </Accordion.Panel>
+            </Accordion.Item>
+          </Accordion>
+        </>
+      )}
     </Stack>
   );
 };
