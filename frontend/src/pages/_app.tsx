@@ -494,6 +494,7 @@ function App({ Component, pageProps }: AppProps) {
                               fluid={[
                                 "/admin/shares",
                                 "/admin/audit-logs",
+                                "/admin/users/[id]",
                               ].includes(route)}
                             >
                               <Component {...pageProps} />

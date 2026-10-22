@@ -50,6 +50,16 @@ export class AuditLogQueryDTO {
   @IsOptional()
   @IsString()
   @MaxLength(64)
+  loginsOf?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  filesOf?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
   cursor?: string;
 
   @IsOptional()

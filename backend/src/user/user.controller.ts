@@ -21,12 +21,14 @@ import { UpdateOwnUserDTO } from "./dto/updateOwnUser.dto";
 import { UpdateUserDto } from "./dto/updateUser.dto";
 import { UserDTO } from "./dto/user.dto";
 import { UserSevice } from "./user.service";
+import { UserOverviewService } from "./userOverview.service";
 import { DemoModeGuard } from "../auth/guard/demoMode.guard";
 
 @Controller("users")
 export class UserController {
   constructor(
     private userService: UserSevice,
+    private overview: UserOverviewService,
     private config: ConfigService,
   ) {}
 
@@ -83,6 +85,18 @@ export class UserController {
   @UseGuards(JwtGuard, AdministratorGuard)
   async create(@Body() user: CreateUserDTO) {
     return new UserDTO().from(await this.userService.create(user));
+  }
+
+  @Get(":id/overview")
+  @UseGuards(JwtGuard, AdministratorGuard)
+  async getOverview(@Param("id") id: string) {
+    return this.overview.get(id);
+  }
+
+  @Delete(":id/sessions")
+  @UseGuards(JwtGuard, AdministratorGuard, DemoModeGuard)
+  async revokeSessions(@Param("id") id: string, @GetUser() admin: User) {
+    return this.overview.revokeSessions(id, admin);
   }
 
   @Patch(":id")

@@ -367,6 +367,122 @@ export default {
 
   // END /admin/users
 
+  // /admin/users/[id]
+  "admin.userOverview.not-found": "This account could not be loaded",
+  "admin.userOverview.created":
+    "Account created {date}",
+  "admin.userOverview.badge.totp":
+    "2FA on",
+  "admin.userOverview.badge.no-totp":
+    "No 2FA",
+  "admin.userOverview.badge.inactive":
+    "Not activated",
+  "admin.userOverview.badge.no-password":
+    "No password",
+  "admin.userOverview.stat.storage":
+    "Storage",
+  "admin.userOverview.stat.storage.of":
+    "of {quota} quota",
+  "admin.userOverview.stat.storage.no-quota":
+    "No quota",
+  "admin.userOverview.stat.shares":
+    "Active shares",
+  "admin.userOverview.stat.shares.hint":
+    "{expired} expired, {reverse} reverse shares",
+  "admin.userOverview.stat.last-login":
+    "Last login",
+  "admin.userOverview.stat.last-login.hint":
+    "{failed} failed logins in 30 days",
+  "admin.userOverview.stat.devices":
+    "Devices",
+  "admin.userOverview.stat.devices.hint":
+    "{ips} IP addresses, {sessions} active sessions",
+  "admin.userOverview.permissions":
+    "Shares {share} · Reverse shares {reverse} · Max shares {maxShares} · Max reverse shares {maxReverseShares} · Max share size {shareSize}",
+  "admin.userOverview.tab.shares":
+    "Shares",
+  "admin.userOverview.tab.logins":
+    "Logins",
+  "admin.userOverview.tab.uploads":
+    "Uploads",
+  "admin.userOverview.tab.downloads":
+    "Downloads",
+  "admin.userOverview.tab.files-of":
+    "Downloads of their files",
+  "admin.userOverview.tab.identities":
+    "Devices and IPs",
+  "admin.userOverview.tab.sessions":
+    "Sessions",
+  "admin.userOverview.files-of.description":
+    "Who opened, previewed or downloaded the shares of this account. Their own visits are left out.",
+  "admin.userOverview.shares.none":
+    "No shares",
+  "admin.userOverview.shares.share":
+    "Share",
+  "admin.userOverview.shares.created":
+    "Created",
+  "admin.userOverview.shares.expires":
+    "Expires",
+  "admin.userOverview.shares.files":
+    "Files",
+  "admin.userOverview.shares.size":
+    "Size",
+  "admin.userOverview.shares.views":
+    "Views",
+  "admin.userOverview.shares.state":
+    "State",
+  "admin.userOverview.shares.expired":
+    "Expired",
+  "admin.userOverview.shares.blocked":
+    "Blocked",
+  "admin.userOverview.shares.password":
+    "Password",
+  "admin.userOverview.reverse-shares":
+    "Reverse shares",
+  "admin.userOverview.reverse-shares.created":
+    "Created",
+  "admin.userOverview.reverse-shares.expires":
+    "Shares expire",
+  "admin.userOverview.reverse-shares.uses-left":
+    "Uses left",
+  "admin.userOverview.reverse-shares.max-size":
+    "Max size",
+  "admin.userOverview.reverse-shares.received":
+    "Received",
+  "admin.userOverview.identities.deviceId":
+    "Devices",
+  "admin.userOverview.identities.visitorId":
+    "Fingerprints",
+  "admin.userOverview.identities.ipAddress":
+    "IP addresses",
+  "admin.userOverview.identities.value":
+    "Value",
+  "admin.userOverview.identities.events":
+    "Events",
+  "admin.userOverview.identities.first-seen":
+    "First seen",
+  "admin.userOverview.identities.last-seen":
+    "Last seen",
+  "admin.userOverview.sessions.none":
+    "No active sessions",
+  "admin.userOverview.sessions.created":
+    "Signed in",
+  "admin.userOverview.sessions.expires":
+    "Expires",
+  "admin.userOverview.sessions.method":
+    "Method",
+  "admin.userOverview.sessions.password":
+    "Password",
+  "admin.userOverview.sessions.revoke":
+    "Sign out everywhere",
+  "admin.userOverview.sessions.revoke.title":
+    "Sign this account out everywhere?",
+  "admin.userOverview.sessions.revoke.description":
+    "Every session of this account ends right away, on every device. The account itself stays, and it can sign in again.",
+  "admin.userOverview.sessions.revoke.done":
+    "{count} sessions ended",
+  // END /admin/users/[id]
+
   // /admin/auditLogs
   "admin.auditLogs.title": "Audit log",
   "admin.auditLogs.disabled":
