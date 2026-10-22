@@ -100,7 +100,7 @@ export class UserSevice {
       const hash = user.password && (await argon.hash(user.password));
       const { displayName, ...rest } = user;
 
-      return await this.prisma.user.update({
+      const updated = await this.prisma.user.update({
         where: { id },
         data: {
           ...rest,
@@ -115,6 +115,13 @@ export class UserSevice {
           ...extra,
         },
       });
+
+      // a new password ends the sessions opened with the old one
+      if (hash) {
+        await this.prisma.refreshToken.deleteMany({ where: { userId: id } });
+      }
+
+      return updated;
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
         if (e.code == "P2002") {
