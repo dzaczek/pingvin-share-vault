@@ -56,8 +56,13 @@ export class ShareService {
     reverseShareToken?: string,
     ip?: string,
   ) {
+    // a cookie left over from an expired or used up reverse share must not
+    // pull a signed in user's share into it
     const reverseShare =
-      await this.reverseShareService.getByToken(reverseShareToken);
+      reverseShareToken &&
+      (await this.reverseShareService.isValid(reverseShareToken))
+        ? await this.reverseShareService.getByToken(reverseShareToken)
+        : null;
     const quotaOwner = reverseShare ? reverseShare.creator : user;
 
     if (!reverseShare && user) {
@@ -428,6 +433,21 @@ export class ShareService {
   }
 
   async revertComplete(id: string) {
+    const share = await this.prisma.share.findUnique({
+      where: { id },
+      include: { reverseShare: true },
+    });
+
+    if (!share) throw new NotFoundException(this.i18n.t("share.notFound"));
+
+    // completing took a use, reopening gives it back
+    if (share.uploadLocked && share.reverseShare) {
+      await this.prisma.reverseShare.update({
+        where: { id: share.reverseShare.id },
+        data: { remainingUses: { increment: 1 } },
+      });
+    }
+
     return this.prisma.share.update({
       where: { id },
       data: { uploadLocked: false, isZipReady: false },

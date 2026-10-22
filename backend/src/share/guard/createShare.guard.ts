@@ -16,7 +16,7 @@ export class CreateShareGuard extends JwtGuard {
     if (await super.canActivate(context)) return true;
 
     const reverseShareTokenId = context.switchToHttp().getRequest()
-      .cookies.reverse_share_token;
+      .cookies?.reverse_share_token;
 
     if (!reverseShareTokenId) return false;
 
