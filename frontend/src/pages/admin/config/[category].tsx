@@ -256,6 +256,9 @@ export default function AppShellDemo() {
                 const shouldShowCustomPasswordPolicies =
                   getEffectiveConfigValue("security.customPasswordPolicy") ===
                   "true";
+                const isAuditLogEnabled =
+                  getEffectiveConfigValue("security.auditLogEnabled") ===
+                  "true";
                 const anonymousWarningMessageKeys = [
                   "share.anonymousWarningMessagePl",
                   "share.anonymousWarningMessageEn",
@@ -337,6 +340,9 @@ export default function AppShellDemo() {
                           (configVariable.key ===
                             "appearance.glassBackgroundUrl" &&
                             !["image", "video"].includes(glassBackground)) ||
+                          (configVariable.key ===
+                            "security.auditLogRetentionDays" &&
+                            !isAuditLogEnabled) ||
                           (configVariable.key === "security.minLength" &&
                             !shouldShowCustomPasswordPolicies) ||
                           (configVariable.key === "security.requireLowercase" &&

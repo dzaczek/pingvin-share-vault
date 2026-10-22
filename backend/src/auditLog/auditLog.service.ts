@@ -63,6 +63,7 @@ export class AuditLogService {
   // Fire and forget. The request context is read right here, before anything
   // is awaited, and a failed write only ends up as a warning.
   log(action: AuditAction, entry: AuditEntry = {}) {
+    if (!this.config.get("security.auditLogEnabled")) return;
     const ctx = requestContext(auditRequestStore.getStore());
 
     this.prisma.auditLog

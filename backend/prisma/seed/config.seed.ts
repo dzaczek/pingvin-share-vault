@@ -103,6 +103,10 @@ export const configVariables = {
       defaultValue: "false",
       secret: false,
     },
+    auditLogEnabled: {
+      type: "boolean",
+      defaultValue: "true",
+    },
     auditLogRetentionDays: {
       type: "number",
       // the environment variable used before this setting is still the default

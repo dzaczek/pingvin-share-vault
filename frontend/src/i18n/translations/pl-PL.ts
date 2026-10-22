@@ -334,6 +334,8 @@ export default {
 
   // /admin/auditLogs
   "admin.auditLogs.title": "Dziennik zdarzeń",
+  "admin.auditLogs.disabled":
+    "Rejestrowanie zdarzeń jest wyłączone w ustawieniach bezpieczeństwa. Nic nowego nie jest zapisywane, starsze wpisy zostają do czasu usunięcia przez retencję.",
   "admin.auditLogs.tab.timeline": "Oś czasu",
   "admin.auditLogs.tab.identity": "Ślad",
   "admin.auditLogs.tab.shards": "Shardy",
@@ -730,6 +732,9 @@ export default {
   "admin.config.general.app-url": "Adres URL aplikacji",
   "admin.config.general.app-url.description":
     "Pod którym adresem URL Pingvin Share jest dostępny",
+  "admin.config.security.audit-log-enabled": "Rejestrowanie zdarzeń",
+  "admin.config.security.audit-log-enabled.description":
+    "Zapisuje logowania, wysyłki, pobrania i wyświetlenia udziałów w dzienniku audytu oraz to, kto otworzył dany udział, w jego logu dostępu. Po wyłączeniu nic nowego nie jest zapisywane.",
   "admin.config.security.audit-log-retention-days": "Przechowywanie dziennika audytu",
   "admin.config.security.audit-log-retention-days.description":
     "Liczba dni przechowywania dziennika audytu, starsze wpisy są usuwane co noc. 0 przechowuje go zawsze.",
