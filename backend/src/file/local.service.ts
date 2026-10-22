@@ -251,6 +251,12 @@ export class LocalFileService {
   }
 
   async getZip(shareId: string): Promise<Readable> {
+    const shareRoot = resolve(SHARE_DIRECTORY);
+    const shareDir = resolve(shareRoot, shareId);
+    if (!shareDir.startsWith(shareRoot + sep)) {
+      throw new BadRequestException(this.i18n.t("file.invalidIdFormat"));
+    }
+
     if (this.config.get("share.downloadAll") === "zip-on-the-fly") {
       const files = await this.prisma.file.findMany({ where: { shareId } });
       const paths = files.map((file) => this.getSafeFilePath(shareId, file.id));
@@ -277,9 +283,7 @@ export class LocalFileService {
     }
 
     return new Promise((resolve, reject) => {
-      const zipStream = createReadStream(
-        `${SHARE_DIRECTORY}/${shareId}/archive.zip`,
-      );
+      const zipStream = createReadStream(`${shareDir}/archive.zip`);
 
       // not built yet, or still being written under its temporary name
       zipStream.on("error", (err: NodeJS.ErrnoException) => {

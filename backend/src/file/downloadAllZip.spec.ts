@@ -1,4 +1,4 @@
-import { NotFoundException } from "@nestjs/common";
+import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { execFileSync } from "child_process";
 import * as fs from "fs";
 import * as os from "os";
@@ -138,6 +138,22 @@ describe("the zip built after upload", () => {
       NotFoundException,
     );
   });
+});
+
+describe("a share id that leaves the share directory", () => {
+  it.each(["zip-prebuilt", "zip-on-the-fly"])(
+    "is refused when the mode is %s",
+    async (mode) => {
+      fs.writeFileSync(path.join(root, "archive.zip"), "not this one");
+
+      await expect(local(mode).getZip("..")).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
+      await expect(local(mode).getZip("")).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
+    },
+  );
 });
 
 describe("the zip route", () => {
