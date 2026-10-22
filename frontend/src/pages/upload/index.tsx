@@ -364,7 +364,8 @@ const Upload = ({
     return (
       <>
         <Meta title={t("upload.title")} />
-        <Paper p="lg" mx="auto" sx={{ maxWidth: 460 }}>
+        {/* the golden section of a page about 1000px wide */}
+        <Paper p="lg" mx="auto" sx={{ maxWidth: 618 }}>
           {completedShare ? (
             <Stack>
               <Group spacing="sm" noWrap>

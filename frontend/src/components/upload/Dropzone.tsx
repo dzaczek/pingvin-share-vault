@@ -33,6 +33,16 @@ import toast from "../../utils/toast.util";
 import { glassSurface } from "../../styles/glass.style";
 import { precisionTokens } from "../../styles/precision.style";
 
+// The panel rows are sized off the golden ratio. The icon sets the scale,
+// the row is the icon times phi, the title and the gap next to the icon are
+// the icon over phi squared, the hint is one half step below the title.
+const PHI = 1.618;
+const ROW_ICON = 48;
+const ROW_HEIGHT = Math.round(ROW_ICON * PHI);
+const ROW_GAP = Math.round(ROW_ICON / PHI ** 2);
+const ROW_TITLE = ROW_GAP;
+const ROW_HINT = Math.round(ROW_TITLE / Math.sqrt(PHI));
+
 const useStyles = createStyles((theme, glass: GlassSettings | null) => ({
   wrapper: {
     position: "relative",
@@ -308,7 +318,8 @@ const Dropzone = ({
       sx={(theme) => {
         const dark = theme.colorScheme === "dark";
         return {
-          padding: 16,
+          minHeight: ROW_HEIGHT,
+          padding: `${(ROW_HEIGHT - ROW_ICON) / 2}px ${ROW_GAP}px`,
           borderRadius: glass ? theme.radius.lg : 8,
           border: glass
             ? `1px dashed rgba(255, 255, 255, ${dark ? 0.25 : 0.8})`
@@ -335,23 +346,23 @@ const Dropzone = ({
             },
           })}
     >
-      <Group noWrap spacing="md" style={{ pointerEvents: "none" }}>
+      <Group noWrap spacing={ROW_GAP} style={{ pointerEvents: "none" }}>
         <ThemeIcon
-          size={44}
+          size={ROW_ICON}
           radius={999}
           variant={kind === "files" ? "filled" : "light"}
         >
           {kind === "files" ? <TbPlus size={24} /> : <TbFolder size={22} />}
         </ThemeIcon>
         <div>
-          <Text weight={650} size="lg">
+          <Text weight={650} size={ROW_TITLE}>
             {kind === "files" && title ? (
               title
             ) : (
               <FormattedMessage id={`upload.precision.add-${kind}`} />
             )}
           </Text>
-          <Text size="xs" color="dimmed">
+          <Text size={ROW_HINT} color="dimmed">
             <FormattedMessage
               id={`upload.precision.${kind}-hint`}
               values={{ maxSize: byteToHumanSizeString(maxShareSize) }}
