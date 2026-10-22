@@ -187,10 +187,6 @@ export const CreateUploadModalBody = ({
     if (!(await shareService.isShareIdAvailable(values.link))) {
       form.setFieldError("link", t("upload.modal.link.error.taken"));
     } else {
-      const expirationString = form.values.never_expires
-        ? "never"
-        : form.values.expiration_num + form.values.expiration_unit;
-
       const expirationDate = moment().add(
         form.values.expiration_num,
         form.values.expiration_unit.replace(
@@ -219,6 +215,13 @@ export const CreateUploadModalBody = ({
         );
         return;
       }
+
+      // the date shown above, counted in this browser's calendar. A relative
+      // "7-days" would be counted on the server, which may sit in UTC and
+      // come out an hour off around a clock change.
+      const expirationString = form.values.never_expires
+        ? "never"
+        : expirationDate.toISOString();
 
       uploadCallback(
         {

@@ -130,6 +130,14 @@ describe("the zip built after upload", () => {
 
     expect(Buffer.concat(chunks).toString()).toBe("a prebuilt zip");
   });
+
+  it("is not found while it is still being written", async () => {
+    writeFile("archive.zip.part", "half of a zip");
+
+    await expect(local("zip-prebuilt").getZip(SHARE_ID)).rejects.toThrow(
+      NotFoundException,
+    );
+  });
 });
 
 describe("the zip route", () => {

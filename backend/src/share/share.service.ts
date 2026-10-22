@@ -223,6 +223,7 @@ export class ShareService {
       return;
     }
     const zipPath = resolve(path, "archive.zip");
+    const partPath = `${zipPath}.part`;
 
     if (this.activeZipBuilds.has(shareId)) return;
     this.activeZipBuilds.add(shareId);
@@ -259,9 +260,12 @@ export class ShareService {
       // never marked ready while a recipient could still get half of the zip,
       // and on failure the cleanup below cannot race the file being written.
       // finalize fails with the same error pipeline reports.
-      const written = pipeline(archive, fs.createWriteStream(zipPath));
+      // written under another name and renamed when complete, so a download
+      // that comes early finds no zip instead of half of one
+      const written = pipeline(archive, fs.createWriteStream(partPath));
       archive.finalize().catch(() => undefined);
       await written;
+      await fs.promises.rename(partPath, zipPath);
 
       await this.prisma.share.update({
         where: { id: shareId },
@@ -269,7 +273,7 @@ export class ShareService {
       });
     } catch (e) {
       this.logger.error(`Could not create the zip of share ${shareId}`, e);
-      await fs.promises.rm(zipPath, { force: true }).catch(() => undefined);
+      await fs.promises.rm(partPath, { force: true }).catch(() => undefined);
     } finally {
       this.activeZipBuilds.delete(shareId);
     }
@@ -729,7 +733,12 @@ export class ShareService {
       maxExpiration.value !== 0 &&
       (expiresNever ||
         expiration >
-          moment().add(maxExpiration.value, maxExpiration.unit).toDate())
+          moment()
+            .add(maxExpiration.value, maxExpiration.unit)
+            // the browser sends a date from its own calendar, which runs an
+            // hour longer over a clock change, and its clock may be off a bit
+            .add(2, "hours")
+            .toDate())
     ) {
       throw new BadRequestException(this.i18n.t("share.maxExpirationExceeded"));
     }
