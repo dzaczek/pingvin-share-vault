@@ -11,20 +11,45 @@ describe("parseRelativeDateToAbsolute", () => {
     expect(parseRelativeDateToAbsolute("never").getTime()).toBe(0);
   });
 
+  // Days and weeks are calendar days, the same time on the clock. Across a
+  // daylight saving change that is an hour more or less than n * 24h, so the
+  // expected values are built the same way instead of counting milliseconds.
+  const later = (change: (d: Date) => void) => {
+    const d = new Date();
+    change(d);
+    return d.getTime();
+  };
+
   it("adds the given amount of time to now", () => {
-    const before = Date.now();
+    const expected = later((d) => d.setDate(d.getDate() + 1));
     const result = parseRelativeDateToAbsolute("1-days").getTime();
-    const expected = before + 24 * 60 * 60 * 1000;
     expect(Math.abs(result - expected)).toBeLessThan(5000);
   });
 
   it("understands the units used by the share form", () => {
-    const now = Date.now();
     const hour = parseRelativeDateToAbsolute("2-hours").getTime();
     const week = parseRelativeDateToAbsolute("1-weeks").getTime();
 
-    expect(Math.abs(hour - (now + 2 * 60 * 60 * 1000))).toBeLessThan(5000);
-    expect(Math.abs(week - (now + 7 * 24 * 60 * 60 * 1000))).toBeLessThan(5000);
+    expect(
+      Math.abs(hour - later((d) => d.setHours(d.getHours() + 2))),
+    ).toBeLessThan(5000);
+    expect(
+      Math.abs(week - later((d) => d.setDate(d.getDate() + 7))),
+    ).toBeLessThan(5000);
+  });
+
+  it("keeps the clock time over a daylight saving change", () => {
+    // in Zurich the clocks go back on 25 October 2026, run with
+    // TZ=Europe/Zurich to cross it on any machine
+    const start = new Date("2026-10-22T12:00:00+02:00");
+    jest.useFakeTimers().setSystemTime(start);
+    try {
+      const expected = new Date(start);
+      expected.setDate(start.getDate() + 7);
+      expect(parseRelativeDateToAbsolute("1-weeks")).toEqual(expected);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   it("always returns a future date for a positive span", () => {
