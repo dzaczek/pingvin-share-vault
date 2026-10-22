@@ -283,7 +283,9 @@ export class LocalFileService {
     }
 
     return new Promise((resolve, reject) => {
-      const zipStream = createReadStream(`${shareDir}/archive.zip`);
+      const zipStream = createReadStream(
+        this.getSafeFilePath(shareId, "archive.zip"),
+      );
 
       // not built yet, or still being written under its temporary name
       zipStream.on("error", (err: NodeJS.ErrnoException) => {
