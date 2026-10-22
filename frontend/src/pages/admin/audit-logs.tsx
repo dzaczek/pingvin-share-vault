@@ -60,8 +60,8 @@ const AuditLogs = () => {
   const trailKind = trail.slice(0, sep) as IdentityKind;
   const trailValue = trail.slice(sep + 1);
 
-  // clicking a user, visitor, ip, file, share or shard anywhere opens its
-  // own trail
+  // clicking a user, visitor, device, ip, file, share or shard anywhere
+  // opens its own trail
   const selectIdentity = (kind: IdentityKind, value: string) => {
     setIdentityKind(kind);
     setIdentity(value);
@@ -127,6 +127,10 @@ const AuditLogs = () => {
                 {
                   value: "visitorId",
                   label: t("admin.auditLogs.table.visitor"),
+                },
+                {
+                  value: "deviceId",
+                  label: t("admin.auditLogs.table.device"),
                 },
                 { value: "userId", label: t("admin.auditLogs.table.user") },
                 { value: "ipAddress", label: t("admin.auditLogs.table.ip") },

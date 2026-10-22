@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getVisitorId } from "../utils/visitorId.util";
+import { getDeviceId, getVisitorId } from "../utils/visitorId.util";
 
 const api = axios.create({
   baseURL: "/api",
@@ -8,6 +8,8 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const visitorId = getVisitorId();
   if (visitorId) config.headers.set("X-Browser-Fingerprint", visitorId);
+  const deviceId = getDeviceId();
+  if (deviceId) config.headers.set("X-Device-Id", deviceId);
   return config;
 });
 

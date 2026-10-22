@@ -1,4 +1,4 @@
-import { setCookie } from "cookies-next";
+import { getCookie, setCookie } from "cookies-next";
 
 // A hash of what this browser looks like, so the admin audit log can follow
 // one visitor across requests even without an account. It goes out as the
@@ -6,6 +6,9 @@ import { setCookie } from "cookies-next";
 // cookie is what reaches the backend on plain downloads and <img> previews.
 
 let cached: string | undefined;
+let cachedDevice: string | undefined;
+
+const YEAR = 365 * 24 * 60 * 60;
 
 const fnv1a = (input: string, seed: number) => {
   let h = 0x811c9dc5 ^ seed;
@@ -59,9 +62,10 @@ export const getVisitorId = () => {
   cached = fingerprintHash(
     [
       navigator.language,
+      (navigator.languages ?? []).join(","),
       navigator.hardwareConcurrency,
       navigator.platform,
-      `${screen.width}x${screen.height}x${screen.colorDepth}`,
+      `${screen.width}x${screen.height}x${screen.colorDepth}x${window.devicePixelRatio}`,
       Intl.DateTimeFormat().resolvedOptions().timeZone,
       canvasSignal(),
       webglSignal(),
@@ -70,7 +74,30 @@ export const getVisitorId = () => {
   setCookie("visitor_id", cached, {
     sameSite: "lax",
     path: "/",
-    maxAge: 365 * 24 * 60 * 60,
+    maxAge: YEAR,
   });
   return cached;
+};
+
+// Two phones of the same model give the same fingerprint, so each browser
+// also gets a random id of its own. It lives until the cookies are cleared,
+// the fingerprint is what still links the visits after that.
+export const getDeviceId = () => {
+  if (typeof window === "undefined") return undefined;
+  if (cachedDevice) return cachedDevice;
+
+  const stored = getCookie("device_id");
+  cachedDevice =
+    typeof stored === "string" && /^[a-f0-9]{32}$/.test(stored)
+      ? stored
+      : Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) =>
+          b.toString(16).padStart(2, "0"),
+        ).join("");
+  // written every time, so the year counts from the last visit
+  setCookie("device_id", cachedDevice, {
+    sameSite: "lax",
+    path: "/",
+    maxAge: YEAR,
+  });
+  return cachedDevice;
 };
