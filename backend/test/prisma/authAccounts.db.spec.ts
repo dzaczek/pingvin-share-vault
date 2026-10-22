@@ -49,7 +49,7 @@ beforeAll(async () => {
     config,
     unused,
     unused,
-    unused,
+    { enforcePasswordPolicy: async (p: string) => p.length >= 8 } as any,
     unused,
     i18n,
     unused,

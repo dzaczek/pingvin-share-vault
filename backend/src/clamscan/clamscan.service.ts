@@ -1,6 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import * as NodeClam from "clamscan";
 import * as fs from "fs";
+import * as path from "path";
 import { Readable } from "stream";
 import { FileService } from "src/file/file.service";
 import { PrismaService } from "src/prisma/prisma.service";
@@ -86,6 +87,15 @@ export class ClamScanService {
     infectedFiles: { id: string; name: string }[];
     scanFailed: boolean;
   }> {
+    const shareRoot = path.resolve(SHARE_DIRECTORY);
+    const shareDir = path.resolve(shareRoot, shareId);
+    if (!shareDir.startsWith(shareRoot + path.sep)) {
+      this.logger.error(
+        `Refusing to scan outside the share directory: ${shareId}`,
+      );
+      return { infectedFiles: [], scanFailed: true };
+    }
+
     const clamScan = await this.getClamScan();
 
     if (!clamScan) {
@@ -142,9 +152,9 @@ export class ClamScanService {
     // Local Storage Provider
     let files: string[] = [];
     try {
-      files = (
-        await fs.promises.readdir(`${SHARE_DIRECTORY}/${shareId}`)
-      ).filter((file) => !file.startsWith("archive.zip"));
+      files = (await fs.promises.readdir(shareDir)).filter(
+        (file) => !file.startsWith("archive.zip"),
+      );
     } catch (e) {
       // Nothing on disk for this share, which is what an empty one looks like
       void e;
@@ -164,7 +174,7 @@ export class ClamScanService {
     );
 
     for (const fileId of files) {
-      const filePath = `${SHARE_DIRECTORY}/${shareId}/${fileId}`;
+      const filePath = path.join(shareDir, fileId);
       // a file on disk with no row is still scanned, reported by its id
       const fileName = namesById.get(fileId) || fileId;
 

@@ -28,6 +28,10 @@ const build = async (user: Record<string, unknown>) => {
     refreshToken: {
       create: jest.fn().mockResolvedValue({ id: "rt1", token: "refresh" }),
       deleteMany: jest.fn().mockResolvedValue({ count: 2 }),
+      findFirst: jest.fn().mockResolvedValue({ id: "rt1" }),
+    },
+    resetPasswordToken: {
+      delete: jest.fn().mockResolvedValue({}),
     },
     loginToken: {
       updateMany: jest.fn().mockResolvedValue({ count: 0 }),
@@ -43,19 +47,26 @@ const build = async (user: Record<string, unknown>) => {
           : false,
   };
   const auditLog = { log: jest.fn() };
+  const jwt = {
+    sign: () => "access",
+    verifyAsync: jest
+      .fn()
+      .mockResolvedValue({ sub: "u1", refreshTokenId: "rt1" }),
+  };
+  const userService = { enforcePasswordPolicy: async () => true };
   const unused = {} as any;
   const service = new AuthService(
     prisma as any,
-    { sign: () => "access" } as any,
+    jwt as any,
     config as any,
     unused,
     unused,
-    unused,
+    userService as any,
     unused,
     { t: (key: string) => key } as any,
     auditLog as any,
   );
-  return { service, prisma, auditLog };
+  return { service, prisma, auditLog, jwt };
 };
 
 describe("signing in with a password", () => {
@@ -114,6 +125,7 @@ describe("changing a password", () => {
       createRefreshToken: jest
         .fn()
         .mockResolvedValue({ refreshToken: "refresh", refreshTokenId: "rt1" }),
+      createAccessToken: jest.fn().mockResolvedValue("access"),
       addTokensToResponse: jest.fn(),
     };
     const controller = new AuthController(
@@ -131,10 +143,57 @@ describe("changing a password", () => {
     );
 
     expect(authService.createRefreshToken).toHaveBeenCalledWith("u1");
+    expect(authService.createAccessToken).toHaveBeenCalledWith(
+      { id: "u1" },
+      "rt1",
+    );
+    // the old access token named a session that is gone now, it has to be
+    // replaced too or the next request is refused
     expect(authService.addTokensToResponse).toHaveBeenCalledWith(
       response,
       "refresh",
+      "access",
     );
-    expect(body).toEqual(expect.objectContaining({ refreshToken: "refresh" }));
+    expect(body).toEqual({ accessToken: "access", refreshToken: "refresh" });
+  });
+});
+
+describe("resetting a password", () => {
+  it("ends every session of the user", async () => {
+    const { service, prisma } = await build({});
+
+    await service.resetPassword("reset-token", "a new password");
+
+    expect(prisma.refreshToken.deleteMany).toHaveBeenCalledWith({
+      where: { userId: "u1" },
+    });
+  });
+});
+
+describe("getIdOfCurrentUser", () => {
+  const request = { cookies: { access_token: "access" } } as any;
+
+  it("returns the id while the session lives", async () => {
+    const { service, prisma } = await build({});
+
+    expect(await service.getIdOfCurrentUser(request)).toBe("u1");
+    expect(prisma.refreshToken.findFirst).toHaveBeenCalledWith({
+      where: { id: "rt1", userId: "u1", expiresAt: { gt: expect.any(Date) } },
+    });
+  });
+
+  it("returns null once the session was revoked", async () => {
+    const { service, prisma } = await build({});
+    prisma.refreshToken.findFirst.mockResolvedValue(null);
+
+    expect(await service.getIdOfCurrentUser(request)).toBeNull();
+  });
+
+  it("returns null for a token that names no session", async () => {
+    const { service, prisma, jwt } = await build({});
+    jwt.verifyAsync.mockResolvedValue({ sub: "u1" });
+
+    expect(await service.getIdOfCurrentUser(request)).toBeNull();
+    expect(prisma.refreshToken.findFirst).not.toHaveBeenCalled();
   });
 });

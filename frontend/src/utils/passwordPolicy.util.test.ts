@@ -1,4 +1,4 @@
-import { resolvePasswordPolicy } from "./passwordPolicy.util";
+import { passwordSchema, resolvePasswordPolicy } from "./passwordPolicy.util";
 
 const config = (values: Record<string, any>) => (key: string) => values[key];
 
@@ -53,5 +53,35 @@ describe("resolvePasswordPolicy", () => {
     first.minLength = 99;
 
     expect(resolvePasswordPolicy(off).minLength).toBe(8);
+  });
+});
+
+describe("passwordSchema", () => {
+  const t = (id: string) => id;
+  const error = (policy: Parameters<typeof passwordSchema>[0], value: string) =>
+    passwordSchema(policy, t)
+      .validate(value)
+      .then(() => null)
+      .catch((e) => e.message);
+
+  it("wants 8 characters and nothing else with the policy off", async () => {
+    const off = resolvePasswordPolicy(config({}));
+    expect(await error(off, "1234567")).toBe("common.error.too-short");
+    expect(await error(off, "12345678")).toBeNull();
+  });
+
+  it("follows a custom policy, also below 8", async () => {
+    const policy = resolvePasswordPolicy(
+      config({
+        "security.customPasswordPolicy": true,
+        "security.minLength": 4,
+        "security.requireUppercase": true,
+        "security.requireSpecialCharacter": true,
+      }),
+    );
+    expect(await error(policy, "abc!")).toBe("common.error.password.uppercase");
+    expect(await error(policy, "Abcd")).toBe("common.error.password.special");
+    expect(await error(policy, "Ab!")).toBe("common.error.too-short");
+    expect(await error(policy, "Abc!")).toBeNull();
   });
 });

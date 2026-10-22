@@ -69,9 +69,19 @@ const AdminConfigInput = ({
     configVariable.key === "share.enableShareEmailRecipients";
   const isEmailVerificationConfig =
     configVariable.key === "security.enableEmailVerification";
+  const isDownloadNotificationConfig =
+    configVariable.key === "share.enableShareDownloadNotifications";
+  // the recipient restriction only shows up under the email recipients field
+  const isUserRecipientsConfig =
+    configVariable.key === "share.enableUserRecipients";
+  const needsSmtp =
+    isEmailShareConfig ||
+    isEmailVerificationConfig ||
+    isDownloadNotificationConfig ||
+    isUserRecipientsConfig;
   let isSmtpEnabled = false;
 
-  if (isEmailShareConfig || isEmailVerificationConfig) {
+  if (needsSmtp) {
     isSmtpEnabled =
       optionalConfigVariables?.find((config) => config.key === "smtp.enabled")
         ?.value === "true";
@@ -391,16 +401,15 @@ const AdminConfigInput = ({
           w={201}
         />
       )}
-      {configVariable.type == "boolean" &&
-        (isEmailShareConfig || isEmailVerificationConfig) && (
-          <>
-            <Switch
-              disabled={!isSmtpEnabled}
-              {...form.getInputProps("booleanValue", { type: "checkbox" })}
-              onChange={(e) => onValueChange(configVariable, e.target.checked)}
-            />
-          </>
-        )}
+      {configVariable.type == "boolean" && needsSmtp && (
+        <>
+          <Switch
+            disabled={!configVariable.allowEdit || !isSmtpEnabled}
+            {...form.getInputProps("booleanValue", { type: "checkbox" })}
+            onChange={(e) => onValueChange(configVariable, e.target.checked)}
+          />
+        </>
+      )}
       {configVariable.type == "boolean" && isWarnAnonymousLoggedInConfig && (
         <>
           <Switch
@@ -413,11 +422,7 @@ const AdminConfigInput = ({
         </>
       )}
       {configVariable.type == "boolean" &&
-        !(
-          isEmailShareConfig ||
-          isEmailVerificationConfig ||
-          isWarnAnonymousLoggedInConfig
-        ) && (
+        !(needsSmtp || isWarnAnonymousLoggedInConfig) && (
           <>
             <Switch
               disabled={!configVariable.allowEdit}

@@ -21,7 +21,7 @@ services:
     volumes:
       - "./data:/opt/app/backend/data:rw,z"
       - "./data/images:/opt/app/frontend/public/img:rw,z"
-#      - "./config.yaml:/opt/app/config.yaml"
+#      - "./config.yaml:/opt/app/config.yaml:ro,z"
 
   # catches every mail the instance sends, web ui on http://localhost:8025.
   # the integration suite uses it as smtp host "mailpit", port 1025.

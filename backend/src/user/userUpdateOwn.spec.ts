@@ -76,3 +76,34 @@ describe("UserSevice.update errors", () => {
     );
   });
 });
+
+describe("UserSevice.update sessions", () => {
+  const build = () => {
+    const prisma = {
+      user: { update: jest.fn().mockResolvedValue({ id: "u1" }) },
+      refreshToken: { deleteMany: jest.fn().mockResolvedValue({ count: 1 }) },
+    };
+    const service = new UserSevice(
+      prisma as any,
+      {} as any,
+      {} as any,
+      { get: () => false } as any,
+      { t: (key: string) => key } as any,
+    );
+    return { service, prisma };
+  };
+
+  it("signs the user out everywhere when an admin sets a new password", async () => {
+    const { service, prisma } = build();
+    await service.update("u1", { password: "a new password" });
+    expect(prisma.refreshToken.deleteMany).toHaveBeenCalledWith({
+      where: { userId: "u1" },
+    });
+  });
+
+  it("keeps the sessions on any other edit", async () => {
+    const { service, prisma } = build();
+    await service.update("u1", { displayName: "Anna" });
+    expect(prisma.refreshToken.deleteMany).not.toHaveBeenCalled();
+  });
+});

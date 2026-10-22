@@ -15,7 +15,7 @@ import { isValidShareId } from "./shareIdValidation.guard";
 @Injectable()
 export class ShareOwnerGuard extends JwtGuard {
   constructor(
-    configService: ConfigService,
+    private configService: ConfigService,
     private prisma: PrismaService,
     private readonly i18n: I18nService,
   ) {
@@ -37,7 +37,7 @@ export class ShareOwnerGuard extends JwtGuard {
 
     const share = await this.prisma.share.findUnique({
       where: { id: shareId },
-      include: { security: true },
+      include: { security: true, reverseShare: true },
     });
 
     if (!share) throw new NotFoundException(this.i18n.t("share.notFound"));
@@ -56,16 +56,29 @@ export class ShareOwnerGuard extends JwtGuard {
       throw new NotFoundException(this.i18n.t("share.notFound"));
     }
 
-    // If the user is the creator of the share, allow access
-    if (user && share.creatorId == user.id) return true;
+    // If the user is the creator of the share or of its reverse share
+    if (
+      user &&
+      (share.creatorId == user.id ||
+        (this.allowAdmin && share.reverseShare?.creatorId === user.id))
+    )
+      return true;
 
     // If the user is an admin, allow access
     if (this.allowAdmin && user?.isAdmin) return true;
 
     // An anonymous share has no owner to check, so anyone may work on it, but
     // only while it is being uploaded. Once done, everyone holding the link
-    // could otherwise reopen it and swap the files.
-    if (!share.creatorId) return !share.uploadLocked;
+    // could otherwise reopen it and swap the files. One uploaded through a
+    // reverse share also needs that reverse share's cookie.
+    if (!share.creatorId) {
+      if (share.uploadLocked) return false;
+      if (share.reverseShare) {
+        const token = request.cookies?.reverse_share_token;
+        return !!token && token === share.reverseShare.token;
+      }
+      return this.configService.get("security.allowUnauthenticatedShares");
+    }
 
     // If not signed in, deny access
     if (!user) return false;

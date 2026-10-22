@@ -26,16 +26,20 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   // The token names the session it was issued for. Once that session is gone,
   // signed out or revoked by an admin, the token stops working right away
-  // instead of living out its 15 minutes.
-  async validate(payload: { sub: string; refreshTokenId?: string }) {
-    const user: User = await this.prisma.user.findFirst({
+  // instead of living out its 15 minutes. A token without one is refused.
+  async validate(payload: {
+    sub: string;
+    refreshTokenId?: string;
+  }): Promise<User | null> {
+    if (!payload.refreshTokenId) return null;
+    const session = await this.prisma.refreshToken.findFirst({
       where: {
-        id: payload.sub,
-        ...(payload.refreshTokenId && {
-          refreshTokens: { some: { id: payload.refreshTokenId } },
-        }),
+        id: payload.refreshTokenId,
+        userId: payload.sub,
+        expiresAt: { gt: new Date() },
       },
+      include: { user: true },
     });
-    return user;
+    return session?.user ?? null;
   }
 }

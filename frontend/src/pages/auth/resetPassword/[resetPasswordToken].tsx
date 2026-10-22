@@ -12,8 +12,13 @@ import { useForm, yupResolver } from "@mantine/form";
 import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
 import * as yup from "yup";
+import useConfig from "../../../hooks/config.hook";
 import useTranslate from "../../../hooks/useTranslate.hook";
 import authService from "../../../services/auth.service";
+import {
+  passwordSchema,
+  resolvePasswordPolicy,
+} from "../../../utils/passwordPolicy.util";
 import toast from "../../../utils/toast.util";
 
 const useStyles = createStyles((theme) => ({
@@ -28,6 +33,7 @@ const ResetPassword = () => {
   const { classes } = useStyles();
   const router = useRouter();
   const t = useTranslate();
+  const config = useConfig();
 
   const form = useForm({
     initialValues: {
@@ -35,10 +41,9 @@ const ResetPassword = () => {
     },
     validate: yupResolver(
       yup.object().shape({
-        password: yup
-          .string()
-          .min(8, t("common.error.too-short", { length: 8 }))
-          .required(t("common.error.field-required")),
+        password: passwordSchema(resolvePasswordPolicy(config.get), t).required(
+          t("common.error.field-required"),
+        ),
       }),
     ),
   });

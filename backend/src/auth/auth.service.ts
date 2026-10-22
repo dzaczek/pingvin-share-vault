@@ -51,6 +51,13 @@ export class AuthService {
     );
     const email = dto.email.toLowerCase().trim();
 
+    if (
+      typeof dto.password === "string" &&
+      !(await this.userService.enforcePasswordPolicy(dto.password))
+    ) {
+      throw new BadRequestException(this.i18n.t("auth.passwordPolicyNotMet"));
+    }
+
     const hash = dto.password ? await argon.hash(dto.password) : null;
     try {
       return await this.prisma.$transaction(async (tx) => {
@@ -239,7 +246,7 @@ export class AuthService {
       );
     }
 
-    await this.prisma.$transaction(async (tx) => {
+    const { token } = await this.prisma.$transaction(async (tx) => {
       // Delete old reset password token
       if (user.resetPasswordToken) {
         await tx.resetPasswordToken.delete({
@@ -247,24 +254,33 @@ export class AuthService {
         });
       }
 
-      const { token } = await tx.resetPasswordToken.create({
+      return await tx.resetPasswordToken.create({
         data: {
           expiresAt: moment().add(1, "hour").toDate(),
           user: { connect: { id: user.id } },
         },
       });
-
-      await this.emailService.sendResetPasswordEmail(
-        user.email,
-        token,
-        user.displayName || user.username,
-      );
     });
+
+    // sent after the commit, so a slow mail server does not hold the
+    // transaction open
+    await this.emailService.sendResetPasswordEmail(
+      user.email,
+      token,
+      user.displayName || user.username,
+    );
   }
 
   async resetPassword(token: string, newPassword: string) {
     if (this.config.get("oauth.disablePassword"))
       throw new ForbiddenException(this.i18n.t("auth.passwordSignInDisabled"));
+
+    if (
+      typeof newPassword === "string" &&
+      !(await this.userService.enforcePasswordPolicy(newPassword))
+    ) {
+      throw new BadRequestException(this.i18n.t("auth.passwordPolicyNotMet"));
+    }
 
     const user = await this.prisma.user.findFirst({
       where: { resetPasswordToken: { token, expiresAt: { gt: new Date() } } },
@@ -274,6 +290,11 @@ export class AuthService {
       throw new BadRequestException(this.i18n.t("auth.tokenInvalidOrExpired"));
 
     const newPasswordHash = await argon.hash(newPassword);
+
+    // whoever knew the old password is signed out with it
+    await this.prisma.refreshToken.deleteMany({
+      where: { userId: user.id },
+    });
 
     await this.prisma.resetPasswordToken.delete({
       where: { token },
@@ -347,6 +368,13 @@ export class AuthService {
 
     if (!isPasswordValid)
       throw new ForbiddenException(this.i18n.t("auth.invalidPassword"));
+
+    if (
+      typeof newPassword === "string" &&
+      !(await this.userService.enforcePasswordPolicy(newPassword))
+    ) {
+      throw new BadRequestException(this.i18n.t("auth.passwordPolicyNotMet"));
+    }
 
     const hash = await argon.hash(newPassword);
 
@@ -532,7 +560,16 @@ export class AuthService {
           secret: this.config.get("internal.jwtSecret"),
         },
       );
-      return payload.sub;
+      // same rule as the jwt strategy, the session has to still exist
+      if (!payload.refreshTokenId) return null;
+      const session = await this.prisma.refreshToken.findFirst({
+        where: {
+          id: payload.refreshTokenId,
+          userId: payload.sub,
+          expiresAt: { gt: new Date() },
+        },
+      });
+      return session ? payload.sub : null;
     } catch {
       return null;
     }

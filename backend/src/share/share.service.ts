@@ -56,8 +56,13 @@ export class ShareService {
     reverseShareToken?: string,
     ip?: string,
   ) {
+    // a cookie left over from an expired or used up reverse share must not
+    // pull a signed in user's share into it
     const reverseShare =
-      await this.reverseShareService.getByToken(reverseShareToken);
+      reverseShareToken &&
+      (await this.reverseShareService.isValid(reverseShareToken))
+        ? await this.reverseShareService.getByToken(reverseShareToken)
+        : null;
     const quotaOwner = reverseShare ? reverseShare.creator : user;
 
     if (!reverseShare && user) {
@@ -428,6 +433,21 @@ export class ShareService {
   }
 
   async revertComplete(id: string) {
+    const share = await this.prisma.share.findUnique({
+      where: { id },
+      include: { reverseShare: true },
+    });
+
+    if (!share) throw new NotFoundException(this.i18n.t("share.notFound"));
+
+    // completing took a use, reopening gives it back
+    if (share.uploadLocked && share.reverseShare) {
+      await this.prisma.reverseShare.update({
+        where: { id: share.reverseShare.id },
+        data: { remainingUses: { increment: 1 } },
+      });
+    }
+
     return this.prisma.share.update({
       where: { id },
       data: { uploadLocked: false, isZipReady: false },
@@ -753,11 +773,23 @@ export class ShareService {
     return this.shareAccessLogService.findByShare(shareId);
   }
 
-  async increaseViewCount(share: Share, ip?: string) {
-    await this.prisma.share.update({
-      where: { id: share.id },
-      data: { views: share.views + 1 },
+  // Checks the limit and counts the view in one conditional write, so two
+  // visitors at the same time cannot both get the last view
+  async increaseViewCount(
+    share: Share & { security?: ShareSecurity | null },
+    ip?: string,
+  ) {
+    const maxViews = share.security?.maxViews;
+    const { count } = await this.prisma.share.updateMany({
+      where: { id: share.id, ...(maxViews && { views: { lt: maxViews } }) },
+      data: { views: { increment: 1 } },
     });
+    if (count === 0) {
+      throw new ForbiddenException(
+        this.i18n.t("share.maxViewsExceeded"),
+        "share_max_views_exceeded",
+      );
+    }
     if (ip) await this.shareAccessLogService.log(share.id, ip, "VIEWED");
   }
 
@@ -789,16 +821,8 @@ export class ShareService {
       }
     }
 
-    if (share.security?.maxViews && share.security.maxViews <= share.views) {
-      throw new ForbiddenException(
-        this.i18n.t("share.maxViewsExceeded"),
-        "share_max_views_exceeded",
-      );
-    }
-
-    const token = await this.generateShareToken(share);
     await this.increaseViewCount(share, ip);
-    return token;
+    return this.generateShareToken(share);
   }
 
   async generateShareToken(share: Share & { security?: ShareSecurity }) {
