@@ -1,3 +1,10 @@
+## [2026.10.6](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.5...v2026.10.6) (2026-10-22)
+
+### Features
+
+* **appearance:** tabs per style in admin, glass options on the account page ([09571c2](https://github.com/dzaczek/pingvin-share-vault/commit/09571c2dede70bcdc6f902d3ddfdf81038fafa05))
+* **security:** setting to turn audit and share access logging off ([4375db6](https://github.com/dzaczek/pingvin-share-vault/commit/4375db65c1d5a653fc03e318135245c6abec85c8))
+
 ## [2026.10.5](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.4...v2026.10.5) (2026-10-21)
 
 ### Features
