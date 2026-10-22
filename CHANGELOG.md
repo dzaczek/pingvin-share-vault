@@ -1,3 +1,16 @@
+## [2026.10.8](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.7...v2026.10.8) (2026-10-22)
+
+### Features
+
+* **admin:** a page per user with everything the admin may need ([f206b7f](https://github.com/dzaczek/pingvin-share-vault/commit/f206b7ff13e6894591fd835ac48177951301f4d5))
+
+### Bug Fixes
+
+* **admin:** only a user id from the address reaches the api ([00306fc](https://github.com/dzaczek/pingvin-share-vault/commit/00306fcf1a6e230468865862691295baec37af7f))
+* **admin:** plural forms on the user page ([36186b5](https://github.com/dzaczek/pingvin-share-vault/commit/36186b5472fb6d8e516fe20337174d1b2b9f21b4))
+* **share:** no half written zip and the expiration the form showed ([b7080ee](https://github.com/dzaczek/pingvin-share-vault/commit/b7080ee8b13dc726a076fb173c2841082130f28d))
+* **upload:** size the upload panel by the golden ratio ([25ad2b9](https://github.com/dzaczek/pingvin-share-vault/commit/25ad2b9e2f58da239acb0ba63ff27d8460fcc3b0))
+
 ## [2026.10.7](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.6...v2026.10.7) (2026-10-22)
 
 ### Features
