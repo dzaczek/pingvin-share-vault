@@ -1329,7 +1329,7 @@ export default {
   "common.error.unknown": "Wystąpił nieznany błąd",
   "common.error.invalid-email": "Adres e-mail jest nieprawidłowy",
   "common.error.too-short": "Musi mieć co najmniej {length} znaków",
-  "common.error.too-long": "Musi mieć co najmniej {length} znaków",
+  "common.error.too-long": "Może mieć co najwyżej {length} znaków",
   "common.error.number-too-small": "Musi mieć co najmniej {min}",
   "common.error.number-too-large": "Musi wynosić co najwyżej {max}",
   "common.error.exact-length": "Musi mieć dokładnie {length} znaków",
