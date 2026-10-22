@@ -6,10 +6,12 @@ import { renderWithProviders } from "../renderWithProviders";
 // The admin's page about one account. The histories are the audit log table,
 // tested on its own, so this is about what the page builds around them.
 
+const USER_ID = "7ee8caa8-e33d-4eba-89f8-3569f4a6c93c";
 const overview = jest.fn();
 const revokeSessions = jest.fn();
 const list = jest.fn();
 const push = jest.fn();
+let query: Record<string, string> = {};
 
 jest.mock("../../services/user.service", () => ({
   __esModule: true,
@@ -26,7 +28,7 @@ jest.mock("../../services/auditLog.service", () => ({
 
 jest.mock("next/router", () => ({
   useRouter: () => ({
-    query: { id: "u1" },
+    query,
     pathname: "/admin/users/[id]",
     push,
     replace: jest.fn(),
@@ -41,7 +43,7 @@ global.ResizeObserver = class {
 
 const data: UserOverview = {
   user: {
-    id: "u1",
+    id: USER_ID,
     username: "jan",
     email: "jan@example.invalid",
     displayName: "Jan Kowalski",
@@ -98,6 +100,7 @@ const data: UserOverview = {
 };
 
 beforeEach(() => {
+  query = { id: USER_ID };
   overview.mockReset().mockResolvedValue(data);
   revokeSessions.mockReset().mockResolvedValue({ count: 1 });
   list.mockReset().mockResolvedValue({ entries: [], nextCursor: null });
@@ -109,7 +112,7 @@ describe("admin user page", () => {
     renderWithProviders(<UserPage />);
 
     expect(await screen.findByText("Jan Kowalski")).toBeInTheDocument();
-    expect(overview).toHaveBeenCalledWith("u1");
+    expect(overview).toHaveBeenCalledWith(USER_ID);
     expect(screen.getByText("2FA on")).toBeInTheDocument();
     expect(screen.getByText("github: jank")).toBeInTheDocument();
     expect(screen.getByText(/^of .+ quota$/)).toBeInTheDocument();
@@ -127,7 +130,7 @@ describe("admin user page", () => {
     );
 
     await waitFor(() => expect(list).toHaveBeenCalled());
-    expect(list.mock.calls[0][0]).toMatchObject({ loginsOf: "u1" });
+    expect(list.mock.calls[0][0]).toMatchObject({ loginsOf: USER_ID });
   });
 
   it("asks for what others did with the files of this account", async () => {
@@ -140,7 +143,7 @@ describe("admin user page", () => {
     );
 
     await waitFor(() => expect(list).toHaveBeenCalled());
-    expect(list.mock.calls[0][0]).toMatchObject({ filesOf: "u1" });
+    expect(list.mock.calls[0][0]).toMatchObject({ filesOf: USER_ID });
   });
 
   it("opens the trail of a device in the audit log", async () => {
@@ -164,8 +167,18 @@ describe("admin user page", () => {
     const confirm = await screen.findAllByText("Sign out everywhere");
     fireEvent.click(confirm[confirm.length - 1]);
 
-    await waitFor(() => expect(revokeSessions).toHaveBeenCalledWith("u1"));
+    await waitFor(() => expect(revokeSessions).toHaveBeenCalledWith(USER_ID));
     // and loads the page again to show no sessions
     await waitFor(() => expect(overview).toHaveBeenCalledTimes(2));
+  });
+
+  it("never asks the api for an id that is no user id", async () => {
+    query = { id: "../configs" };
+    renderWithProviders(<UserPage />);
+
+    expect(
+      await screen.findByText("This account could not be loaded"),
+    ).toBeInTheDocument();
+    expect(overview).not.toHaveBeenCalled();
   });
 });

@@ -24,11 +24,12 @@ const remove = async (id: string) => {
   await api.delete(`/users/${id}`);
 };
 
+// the id comes from the address bar, so it may not reach any other path
 const overview = async (id: string): Promise<UserOverview> =>
-  (await api.get(`/users/${id}/overview`)).data;
+  (await api.get(`/users/${encodeURIComponent(id)}/overview`)).data;
 
 const revokeSessions = async (id: string): Promise<{ count: number }> =>
-  (await api.delete(`/users/${id}/sessions`)).data;
+  (await api.delete(`/users/${encodeURIComponent(id)}/sessions`)).data;
 
 const updateCurrentUser = async (user: UpdateCurrentUser) => {
   return (await api.patch("/users/me", user)).data;

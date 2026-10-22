@@ -111,7 +111,12 @@ const Empty = ({ id }: { id: string }) => (
 
 const UserPage = () => {
   const router = useRouter();
-  const id = typeof router.query.id === "string" ? router.query.id : "";
+  // user ids are uuids, anything else in the address is not one of ours
+  const id =
+    typeof router.query.id === "string" &&
+    /^[0-9a-f-]{36}$/i.test(router.query.id)
+      ? router.query.id
+      : "";
   const t = useTranslate();
   const modals = useModals();
   const config = useConfig();
@@ -163,7 +168,8 @@ const UserPage = () => {
           .catch(toast.axiosError),
     });
 
-  if (failed) return <Empty id="admin.userOverview.not-found" />;
+  const invalid = typeof router.query.id === "string" && !id;
+  if (failed || invalid) return <Empty id="admin.userOverview.not-found" />;
   if (!overview)
     return (
       <Center p="xl">
