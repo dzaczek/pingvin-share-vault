@@ -47,6 +47,10 @@ import Config from "../types/config.type";
 import { CurrentUser } from "../types/user.type";
 import { emotionCache } from "../utils/emotionCache";
 import i18nUtil from "../utils/i18n.util";
+import {
+  applyGlassPreferences,
+  GLASS_PREFERENCE_KEYS,
+} from "../utils/glassPreferences.util";
 import userPreferences from "../utils/userPreferences.util";
 import { getVisitorId } from "../utils/visitorId.util";
 import Footer from "../components/footer/Footer";
@@ -222,32 +226,49 @@ function App({ Component, pageProps }: AppProps) {
   // the account page choice wins over the admin default, and it lives in
   // local storage, so like the color scheme it is read after hydration
   const [uiPreference, setUiPreference] = useState("default");
-  useEffect(() => setUiPreference(userPreferences.get("uiStyle")), []);
+  const [glassPreferences, setGlassPreferences] = useState<
+    Record<string, string>
+  >({});
+  useEffect(() => {
+    setUiPreference(userPreferences.get("uiStyle"));
+    setGlassPreferences(
+      Object.fromEntries(
+        GLASS_PREFERENCE_KEYS.map((key) => [key, userPreferences.get(key)]),
+      ),
+    );
+  }, []);
   const uiStyle = UI_STYLES.includes(uiPreference)
     ? uiPreference
     : getStringConfigValue("appearance.uiStyle", "standard");
   const glassBlur = parseInt(getStringConfigValue("appearance.glassBlur"));
   const glass: GlassSettings | null =
     uiStyle === "glass"
-      ? {
-          variant:
-            getStringConfigValue("appearance.glassVariant") === "clear"
-              ? "clear"
-              : "regular",
-          blur: glassBlur >= 0 && glassBlur <= 40 ? glassBlur : 20,
-          background: (
-            ["gradient", "aurora", "color", "image", "video", "none"].includes(
-              getStringConfigValue("appearance.glassBackground"),
-            )
+      ? applyGlassPreferences(
+          {
+            variant:
+              getStringConfigValue("appearance.glassVariant") === "clear"
+                ? "clear"
+                : "regular",
+            blur: glassBlur >= 0 && glassBlur <= 40 ? glassBlur : 20,
+            background: ([
+              "gradient",
+              "aurora",
+              "color",
+              "image",
+              "video",
+              "none",
+            ].includes(getStringConfigValue("appearance.glassBackground"))
               ? getStringConfigValue("appearance.glassBackground")
-              : "gradient"
-          ) as GlassSettings["background"],
-          color: getStringConfigValue("appearance.glassBackgroundColor"),
-          url: getStringConfigValue("appearance.glassBackgroundUrl"),
-          tint: getStringConfigValue("appearance.glassTint", "true") === "true",
-          uploadPanel:
-            getStringConfigValue("appearance.glassUploadPanel") === "true",
-        }
+              : "gradient") as GlassSettings["background"],
+            color: getStringConfigValue("appearance.glassBackgroundColor"),
+            url: getStringConfigValue("appearance.glassBackgroundUrl"),
+            tint:
+              getStringConfigValue("appearance.glassTint", "true") === "true",
+            uploadPanel:
+              getStringConfigValue("appearance.glassUploadPanel") === "true",
+          },
+          glassPreferences,
+        )
       : null;
 
   const precision = uiStyle === "precision";
@@ -427,6 +448,14 @@ function App({ Component, pageProps }: AppProps) {
                     setPreference: (value) => {
                       userPreferences.set("uiStyle", value);
                       setUiPreference(value);
+                    },
+                    glassPreferences,
+                    setGlassPreference: (key, value) => {
+                      userPreferences.set(key, value);
+                      setGlassPreferences((prefs) => ({
+                        ...prefs,
+                        [key]: value,
+                      }));
                     },
                   }}
                 >
