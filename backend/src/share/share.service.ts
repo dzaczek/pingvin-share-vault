@@ -773,11 +773,23 @@ export class ShareService {
     return this.shareAccessLogService.findByShare(shareId);
   }
 
-  async increaseViewCount(share: Share, ip?: string) {
-    await this.prisma.share.update({
-      where: { id: share.id },
-      data: { views: share.views + 1 },
+  // Checks the limit and counts the view in one conditional write, so two
+  // visitors at the same time cannot both get the last view
+  async increaseViewCount(
+    share: Share & { security?: ShareSecurity | null },
+    ip?: string,
+  ) {
+    const maxViews = share.security?.maxViews;
+    const { count } = await this.prisma.share.updateMany({
+      where: { id: share.id, ...(maxViews && { views: { lt: maxViews } }) },
+      data: { views: { increment: 1 } },
     });
+    if (count === 0) {
+      throw new ForbiddenException(
+        this.i18n.t("share.maxViewsExceeded"),
+        "share_max_views_exceeded",
+      );
+    }
     if (ip) await this.shareAccessLogService.log(share.id, ip, "VIEWED");
   }
 
@@ -809,16 +821,8 @@ export class ShareService {
       }
     }
 
-    if (share.security?.maxViews && share.security.maxViews <= share.views) {
-      throw new ForbiddenException(
-        this.i18n.t("share.maxViewsExceeded"),
-        "share_max_views_exceeded",
-      );
-    }
-
-    const token = await this.generateShareToken(share);
     await this.increaseViewCount(share, ip);
-    return token;
+    return this.generateShareToken(share);
   }
 
   async generateShareToken(share: Share & { security?: ShareSecurity }) {
