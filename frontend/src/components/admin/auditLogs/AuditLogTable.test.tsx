@@ -19,6 +19,7 @@ const row = (data: Partial<AuditLogEntry>): AuditLogEntry => ({
   userId: null,
   userEmail: null,
   visitorId: null,
+  deviceId: null,
   ipAddress: "192.0.2.1",
   userAgent: "test",
   shardId: "main-node",
@@ -78,5 +79,27 @@ describe("AuditLogTable", () => {
       ["shareId", "s1"],
       ["shareId", "s2"],
     ]);
+  });
+
+  it("shows the device next to the fingerprint and opens its trail", async () => {
+    const onSelect = await renderRows([
+      row({
+        resourceId: "f1",
+        resourceName: "a.txt",
+        deviceId: "b".repeat(32),
+      }),
+    ]);
+
+    expect(screen.getByText("Fingerprint")).toBeInTheDocument();
+    fireEvent.click(screen.getByText(`${"b".repeat(12)}…`));
+    expect(onSelect).toHaveBeenCalledWith("deviceId", "b".repeat(32));
+  });
+
+  it("explains a column on hover", async () => {
+    await renderRows([row({ resourceId: "f1", resourceName: "a.txt" })]);
+    fireEvent.mouseEnter(screen.getByText("Device"));
+    expect(
+      await screen.findByText(/random ID this browser got/),
+    ).toBeInTheDocument();
   });
 });

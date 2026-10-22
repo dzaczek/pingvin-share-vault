@@ -20,6 +20,11 @@ export class AuditLogQueryDTO {
   @IsOptional()
   @IsString()
   @MaxLength(64)
+  deviceId?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
   ipAddress?: string;
 
   @IsOptional()

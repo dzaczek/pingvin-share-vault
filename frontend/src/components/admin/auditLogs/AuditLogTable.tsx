@@ -5,6 +5,7 @@ import {
   Button,
   Center,
   Code,
+  Group,
   Loader,
   Table,
   Text,
@@ -12,13 +13,49 @@ import {
 } from "@mantine/core";
 import moment from "moment";
 import { useCallback, useEffect, useState } from "react";
+import { TbInfoCircle } from "react-icons/tb";
 import { FormattedMessage } from "react-intl";
 import auditLogService from "../../../services/auditLog.service";
 import { AuditLogEntry, AuditLogFilter } from "../../../types/auditLog.type";
 import toast from "../../../utils/toast.util";
 
 export type IdentityKind =
-  "userId" | "visitorId" | "ipAddress" | "resourceId" | "shareId" | "shardId";
+  | "userId"
+  | "visitorId"
+  | "deviceId"
+  | "ipAddress"
+  | "resourceId"
+  | "shareId"
+  | "shardId";
+
+const COLUMNS = [
+  "time",
+  "action",
+  "user",
+  "visitor",
+  "device",
+  "ip",
+  "resource",
+  "details",
+];
+
+// the name with what the column means on hover, visitor and device are
+// easy to mix up
+const ColumnHeader = ({ column }: { column: string }) => (
+  <Tooltip
+    multiline
+    width={280}
+    withinPortal
+    label={
+      <FormattedMessage id={`admin.auditLogs.table.${column}.description`} />
+    }
+  >
+    <Group spacing={4} noWrap sx={{ cursor: "help" }}>
+      <FormattedMessage id={`admin.auditLogs.table.${column}`} />
+      <TbInfoCircle size={14} />
+    </Group>
+  </Tooltip>
+);
 
 const POLL_MS = 10_000;
 
@@ -151,27 +188,11 @@ const AuditLogTable = ({
         <Table verticalSpacing="xs" fontSize="sm" striped>
           <thead>
             <tr>
-              <th>
-                <FormattedMessage id="admin.auditLogs.table.time" />
-              </th>
-              <th>
-                <FormattedMessage id="admin.auditLogs.table.action" />
-              </th>
-              <th>
-                <FormattedMessage id="admin.auditLogs.table.user" />
-              </th>
-              <th>
-                <FormattedMessage id="admin.auditLogs.table.visitor" />
-              </th>
-              <th>
-                <FormattedMessage id="admin.auditLogs.table.ip" />
-              </th>
-              <th>
-                <FormattedMessage id="admin.auditLogs.table.resource" />
-              </th>
-              <th>
-                <FormattedMessage id="admin.auditLogs.table.details" />
-              </th>
+              {COLUMNS.map((column) => (
+                <th key={column}>
+                  <ColumnHeader column={column} />
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -203,6 +224,13 @@ const AuditLogTable = ({
                   <Identity
                     kind="visitorId"
                     value={entry.visitorId}
+                    onSelect={onSelectIdentity}
+                  />
+                </td>
+                <td>
+                  <Identity
+                    kind="deviceId"
+                    value={entry.deviceId}
                     onSelect={onSelectIdentity}
                   />
                 </td>

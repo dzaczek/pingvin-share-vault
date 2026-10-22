@@ -236,6 +236,7 @@ model AuditLog {
   userId       String?
   userEmail    String?
   visitorId    String?
+  deviceId     String?
   ipAddress    String
   userAgent    String
   shardId      String  @default("main-node")
@@ -247,6 +248,7 @@ model AuditLog {
   @@index([createdAt(sort: Desc)])
   @@index([userId])
   @@index([visitorId])
+  @@index([deviceId])
   @@index([ipAddress])
   @@index([shardId])
   @@index([resourceId])

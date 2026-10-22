@@ -382,12 +382,29 @@ export default {
   "admin.auditLogs.table.time": "Time",
   "admin.auditLogs.table.action": "Action",
   "admin.auditLogs.table.user": "User",
-  "admin.auditLogs.table.visitor": "Visitor",
+  "admin.auditLogs.table.visitor": "Fingerprint",
+  "admin.auditLogs.table.device": "Device",
   "admin.auditLogs.table.ip": "IP",
   "admin.auditLogs.table.resource": "Resource",
   "admin.auditLogs.table.share": "Share",
   "admin.auditLogs.table.shard": "Shard",
   "admin.auditLogs.table.details": "Details",
+  "admin.auditLogs.table.time.description":
+    "When the server wrote the entry. Hover the time to see the browser user agent.",
+  "admin.auditLogs.table.action.description":
+    "What happened: a login, an upload, a download, a preview or a share view.",
+  "admin.auditLogs.table.user.description":
+    "The signed in account. Empty for guests. The email stays even after the account is deleted.",
+  "admin.auditLogs.table.visitor.description":
+    "A hash of how the browser looks: screen, languages, time zone, GPU and how it draws text. It survives cleared cookies, but it changes after a browser update and two devices of the same model share it.",
+  "admin.auditLogs.table.device.description":
+    "A random ID this browser got on its first visit, kept in a cookie. It tells apart two devices of the same model, but it is gone when the cookies are cleared.",
+  "admin.auditLogs.table.ip.description":
+    "The address the request came from, as seen behind the proxy.",
+  "admin.auditLogs.table.resource.description":
+    "The file or share the action was about.",
+  "admin.auditLogs.table.details.description":
+    "Extra data of the action, such as size and storage, plus the share and the shard that handled it.",
   "admin.auditLogs.shards.storage": "Storage",
   "admin.auditLogs.shards.count": "Events",
   "admin.auditLogs.shards.bytes": "Data",

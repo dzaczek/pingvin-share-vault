@@ -26,6 +26,7 @@ export type AuditEntry = {
 export type AuditLogFilter = {
   userId?: string;
   visitorId?: string;
+  deviceId?: string;
   ipAddress?: string;
   shardId?: string;
   action?: string;
@@ -74,6 +75,7 @@ export class AuditLogService {
           ipAddress: ctx.ipAddress,
           userAgent: ctx.userAgent,
           visitorId: ctx.visitorId,
+          deviceId: ctx.deviceId,
           userId: entry.userId ?? ctx.user?.id ?? null,
           userEmail: (entry.userEmail ?? ctx.user?.email ?? null)?.slice(
             0,
@@ -101,6 +103,7 @@ export class AuditLogService {
     for (const key of [
       "userId",
       "visitorId",
+      "deviceId",
       "ipAddress",
       "shardId",
       "action",
