@@ -1,4 +1,5 @@
 import {
+  Alert,
   Group,
   SegmentedControl,
   Select,
@@ -9,7 +10,8 @@ import {
   Title,
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { TbInfoCircle } from "react-icons/tb";
 import { FormattedMessage } from "react-intl";
 import Meta from "../../components/Meta";
 import AuditLogTable, {
@@ -17,6 +19,7 @@ import AuditLogTable, {
 } from "../../components/admin/auditLogs/AuditLogTable";
 import ShardSummary from "../../components/admin/auditLogs/ShardSummary";
 import useTranslate from "../../hooks/useTranslate.hook";
+import configService from "../../services/config.service";
 
 const ACTIONS = [
   "AUTH_LOGIN_SUCCESS",
@@ -31,6 +34,18 @@ const ACTIONS = [
 const AuditLogs = () => {
   const t = useTranslate();
   const [tab, setTab] = useState<string | null>("timeline");
+  const [disabled, setDisabled] = useState(false);
+
+  useEffect(() => {
+    configService
+      .getByCategory("security")
+      .then((variables) =>
+        setDisabled(
+          variables.find((v) => v.key === "security.auditLogEnabled")?.value ===
+            "false",
+        ),
+      );
+  }, []);
 
   const [action, setAction] = useState<string | null>(null);
   const [live, setLive] = useState(true);
@@ -59,6 +74,11 @@ const AuditLogs = () => {
       <Title mb={20} order={3}>
         <FormattedMessage id="admin.auditLogs.title" />
       </Title>
+      {disabled && (
+        <Alert mb="md" variant="light" color="orange" icon={<TbInfoCircle />}>
+          <FormattedMessage id="admin.auditLogs.disabled" />
+        </Alert>
+      )}
 
       <Tabs value={tab} onTabChange={setTab}>
         <Tabs.List mb="md">

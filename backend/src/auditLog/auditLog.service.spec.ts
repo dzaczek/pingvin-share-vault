@@ -1,7 +1,10 @@
 import { auditRequestStore } from "./auditLog.context";
 import { AuditLogService, redact } from "./auditLog.service";
 
-const build = (create: (args: any) => Promise<unknown> = async () => ({})) => {
+const build = (
+  create: (args: any) => Promise<unknown> = async () => ({}),
+  enabled = true,
+) => {
   const created: any[] = [];
   const warnings: string[] = [];
   const findManyCalls: any[] = [];
@@ -20,7 +23,10 @@ const build = (create: (args: any) => Promise<unknown> = async () => ({})) => {
     },
   };
 
-  const service = new AuditLogService(prisma as any, { get: () => 90 } as any);
+  const config = {
+    get: (key: string) => (key === "security.auditLogEnabled" ? enabled : 90),
+  };
+  const service = new AuditLogService(prisma as any, config as any);
   (service as any).logger = { warn: (m: string) => void warnings.push(m) };
 
   return {
@@ -135,6 +141,13 @@ describe("AuditLogService.log", () => {
       reason: "wrong_credentials",
       password: "[REDACTED]",
     });
+  });
+
+  it("writes nothing when audit logging is turned off", async () => {
+    const { service, created } = build(undefined, false);
+    service.log("FILE_UPLOAD");
+    await flush();
+    expect(created).toEqual([]);
   });
 
   it("never throws when the write fails", async () => {

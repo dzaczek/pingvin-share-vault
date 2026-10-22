@@ -1,4 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "src/config/config.service";
 import { PrismaService } from "src/prisma/prisma.service";
 
 export type ShareAccessEvent = "CREATED" | "VIEWED";
@@ -7,9 +8,14 @@ export type ShareAccessEvent = "CREATED" | "VIEWED";
 export class ShareAccessLogService {
   private readonly logger = new Logger(ShareAccessLogService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private config: ConfigService,
+  ) {}
 
   async log(shareId: string, ip: string, event: ShareAccessEvent) {
+    // the same switch as the audit log, both record who touched what
+    if (!this.config.get("security.auditLogEnabled")) return;
     try {
       await this.prisma.shareAccessLog.create({
         data: { shareId, ip, event },
