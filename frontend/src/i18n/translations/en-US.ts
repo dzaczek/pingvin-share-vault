@@ -367,6 +367,8 @@ export default {
 
   // /admin/auditLogs
   "admin.auditLogs.title": "Audit log",
+  "admin.auditLogs.disabled":
+    "Audit logging is turned off in Security settings. Nothing new is recorded, older entries stay until the retention removes them.",
   "admin.auditLogs.tab.timeline": "Timeline",
   "admin.auditLogs.tab.identity": "Trail",
   "admin.auditLogs.tab.shards": "Shards",
@@ -778,6 +780,9 @@ export default {
   "admin.config.general.app-url": "App URL",
   "admin.config.general.app-url.description":
     "URL where Pingvin Share Vault is available.",
+  "admin.config.security.audit-log-enabled": "Audit logging",
+  "admin.config.security.audit-log-enabled.description":
+    "Record logins, uploads, downloads and share views in the audit log, and who opened each share in its access log. When off, nothing new is written.",
   "admin.config.security.audit-log-retention-days": "Audit log retention",
   "admin.config.security.audit-log-retention-days.description":
     "Days the audit log is kept, entries older than that are deleted every night. 0 keeps it forever.",
