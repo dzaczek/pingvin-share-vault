@@ -1,3 +1,17 @@
+## [2026.10.9](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.8...v2026.10.9) (2026-10-22)
+
+### Bug Fixes
+
+* **file:** build the prebuilt zip path through the safe path helper ([3ca970b](https://github.com/dzaczek/pingvin-share-vault/commit/3ca970b6239708d37b36149c5893cec20f311fe8))
+* **admin:** grey out every mail setting without smtp, respect config.yaml locks ([9857b5d](https://github.com/dzaczek/pingvin-share-vault/commit/9857b5dc6aa4b12812381ca40960980f69a9f98a))
+* **file:** keep zip and scan paths inside the share directory ([45d566f](https://github.com/dzaczek/pingvin-share-vault/commit/45d566f5a9b3b1844b3705a86080a8299ab38efb))
+* **i18n:** too long error in polish said at least ([7166ad2](https://github.com/dzaczek/pingvin-share-vault/commit/7166ad2e687f9b849d25e7a6d5979931ca873fa9))
+* **shares:** count views against max views in one write ([382bd47](https://github.com/dzaczek/pingvin-share-vault/commit/382bd47e857002a0839ef5aa853e9167834114ef))
+* **shares:** check reverse share token before using it ([7a30e87](https://github.com/dzaczek/pingvin-share-vault/commit/7a30e875996ee2b293d90dae730194b1911e08d0))
+* **frontend:** check new passwords against the configured policy ([b3f4a81](https://github.com/dzaczek/pingvin-share-vault/commit/b3f4a81a4b5df4de796995db53197cfcdf777517))
+* **auth:** apply the password policy everywhere a password is set ([fe55987](https://github.com/dzaczek/pingvin-share-vault/commit/fe55987630b3cd2413cb9da27531833bd7ba4c50))
+* **auth:** access tokens die with their session ([e67ddb6](https://github.com/dzaczek/pingvin-share-vault/commit/e67ddb60acdc655e91a623737d389b1bfb75fb5b))
+
 ## [2026.10.8](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.7...v2026.10.8) (2026-10-22)
 
 ### Features
