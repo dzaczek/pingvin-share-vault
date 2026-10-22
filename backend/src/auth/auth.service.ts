@@ -51,6 +51,13 @@ export class AuthService {
     );
     const email = dto.email.toLowerCase().trim();
 
+    if (
+      typeof dto.password === "string" &&
+      !(await this.userService.enforcePasswordPolicy(dto.password))
+    ) {
+      throw new BadRequestException(this.i18n.t("auth.passwordPolicyNotMet"));
+    }
+
     const hash = dto.password ? await argon.hash(dto.password) : null;
     try {
       return await this.prisma.$transaction(async (tx) => {
@@ -268,6 +275,13 @@ export class AuthService {
     if (this.config.get("oauth.disablePassword"))
       throw new ForbiddenException(this.i18n.t("auth.passwordSignInDisabled"));
 
+    if (
+      typeof newPassword === "string" &&
+      !(await this.userService.enforcePasswordPolicy(newPassword))
+    ) {
+      throw new BadRequestException(this.i18n.t("auth.passwordPolicyNotMet"));
+    }
+
     const user = await this.prisma.user.findFirst({
       where: { resetPasswordToken: { token, expiresAt: { gt: new Date() } } },
     });
@@ -354,6 +368,13 @@ export class AuthService {
 
     if (!isPasswordValid)
       throw new ForbiddenException(this.i18n.t("auth.invalidPassword"));
+
+    if (
+      typeof newPassword === "string" &&
+      !(await this.userService.enforcePasswordPolicy(newPassword))
+    ) {
+      throw new BadRequestException(this.i18n.t("auth.passwordPolicyNotMet"));
+    }
 
     const hash = await argon.hash(newPassword);
 

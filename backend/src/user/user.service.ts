@@ -40,7 +40,10 @@ export class UserSevice {
     let hash: string;
     let randomPassword: string;
 
-    if (dto.password && !(await this.enforcePasswordPolicy(dto.password))) {
+    if (
+      typeof dto.password === "string" &&
+      !(await this.enforcePasswordPolicy(dto.password))
+    ) {
       throw new BadRequestException(this.i18n.t("auth.passwordPolicyNotMet"));
     }
 
@@ -93,7 +96,10 @@ export class UserSevice {
     extra: Prisma.UserUpdateInput = {},
   ) {
     try {
-      if (user.password && !(await this.enforcePasswordPolicy(user.password))) {
+      if (
+        typeof user.password === "string" &&
+        !(await this.enforcePasswordPolicy(user.password))
+      ) {
         throw new BadRequestException(this.i18n.t("auth.passwordPolicyNotMet"));
       }
 
@@ -326,9 +332,11 @@ export class UserSevice {
     }
   }
 
+  // The only place the password rules live. With the custom policy off a
+  // password still needs 8 characters.
   async enforcePasswordPolicy(password: string): Promise<boolean> {
     if (!this.configService.get("security.customPasswordPolicy")) {
-      return true;
+      return password.length >= 8;
     }
 
     const minLength = this.configService.get("security.minLength");
