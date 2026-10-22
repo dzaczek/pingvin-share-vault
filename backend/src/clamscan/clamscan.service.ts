@@ -144,7 +144,7 @@ export class ClamScanService {
     try {
       files = (
         await fs.promises.readdir(`${SHARE_DIRECTORY}/${shareId}`)
-      ).filter((file) => file != "archive.zip");
+      ).filter((file) => !file.startsWith("archive.zip"));
     } catch (e) {
       // Nothing on disk for this share, which is what an empty one looks like
       void e;

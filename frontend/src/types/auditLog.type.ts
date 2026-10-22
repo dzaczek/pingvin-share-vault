@@ -28,6 +28,8 @@ export type AuditLogFilter = {
   action?: string;
   resourceId?: string;
   shareId?: string;
+  loginsOf?: string;
+  filesOf?: string;
   cursor?: string;
   take?: number;
   order?: "asc" | "desc";

@@ -334,6 +334,122 @@ export default {
     "Jeśli zaznaczone, użytkownik będzie miał dostęp do panelu administratora.",
   // END /admin/users
 
+  // /admin/users/[id]
+  "admin.userOverview.not-found": "Nie udało się wczytać tego konta",
+  "admin.userOverview.created":
+    "Konto założone {date}",
+  "admin.userOverview.badge.totp":
+    "2FA włączone",
+  "admin.userOverview.badge.no-totp":
+    "Bez 2FA",
+  "admin.userOverview.badge.inactive":
+    "Nieaktywowane",
+  "admin.userOverview.badge.no-password":
+    "Bez hasła",
+  "admin.userOverview.stat.storage":
+    "Miejsce",
+  "admin.userOverview.stat.storage.of":
+    "z {quota} limitu",
+  "admin.userOverview.stat.storage.no-quota":
+    "Bez limitu",
+  "admin.userOverview.stat.shares":
+    "Aktywne udostępnienia",
+  "admin.userOverview.stat.shares.hint":
+    "{expired, plural, one {# wygasłe} few {# wygasłe} other {# wygasłych}}, {reverse, plural, one {# odwrotne} few {# odwrotne} other {# odwrotnych}}",
+  "admin.userOverview.stat.last-login":
+    "Ostatnie logowanie",
+  "admin.userOverview.stat.last-login.hint":
+    "{failed, plural, one {# nieudane logowanie} few {# nieudane logowania} other {# nieudanych logowań}} w 30 dni",
+  "admin.userOverview.stat.devices":
+    "Urządzenia",
+  "admin.userOverview.stat.devices.hint":
+    "{ips, plural, one {# adres IP} few {# adresy IP} other {# adresów IP}}, {sessions, plural, one {# aktywna sesja} few {# aktywne sesje} other {# aktywnych sesji}}",
+  "admin.userOverview.permissions":
+    "Udostępnienia {share} · Odwrotne {reverse} · Maks. udostępnień {maxShares} · Maks. odwrotnych {maxReverseShares} · Maks. rozmiar {shareSize}",
+  "admin.userOverview.tab.shares":
+    "Udostępnienia",
+  "admin.userOverview.tab.logins":
+    "Logowania",
+  "admin.userOverview.tab.uploads":
+    "Wysłane",
+  "admin.userOverview.tab.downloads":
+    "Pobrane",
+  "admin.userOverview.tab.files-of":
+    "Pobrania jego plików",
+  "admin.userOverview.tab.identities":
+    "Urządzenia i IP",
+  "admin.userOverview.tab.sessions":
+    "Sesje",
+  "admin.userOverview.files-of.description":
+    "Kto otwierał, podglądał lub pobierał udostępnienia tego konta. Jego własne wizyty są pominięte.",
+  "admin.userOverview.shares.none":
+    "Brak udostępnień",
+  "admin.userOverview.shares.share":
+    "Udostępnienie",
+  "admin.userOverview.shares.created":
+    "Utworzone",
+  "admin.userOverview.shares.expires":
+    "Wygasa",
+  "admin.userOverview.shares.files":
+    "Pliki",
+  "admin.userOverview.shares.size":
+    "Rozmiar",
+  "admin.userOverview.shares.views":
+    "Wyświetlenia",
+  "admin.userOverview.shares.state":
+    "Stan",
+  "admin.userOverview.shares.expired":
+    "Wygasłe",
+  "admin.userOverview.shares.blocked":
+    "Zablokowane",
+  "admin.userOverview.shares.password":
+    "Hasło",
+  "admin.userOverview.reverse-shares":
+    "Udostępnienia odwrotne",
+  "admin.userOverview.reverse-shares.created":
+    "Utworzone",
+  "admin.userOverview.reverse-shares.expires":
+    "Wygasanie udostępnień",
+  "admin.userOverview.reverse-shares.uses-left":
+    "Pozostałe użycia",
+  "admin.userOverview.reverse-shares.max-size":
+    "Maks. rozmiar",
+  "admin.userOverview.reverse-shares.received":
+    "Otrzymane",
+  "admin.userOverview.identities.deviceId":
+    "Urządzenia",
+  "admin.userOverview.identities.visitorId":
+    "Fingerprinty",
+  "admin.userOverview.identities.ipAddress":
+    "Adresy IP",
+  "admin.userOverview.identities.value":
+    "Wartość",
+  "admin.userOverview.identities.events":
+    "Zdarzenia",
+  "admin.userOverview.identities.first-seen":
+    "Pierwszy raz",
+  "admin.userOverview.identities.last-seen":
+    "Ostatni raz",
+  "admin.userOverview.sessions.none":
+    "Brak aktywnych sesji",
+  "admin.userOverview.sessions.created":
+    "Zalogowano",
+  "admin.userOverview.sessions.expires":
+    "Wygasa",
+  "admin.userOverview.sessions.method":
+    "Sposób",
+  "admin.userOverview.sessions.password":
+    "Hasło",
+  "admin.userOverview.sessions.revoke":
+    "Wyloguj wszędzie",
+  "admin.userOverview.sessions.revoke.title":
+    "Wylogować to konto wszędzie?",
+  "admin.userOverview.sessions.revoke.description":
+    "Wszystkie sesje tego konta kończą się od razu, na każdym urządzeniu. Konto zostaje i może zalogować się ponownie.",
+  "admin.userOverview.sessions.revoke.done":
+    "{count, plural, one {Zakończono # sesję} few {Zakończono # sesje} other {Zakończono # sesji}}",
+  // END /admin/users/[id]
+
   // /admin/auditLogs
   "admin.auditLogs.title": "Dziennik zdarzeń",
   "admin.auditLogs.disabled":

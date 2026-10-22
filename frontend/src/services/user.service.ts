@@ -3,6 +3,7 @@ import {
   CurrentUser,
   UpdateCurrentUser,
   UpdateUser,
+  UserOverview,
 } from "../types/user.type";
 import api from "./api.service";
 import authService from "./auth.service";
@@ -22,6 +23,13 @@ const update = async (id: string, user: UpdateUser) => {
 const remove = async (id: string) => {
   await api.delete(`/users/${id}`);
 };
+
+// the id comes from the address bar, so it may not reach any other path
+const overview = async (id: string): Promise<UserOverview> =>
+  (await api.get(`/users/${encodeURIComponent(id)}/overview`)).data;
+
+const revokeSessions = async (id: string): Promise<{ count: number }> =>
+  (await api.delete(`/users/${encodeURIComponent(id)}/sessions`)).data;
 
 const updateCurrentUser = async (user: UpdateCurrentUser) => {
   return (await api.patch("/users/me", user)).data;
@@ -45,6 +53,8 @@ export default {
   create,
   update,
   remove,
+  overview,
+  revokeSessions,
   getCurrentUser,
   updateCurrentUser,
   removeCurrentUser,

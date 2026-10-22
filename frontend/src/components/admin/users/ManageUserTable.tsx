@@ -1,5 +1,14 @@
-import { ActionIcon, Badge, Box, Group, Skeleton, Table } from "@mantine/core";
+import {
+  ActionIcon,
+  Anchor,
+  Badge,
+  Box,
+  Group,
+  Skeleton,
+  Table,
+} from "@mantine/core";
 import { useModals } from "@mantine/modals";
+import Link from "next/link";
 import { TbCheck, TbEdit, TbTrash } from "react-icons/tb";
 import User from "../../../types/user.type";
 import showUpdateUserModal from "./showUpdateUserModal";
@@ -72,7 +81,10 @@ const ManageUserTable = ({
                 <tr key={user.id}>
                   {showDisplayName && <td>{user.displayName || "-"}</td>}
                   <td>
-                    {user.username}{" "}
+                    {/* the account's own page, with all it did */}
+                    <Anchor component={Link} href={`/admin/users/${user.id}`}>
+                      {user.username}
+                    </Anchor>{" "}
                     {user.isLdap ? (
                       <Badge style={{ marginLeft: "1em" }}>LDAP</Badge>
                     ) : null}

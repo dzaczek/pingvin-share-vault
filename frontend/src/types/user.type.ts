@@ -53,6 +53,54 @@ export type UpdateCurrentUser = {
 
 export type CurrentUser = User & {};
 
+type Identity = {
+  value: string;
+  count: number;
+  firstSeen: string;
+  lastSeen: string;
+};
+
+// what GET /users/:id/overview returns, the admin's page about one account
+export type UserOverview = {
+  user: User & {
+    createdAt: string;
+    oauth: { provider: string; providerUsername: string }[];
+  };
+  storageUsed: number;
+  lastLogin: { createdAt: string; ipAddress: string } | null;
+  failedLogins30d: number;
+  shares: {
+    id: string;
+    name: string | null;
+    createdAt: string;
+    expiration: string;
+    expired: boolean;
+    views: number;
+    files: number;
+    size: number;
+    scanStatus: string;
+    blocked: boolean;
+    removedReason: string | null;
+    passwordProtected: boolean;
+    maxViews: number | null;
+  }[];
+  reverseShares: {
+    id: string;
+    createdAt: string;
+    shareExpiration: string;
+    remainingUses: number;
+    maxShareSize: string;
+    shares: number;
+  }[];
+  sessions: {
+    id: string;
+    createdAt: string;
+    expiresAt: string;
+    oauth: string | null;
+  }[];
+  identities: Record<"deviceId" | "visitorId" | "ipAddress", Identity[]>;
+};
+
 export type UserHook = {
   user: CurrentUser | null;
   refreshUser: () => Promise<CurrentUser | null>;

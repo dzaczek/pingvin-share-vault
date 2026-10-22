@@ -131,6 +131,33 @@ describe("createZip", () => {
     ).not.toThrow();
   });
 
+  it("leaves no temporary file behind", async () => {
+    writeFile("id-one", "a");
+
+    await build([{ id: "id-one", name: "a.txt" }]).createZip(SHARE_ID);
+
+    expect(fs.readdirSync(shareDir()).sort()).toEqual([
+      "archive.zip",
+      "id-one",
+    ]);
+  });
+
+  it("only shows the archive under its real name once it is whole", async () => {
+    writeFile("id-one", "a".repeat(5_000_000));
+    const zip = path.join(shareDir(), "archive.zip");
+    const seen: number[] = [];
+    // watch the share directory while the zip is written
+    const timer = setInterval(() => {
+      if (fs.existsSync(zip)) seen.push(fs.statSync(zip).size);
+    }, 1);
+
+    await build([{ id: "id-one", name: "a.txt" }]).createZip(SHARE_ID);
+    clearInterval(timer);
+
+    const final = fs.statSync(zip).size;
+    expect(seen.every((size) => size === final)).toBe(true);
+  });
+
   it("marks the share ready once the archive is on disk", async () => {
     writeFile("id-one", "a");
 
@@ -155,6 +182,9 @@ describe("createZip", () => {
     ).resolves.toBeUndefined();
 
     expect(fs.existsSync(path.join(shareDir(), "archive.zip"))).toBe(false);
+    expect(fs.existsSync(path.join(shareDir(), "archive.zip.part"))).toBe(
+      false,
+    );
     expect(shareUpdate).not.toHaveBeenCalled();
   });
 

@@ -27,22 +27,32 @@ const options = {
   simplified: true,
 } as any;
 
-const Trigger = ({ onUpload }: { onUpload: jest.Mock }) => {
+const Trigger = ({
+  onUpload,
+  simplified = true,
+}: {
+  onUpload: jest.Mock;
+  simplified?: boolean;
+}) => {
   const modals = useModals();
   return (
-    <button onClick={() => showCreateUploadModal(modals, options, [], onUpload)}>
+    <button
+      onClick={() =>
+        showCreateUploadModal(modals, { ...options, simplified }, [], onUpload)
+      }
+    >
       open
     </button>
   );
 };
 
-const openForm = (onUpload: jest.Mock) => {
+const openForm = (onUpload: jest.Mock, simplified = true) => {
   render(
     <IntlProvider locale="en-US" messages={translations}>
       <ColorSchemeProvider colorScheme="light" toggleColorScheme={() => undefined}>
         <MantineProvider theme={{ colorScheme: "light" }}>
           <ModalsProvider>
-            <Trigger onUpload={onUpload} />
+            <Trigger onUpload={onUpload} simplified={simplified} />
           </ModalsProvider>
         </MantineProvider>
       </ColorSchemeProvider>
@@ -82,5 +92,26 @@ describe("create upload modal, description", () => {
 
     await waitFor(() => expect(onUpload).toHaveBeenCalled());
     expect(onUpload.mock.calls[0][0].description).toHaveLength(512);
+  });
+});
+
+// The server may run in UTC. A relative "7-days" counted there comes out an
+// hour off the date this form shows when a clock change falls in between, so
+// the form sends the very date it showed.
+describe("create upload modal, expiration", () => {
+  it("sends the date it shows, counted in the browser's calendar", async () => {
+    const onUpload = jest.fn();
+    openForm(onUpload, false);
+
+    const expected = new Date();
+    expected.setDate(expected.getDate() + 7);
+    fireEvent.click(screen.getByText("Share"));
+
+    await waitFor(() => expect(onUpload).toHaveBeenCalled());
+    const sent = onUpload.mock.calls[0][0].expiration;
+    expect(sent).toMatch(/^\d{4}-\d\d-\d\dT/);
+    expect(
+      Math.abs(new Date(sent).getTime() - expected.getTime()),
+    ).toBeLessThan(60_000);
   });
 });
