@@ -18,11 +18,11 @@ import { useEffect, useState } from "react";
 import { TbInfoCircle } from "react-icons/tb";
 import { FormattedMessage } from "react-intl";
 import Meta from "../../../components/Meta";
-import AdminConfigInput from "../../../components/admin/configuration/AdminConfigInput";
 import AnonymousWarningMessageConfigInput from "../../../components/admin/configuration/AnonymousWarningMessageConfigInput";
+import AppearanceConfig from "../../../components/admin/configuration/AppearanceConfig";
+import ConfigRow from "../../../components/admin/configuration/ConfigRow";
 import ConfigurationHeader from "../../../components/admin/configuration/ConfigurationHeader";
 import ConfigurationNavBar from "../../../components/admin/configuration/ConfigurationNavBar";
-import LogoConfigInput from "../../../components/admin/configuration/LogoConfigInput";
 import TestEmailButton from "../../../components/admin/configuration/TestEmailButton";
 import TestRedisButton from "../../../components/admin/configuration/TestRedisButton";
 import CenterLoader from "../../../components/core/CenterLoader";
@@ -33,7 +33,6 @@ import configService from "../../../services/config.service";
 import { AdminConfig, UpdateConfig } from "../../../types/config.type";
 import { getConfigWarnings } from "../../../utils/configWarnings.util";
 import { REPOSITORY_URL } from "../../../utils/repository.util";
-import { camelToKebab } from "../../../utils/string.util";
 import toast from "../../../utils/toast.util";
 
 const categories = [
@@ -222,14 +221,7 @@ export default function AppShellDemo() {
             <CenterLoader />
           ) : (
             <>
-              {/*
-               * Keep custom CSS at the bottom in Appearance settings for better UX.
-               */}
               {(() => {
-                const customCssConfigVariable = configVariables.find(
-                  (configVariable) =>
-                    configVariable.key === "appearance.customCss",
-                );
                 const getEffectiveConfigValue = (key: string): string => {
                   const updatedValue = updatedConfigVariables.find(
                     (item) => item.key === key,
@@ -247,12 +239,6 @@ export default function AppShellDemo() {
                   );
                 };
 
-                const glassBackground = getEffectiveConfigValue(
-                  "appearance.glassBackground",
-                );
-                const shouldShowPrimaryColorOverride =
-                  getEffectiveConfigValue("appearance.themePrimaryColor") ===
-                  "custom";
                 const shouldShowCustomPasswordPolicies =
                   getEffectiveConfigValue("security.customPasswordPolicy") ===
                   "true";
@@ -268,7 +254,6 @@ export default function AppShellDemo() {
                 ];
                 const visibleConfigVariables = configVariables.filter(
                   (configVariable) =>
-                    configVariable.key !== "appearance.customCss" &&
                     !anonymousWarningMessageKeys.includes(configVariable.key),
                 );
 
@@ -329,138 +314,52 @@ export default function AppShellDemo() {
                           />
                         </Text>
                       )}
-                      {visibleConfigVariables.map((configVariable) => {
-                        if (
-                          (configVariable.key ===
-                            "appearance.themePrimaryColorOverride" &&
-                            !shouldShowPrimaryColorOverride) ||
-                          (configVariable.key ===
-                            "appearance.glassBackgroundColor" &&
-                            glassBackground !== "color") ||
-                          (configVariable.key ===
-                            "appearance.glassBackgroundUrl" &&
-                            !["image", "video"].includes(glassBackground)) ||
-                          (configVariable.key ===
-                            "security.auditLogRetentionDays" &&
-                            !isAuditLogEnabled) ||
-                          (configVariable.key === "security.minLength" &&
-                            !shouldShowCustomPasswordPolicies) ||
-                          (configVariable.key === "security.requireLowercase" &&
-                            !shouldShowCustomPasswordPolicies) ||
-                          (configVariable.key === "security.requireUppercase" &&
-                            !shouldShowCustomPasswordPolicies) ||
-                          (configVariable.key === "security.requireNumber" &&
-                            !shouldShowCustomPasswordPolicies) ||
-                          (configVariable.key ===
-                            "security.requireSpecialCharacter" &&
-                            !shouldShowCustomPasswordPolicies)
-                        ) {
-                          return null;
-                        }
-
-                        return (
-                          <Group key={configVariable.key} position="apart">
-                            <Stack
-                              style={{ maxWidth: isMobile ? "100%" : "40%" }}
-                              spacing={0}
-                            >
-                              <Title order={6}>
-                                <FormattedMessage
-                                  id={`admin.config.${camelToKebab(
-                                    configVariable.key,
-                                  )}`}
-                                />
-                              </Title>
-
-                              <Text
-                                sx={{
-                                  whiteSpace: "pre-line",
-                                }}
-                                color="dimmed"
-                                size="sm"
-                                mb="xs"
-                              >
-                                <FormattedMessage
-                                  id={`admin.config.${camelToKebab(
-                                    configVariable.key,
-                                  )}.description`}
-                                  values={{ br: <br /> }}
-                                />
-                              </Text>
-                            </Stack>
-                            <Stack></Stack>
-                            <Box style={{ width: isMobile ? "100%" : "50%" }}>
-                              <AdminConfigInput
-                                key={configVariable.key}
-                                configVariable={configVariable}
-                                updateConfigVariable={updateConfigVariable}
-                                allConfigVariables={configVariables}
-                                updatedConfigVariables={updatedConfigVariables}
-                                optionalConfigVariables={
-                                  optionalConfigVariables
-                                }
-                              />
-                            </Box>
-                          </Group>
-                        );
-                      })}
-                      {categoryId == "appearance" && (
-                        <LogoConfigInput
+                      {categoryId === "appearance" && (
+                        <AppearanceConfig
+                          configVariables={configVariables}
+                          updatedConfigVariables={updatedConfigVariables}
+                          updateConfigVariable={updateConfigVariable}
+                          getEffectiveConfigValue={getEffectiveConfigValue}
                           logo={logo}
                           setLogo={setLogo}
                           darkLogo={darkLogo}
                           setDarkLogo={setDarkLogo}
                         />
                       )}
-                      {categoryId == "appearance" &&
-                        customCssConfigVariable && (
-                          <Group
-                            key={customCssConfigVariable.key}
-                            position="apart"
-                          >
-                            <Stack
-                              style={{ maxWidth: isMobile ? "100%" : "40%" }}
-                              spacing={0}
-                            >
-                              <Title order={6}>
-                                <FormattedMessage
-                                  id={`admin.config.${camelToKebab(
-                                    customCssConfigVariable.key,
-                                  )}`}
-                                />
-                              </Title>
+                      {categoryId !== "appearance" &&
+                        visibleConfigVariables.map((configVariable) => {
+                          if (
+                            (configVariable.key ===
+                              "security.auditLogRetentionDays" &&
+                              !isAuditLogEnabled) ||
+                            (configVariable.key === "security.minLength" &&
+                              !shouldShowCustomPasswordPolicies) ||
+                            (configVariable.key ===
+                              "security.requireLowercase" &&
+                              !shouldShowCustomPasswordPolicies) ||
+                            (configVariable.key ===
+                              "security.requireUppercase" &&
+                              !shouldShowCustomPasswordPolicies) ||
+                            (configVariable.key === "security.requireNumber" &&
+                              !shouldShowCustomPasswordPolicies) ||
+                            (configVariable.key ===
+                              "security.requireSpecialCharacter" &&
+                              !shouldShowCustomPasswordPolicies)
+                          ) {
+                            return null;
+                          }
 
-                              <Text
-                                sx={{
-                                  whiteSpace: "pre-line",
-                                }}
-                                color="dimmed"
-                                size="sm"
-                                mb="xs"
-                              >
-                                <FormattedMessage
-                                  id={`admin.config.${camelToKebab(
-                                    customCssConfigVariable.key,
-                                  )}.description`}
-                                  values={{ br: <br /> }}
-                                />
-                              </Text>
-                            </Stack>
-                            <Stack></Stack>
-                            <Box style={{ width: isMobile ? "100%" : "50%" }}>
-                              <AdminConfigInput
-                                key={customCssConfigVariable.key}
-                                configVariable={customCssConfigVariable}
-                                updateConfigVariable={updateConfigVariable}
-                                allConfigVariables={configVariables}
-                                updatedConfigVariables={updatedConfigVariables}
-                                optionalConfigVariables={
-                                  optionalConfigVariables
-                                }
-                              />
-                            </Box>
-                          </Group>
-                        )}
+                          return (
+                            <ConfigRow
+                              key={configVariable.key}
+                              configVariable={configVariable}
+                              updateConfigVariable={updateConfigVariable}
+                              allConfigVariables={configVariables}
+                              updatedConfigVariables={updatedConfigVariables}
+                              optionalConfigVariables={optionalConfigVariables}
+                            />
+                          );
+                        })}
                       {/* {categoryId === "security" && shouldShowCustomPasswordPolicies && ( */}
                       {/**/}
                       {/* )} */}

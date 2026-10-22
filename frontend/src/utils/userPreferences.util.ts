@@ -11,6 +11,10 @@ const defaultPreferences = [
     key: "uiStyle",
     value: "default",
   },
+  ...["glassVariant", "glassBackground", "glassUploadPanel"].map((key) => ({
+    key,
+    value: "default",
+  })),
 ];
 
 const get = (key: string) => {
