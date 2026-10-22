@@ -176,9 +176,14 @@ export class AuthController {
     // every other session ended with the old password, this one goes on.
     // A separate call, so the token never comes out of the one that handled
     // the password, which is all CodeQL needs to call the cookie a password.
-    const result = await this.authService.createRefreshToken(user.id);
-    this.authService.addTokensToResponse(response, result.refreshToken);
-    return new TokenDTO().from(result);
+    const { refreshToken, refreshTokenId } =
+      await this.authService.createRefreshToken(user.id);
+    const accessToken = await this.authService.createAccessToken(
+      user,
+      refreshTokenId,
+    );
+    this.authService.addTokensToResponse(response, refreshToken, accessToken);
+    return new TokenDTO().from({ accessToken, refreshToken });
   }
 
   @Post("token")

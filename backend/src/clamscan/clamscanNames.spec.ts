@@ -113,4 +113,19 @@ describe("check, local storage", () => {
 
     expect(result).toEqual({ infectedFiles: [], scanFailed: false });
   });
+
+  it("does not scan anything outside the share directory", async () => {
+    fs.writeFileSync(path.join(root, "not-a-share-file"), "x");
+    const service = build([]);
+    const opened: unknown[] = [];
+    (service as any).scanFile = async (_c: unknown, open: () => unknown) => {
+      opened.push(open);
+      return { isInfected: true, failed: false };
+    };
+
+    const result = await service.check(`${SHARE}/..`);
+
+    expect(result).toEqual({ infectedFiles: [], scanFailed: true });
+    expect(opened).toEqual([]);
+  });
 });

@@ -1,3 +1,4 @@
+import * as yup from "yup";
 import { CustomPasswordPolicy } from "../types/config.type";
 
 // What the create-user form should enforce.
@@ -28,4 +29,34 @@ export function resolvePasswordPolicy(
     requireNumber: get("security.requireNumber"),
     requireSpecialCharacter: get("security.requireSpecialCharacter"),
   };
+}
+
+// A new password checked the way the server will check it. Callers add
+// .required() where the field has to be filled in.
+export function passwordSchema(
+  policy: CustomPasswordPolicy,
+  t: (id: string, values?: Record<string, number>) => string,
+) {
+  return yup
+    .string()
+    .min(
+      policy.minLength,
+      t("common.error.too-short", { length: policy.minLength }),
+    )
+    .matches(
+      policy.requireLowercase ? /[a-z]/ : /.*/,
+      t("common.error.password.lowercase"),
+    )
+    .matches(
+      policy.requireUppercase ? /[A-Z]/ : /.*/,
+      t("common.error.password.uppercase"),
+    )
+    .matches(
+      policy.requireNumber ? /[0-9]/ : /.*/,
+      t("common.error.password.number"),
+    )
+    .matches(
+      policy.requireSpecialCharacter ? /[^a-zA-Z0-9]/ : /.*/,
+      t("common.error.password.special"),
+    );
 }

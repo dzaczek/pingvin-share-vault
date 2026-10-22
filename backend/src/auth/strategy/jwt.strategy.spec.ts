@@ -3,13 +3,13 @@ import { JwtStrategy } from "./jwt.strategy";
 // An access token lives 15 minutes. Without a look at its session, signing
 // out or an admin revoking the sessions would leave it working until then.
 
-const build = () => {
+const build = (session: any = null) => {
   const calls: any[] = [];
   const prisma = {
-    user: {
+    refreshToken: {
       findFirst: async (args: any) => {
         calls.push(args);
-        return null;
+        return session;
       },
     },
   };
@@ -18,22 +18,32 @@ const build = () => {
 };
 
 describe("JwtStrategy.validate", () => {
-  it("only accepts a token whose session still exists", async () => {
-    const { strategy, calls } = build();
+  it("returns the user of a live session", async () => {
+    const user = { id: "u1" };
+    const { strategy, calls } = build({ id: "t1", user });
 
-    await strategy.validate({ sub: "u1", refreshTokenId: "t1" });
-
+    expect(await strategy.validate({ sub: "u1", refreshTokenId: "t1" })).toBe(
+      user,
+    );
     expect(calls[0].where).toEqual({
-      id: "u1",
-      refreshTokens: { some: { id: "t1" } },
+      id: "t1",
+      userId: "u1",
+      expiresAt: { gt: expect.any(Date) },
     });
   });
 
-  it("still takes a token from before sessions were named in it", async () => {
-    const { strategy, calls } = build();
+  it("rejects a token once its session is gone or expired", async () => {
+    const { strategy } = build(null);
 
-    await strategy.validate({ sub: "u1" });
+    expect(
+      await strategy.validate({ sub: "u1", refreshTokenId: "t1" }),
+    ).toBeNull();
+  });
 
-    expect(calls[0].where).toEqual({ id: "u1" });
+  it("rejects a token that names no session", async () => {
+    const { strategy, calls } = build({ id: "t1", user: { id: "u1" } });
+
+    expect(await strategy.validate({ sub: "u1" })).toBeNull();
+    expect(calls).toHaveLength(0);
   });
 });

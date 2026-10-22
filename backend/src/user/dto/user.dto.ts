@@ -4,10 +4,10 @@ import {
   IsEmail,
   IsInt,
   IsOptional,
+  IsString,
   Length,
   Matches,
   Min,
-  MinLength,
 } from "class-validator";
 import { i18nValidationMessage } from "nestjs-i18n";
 
@@ -38,7 +38,8 @@ export class UserDTO {
   @Expose()
   hasPassword: boolean;
 
-  @MinLength(8)
+  // length and the other rules are checked by enforcePasswordPolicy
+  @IsString()
   password: string;
 
   @Expose()
