@@ -10,6 +10,7 @@ import {
   Title,
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { TbInfoCircle } from "react-icons/tb";
 import { FormattedMessage } from "react-intl";
@@ -25,15 +26,41 @@ const ACTIONS = [
   "AUTH_LOGIN_SUCCESS",
   "AUTH_LOGIN_TOTP_REQUIRED",
   "AUTH_LOGIN_FAILED",
+  "AUTH_SESSIONS_REVOKED",
   "FILE_UPLOAD",
   "FILE_DOWNLOAD",
   "FILE_PREVIEW",
   "SHARE_VIEW",
 ];
 
-const AuditLogs = () => {
+const IDENTITY_KINDS: IdentityKind[] = [
+  "visitorId",
+  "deviceId",
+  "userId",
+  "ipAddress",
+  "resourceId",
+  "shareId",
+  "shardId",
+];
+
+// ?kind=deviceId&value=... opens that trail, the user page links here
+const AuditLogsPage = () => {
+  const { isReady, query } = useRouter();
+  if (!isReady) return null;
+  const kind = IDENTITY_KINDS.find((k) => k === query.kind);
+  const value = typeof query.value === "string" ? query.value : "";
+  return <AuditLogs trail={kind && value ? { kind, value } : undefined} />;
+};
+
+const AuditLogs = ({
+  trail: initialTrail,
+}: {
+  trail?: { kind: IdentityKind; value: string };
+}) => {
   const t = useTranslate();
-  const [tab, setTab] = useState<string | null>("timeline");
+  const [tab, setTab] = useState<string | null>(
+    initialTrail ? "identity" : "timeline",
+  );
   const [disabled, setDisabled] = useState(false);
 
   useEffect(() => {
@@ -50,8 +77,10 @@ const AuditLogs = () => {
   const [action, setAction] = useState<string | null>(null);
   const [live, setLive] = useState(true);
 
-  const [identityKind, setIdentityKind] = useState<IdentityKind>("visitorId");
-  const [identity, setIdentity] = useState("");
+  const [identityKind, setIdentityKind] = useState<IdentityKind>(
+    initialTrail?.kind ?? "visitorId",
+  );
+  const [identity, setIdentity] = useState(initialTrail?.value ?? "");
   // no request per keystroke while an ip is typed in. Kind and value settle
   // together, otherwise a click briefly asks for the new kind with the old
   // value and finds nothing
@@ -168,4 +197,4 @@ const AuditLogs = () => {
   );
 };
 
-export default AuditLogs;
+export default AuditLogsPage;

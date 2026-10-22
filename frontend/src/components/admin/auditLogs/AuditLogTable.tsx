@@ -61,6 +61,7 @@ const POLL_MS = 10_000;
 
 const actionColor = (action: string) => {
   if (action === "AUTH_LOGIN_FAILED") return "red";
+  if (action === "AUTH_SESSIONS_REVOKED") return "orange";
   if (action.startsWith("AUTH_")) return "green";
   if (action === "FILE_UPLOAD") return "blue";
   if (action === "FILE_DOWNLOAD") return "violet";

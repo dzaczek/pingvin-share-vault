@@ -10,6 +10,7 @@ export type AuditAction =
   | "AUTH_LOGIN_SUCCESS"
   | "AUTH_LOGIN_TOTP_REQUIRED"
   | "AUTH_LOGIN_FAILED"
+  | "AUTH_SESSIONS_REVOKED"
   | "FILE_UPLOAD"
   | "FILE_DOWNLOAD"
   | "FILE_PREVIEW"
@@ -32,6 +33,10 @@ export type AuditLogFilter = {
   action?: string;
   resourceId?: string;
   shareId?: string;
+  // the logins of one account, the failed ones matched by what was typed in
+  loginsOf?: string;
+  // what happened to the files of one account: views, downloads, previews
+  filesOf?: string;
   cursor?: string;
   take?: string | number;
   order?: "asc" | "desc";
@@ -51,6 +56,13 @@ export function redact(value: unknown): unknown {
   }
   return value;
 }
+
+const inShares = (ids: string[]): Prisma.AuditLogWhereInput => ({
+  OR: [
+    { resourceId: { in: ids } },
+    ...ids.map((id) => ({ metadata: { path: "$.shareId", equals: id } })),
+  ],
+});
 
 @Injectable()
 export class AuditLogService {
@@ -118,6 +130,46 @@ export class AuditLogService {
         { resourceId: filter.shareId },
         { metadata: { path: "$.shareId", equals: filter.shareId } },
       ];
+
+    const and: Prisma.AuditLogWhereInput[] = [];
+
+    if (filter.loginsOf) {
+      const user = await this.prisma.user.findUnique({
+        where: { id: filter.loginsOf },
+        select: { email: true, username: true },
+      });
+      and.push({
+        action: { startsWith: "AUTH_LOGIN" },
+        OR: [
+          { userId: filter.loginsOf },
+          ...(user
+            ? [
+                {
+                  action: "AUTH_LOGIN_FAILED",
+                  userEmail: { in: [user.email, user.username] },
+                },
+              ]
+            : []),
+        ],
+      });
+    }
+
+    if (filter.filesOf) {
+      // the most recent shares are plenty for a history page
+      const shares = await this.prisma.share.findMany({
+        where: { creatorId: filter.filesOf },
+        orderBy: { createdAt: "desc" },
+        take: 500,
+        select: { id: true },
+      });
+      and.push(
+        { action: { in: ["SHARE_VIEW", "FILE_DOWNLOAD", "FILE_PREVIEW"] } },
+        inShares(shares.map((s) => s.id)),
+        // somebody else, a guest included, not the owner looking at it
+        { OR: [{ userId: null }, { userId: { not: filter.filesOf } }] },
+      );
+    }
+    if (and.length) where.AND = and;
 
     const rows = await this.prisma.auditLog.findMany({
       where,

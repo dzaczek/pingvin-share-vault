@@ -21,6 +21,15 @@ const build = (
         return rows;
       },
     },
+    user: {
+      findUnique: async () => ({
+        email: "jan@example.invalid",
+        username: "jan",
+      }),
+    },
+    share: {
+      findMany: async () => [{ id: "s1" }, { id: "s2" }],
+    },
   };
 
   const config = {
@@ -186,6 +195,47 @@ describe("AuditLogService.find", () => {
       OR: [
         { resourceId: "s1" },
         { metadata: { path: "$.shareId", equals: "s1" } },
+      ],
+    });
+  });
+
+  it("finds the logins of an account, failed ones by what was typed", async () => {
+    const { service, findManyCalls } = build();
+
+    await service.find({ loginsOf: "u1" });
+
+    expect(findManyCalls[0].where).toEqual({
+      AND: [
+        {
+          action: { startsWith: "AUTH_LOGIN" },
+          OR: [
+            { userId: "u1" },
+            {
+              action: "AUTH_LOGIN_FAILED",
+              userEmail: { in: ["jan@example.invalid", "jan"] },
+            },
+          ],
+        },
+      ],
+    });
+  });
+
+  it("finds what others did with the shares of an account", async () => {
+    const { service, findManyCalls } = build();
+
+    await service.find({ filesOf: "u1" });
+
+    expect(findManyCalls[0].where).toEqual({
+      AND: [
+        { action: { in: ["SHARE_VIEW", "FILE_DOWNLOAD", "FILE_PREVIEW"] } },
+        {
+          OR: [
+            { resourceId: { in: ["s1", "s2"] } },
+            { metadata: { path: "$.shareId", equals: "s1" } },
+            { metadata: { path: "$.shareId", equals: "s2" } },
+          ],
+        },
+        { OR: [{ userId: null }, { userId: { not: "u1" } }] },
       ],
     });
   });
