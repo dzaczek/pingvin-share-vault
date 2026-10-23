@@ -1,6 +1,6 @@
 {
   "name": "pingvin-share-frontend",
-  "version": "2026.10.9",
+  "version": "2026.10.10-beta.0",
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack && node scripts/check-pwa-precache.mjs",
