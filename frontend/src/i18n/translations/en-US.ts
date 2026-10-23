@@ -496,7 +496,7 @@ export default {
   "admin.stats.now": "Right now",
   "admin.stats.in-period": "Last {days} days",
   "admin.stats.users": "Users",
-  "admin.stats.users.hint": "{admins} admins, {new} new",
+  "admin.stats.users.hint": "{admins, plural, one {# admin} other {# admins}}, {new} new",
   "admin.stats.shares": "Active shares",
   "admin.stats.shares.hint": "{new} new in this period",
   "admin.stats.files": "Files",

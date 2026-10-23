@@ -63,10 +63,7 @@ const Stat = ({
 
 const grid = {
   cols: 4,
-  breakpoints: [
-    { maxWidth: "md", cols: 2 },
-    { maxWidth: "xs", cols: 1 },
-  ],
+  breakpoints: [{ maxWidth: "md", cols: 2 }],
   mb: "lg",
 };
 
@@ -213,7 +210,7 @@ const AdminStats = () => {
                             <Progress value={(row.value / max) * 100} />
                           </td>
                           <td style={{ textAlign: "right", width: 110 }}>
-                            <Text weight={600}>
+                            <Text weight={600} style={{ whiteSpace: "nowrap" }}>
                               {sizeTop(key)
                                 ? bytes(row.value)
                                 : number(row.value)}
@@ -267,7 +264,9 @@ const AdminStats = () => {
                 {stats.shards.map((s) => (
                   <tr key={s.shardId}>
                     <td>
-                      <Text weight={600}>{s.shardId}</Text>
+                      <Text weight={600} style={{ whiteSpace: "nowrap" }}>
+                        {s.shardId}
+                      </Text>
                     </td>
                     <td>{number(s.uploads)}</td>
                     <td>{bytes(s.uploadBytes)}</td>
