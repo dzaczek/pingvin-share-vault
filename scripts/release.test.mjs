@@ -2,7 +2,12 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import semver from "semver";
-import { changelogSection, nextVersion, previousRelease } from "./release.mjs";
+import {
+  changelogSection,
+  nextBeta,
+  nextVersion,
+  previousRelease,
+} from "./release.mjs";
 
 const october = new Date(2026, 9, 10);
 
@@ -30,6 +35,35 @@ test("never writes a leading zero, which semver rejects", () => {
 test("orders correctly against the old numbering", () => {
   assert.ok(semver.gt("2026.10.0", "2.0.0-beta.1"));
   assert.ok(semver.gt("2026.11.0", "2026.10.9"));
+});
+
+// A beta is a prerelease of the version that comes next, and the final
+// release then takes that same version without the suffix.
+
+test("a beta is a prerelease of the next version", () => {
+  assert.equal(nextBeta(october, ["v2026.10.9"]), "2026.10.10-beta.0");
+  assert.equal(
+    nextBeta(october, ["v2026.10.9", "v2026.10.10-beta.0"]),
+    "2026.10.10-beta.1",
+  );
+});
+
+test("betas do not move the next release on", () => {
+  assert.equal(
+    nextVersion(october, ["v2026.10.9", "v2026.10.10-beta.0", "v2026.10.10-beta.1"]),
+    "2026.10.10",
+  );
+});
+
+test("a beta sorts before its release and after the one before", () => {
+  const beta = nextBeta(october, ["v2026.10.9"]);
+  assert.ok(semver.valid(beta));
+  assert.ok(semver.gt(beta, "2026.10.9"));
+  assert.ok(semver.lt(beta, "2026.10.10"));
+});
+
+test("a beta is never taken as the previous release", () => {
+  assert.equal(previousRelease(["v2026.10.9", "v2026.10.10-beta.0"]), "v2026.10.9");
 });
 
 // The repository carries the original project's history and tags since the

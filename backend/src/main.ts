@@ -49,6 +49,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: logLevels,
   });
+  app.disable("x-powered-by");
 
   app.useGlobalPipes(new I18nValidationPipe({ whitelist: true }));
   app.useGlobalFilters(new I18nValidationExceptionFilter());
