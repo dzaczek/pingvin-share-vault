@@ -21,6 +21,8 @@ const withPWA = require("next-pwa")({
 module.exports = withPWA({
   transpilePackages: ["@uiw/react-md-editor", "@uiw/react-markdown-preview"],
   output: "standalone",
+  // no need to tell every visitor which framework answers
+  poweredByHeader: false,
   // Rotate asset URLs after Cloudflare challenged the share page's JS chunk.
   // Keep the salt fixed so content hashes still provide stable cache keys.
   // This avoids the current false positive, not future WAF misclassifications.

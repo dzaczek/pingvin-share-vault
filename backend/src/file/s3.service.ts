@@ -37,6 +37,7 @@ import { streamedZipLevel } from "./zipLevel";
 import { Readable } from "stream";
 import { validate as isValidUUID } from "uuid";
 import * as archiver from "archiver";
+import { safeFileName } from "src/utils/fileName.util";
 
 @Injectable()
 export class S3FileService {
@@ -447,7 +448,7 @@ export class S3FileService {
 
           if (response.Body instanceof Readable) {
             const body = response.Body as Readable;
-            archive.append(body, { name: file.name });
+            archive.append(body, { name: safeFileName(file.name) || file.id });
             // Wait for this file to be fully appended before moving to the next one to avoid overwhelming memory/connections
             await new Promise((resolve, reject) => {
               body.on("end", resolve);
