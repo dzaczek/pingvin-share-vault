@@ -12,6 +12,7 @@ import { SystemService } from '../src/system/system.service';
 import { ShareAccessLogService } from '../src/shareAccessLog/shareAccessLog.service';
 import { I18nService } from 'nestjs-i18n';
 import { ConfigService as AppConfigService } from '../src/config/config.service';
+import { AuditLogService } from '../src/auditLog/auditLog.service';
 
 describe('ShareService Optimization', () => {
   let shareService: ShareService;
@@ -68,12 +69,34 @@ describe('ShareService Optimization', () => {
         { provide: SystemService, useValue: {} },
         { provide: ShareAccessLogService, useValue: {} },
         { provide: I18nService, useValue: { t: jest.fn() } },
+        { provide: AuditLogService, useValue: { log: jest.fn() } },
         { provide: 'bull_Queue_jobs', useValue: {} },
       ],
     }).compile();
 
     shareService = module.get<ShareService>(ShareService);
     prismaService = module.get<PrismaService>(PrismaService);
+  });
+
+  // the dashboard counts new shares from this entry
+  it('logs a finished share with its file count and size', async () => {
+    jest.spyOn(shareService, 'isShareCompleted').mockResolvedValue(false);
+    (prismaService.share.findUnique as jest.Mock).mockResolvedValue({
+      id: 'share1',
+      name: 'holiday',
+      files: [{ size: '10' }],
+      recipients: [],
+      creator: {},
+    });
+    (prismaService.user.findMany as jest.Mock).mockResolvedValue([]);
+
+    await shareService.complete('share1');
+
+    expect(shareService['auditLog'].log).toHaveBeenCalledWith('SHARE_CREATE', {
+      resourceId: 'share1',
+      resourceName: 'holiday',
+      metadata: { files: 1, size: 10, reverseShareId: undefined },
+    });
   });
 
   describe('complete share recipient transaction optimization', () => {

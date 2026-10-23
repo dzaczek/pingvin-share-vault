@@ -26,6 +26,7 @@ import { SystemModule } from "./system/system.module";
 import { AdminNoticeModule } from "./adminNotice/adminNotice.module";
 import { AuditLogModule } from "./auditLog/auditLog.module";
 import { WallpaperModule } from "./wallpaper/wallpaper.module";
+import { StatsModule } from "./stats/stats.module";
 
 import { SystemLanguageResolver } from "./i18n/systemLanguage.resolver";
 
@@ -47,6 +48,7 @@ const i18nPath = existsSync(join(__dirname, "../i18n"))
     AdminNoticeModule,
     AuditLogModule,
     WallpaperModule,
+    StatsModule,
     ThrottlerModule.forRoot([
       {
         ttl: 60 * 1000,
