@@ -7,6 +7,7 @@
 //
 //   npm run release              bump, write the changelog, commit and tag
 //   npm run release -- --dry-run only print the next version and changelog
+//   npm run release -- --beta    a prerelease of the next version, 2026.10.3-beta.0
 //
 // Pushing and publishing stay a separate, deliberate step, see the output.
 
@@ -28,6 +29,19 @@ export function nextVersion(date, tags) {
     .map((v) => Number(v.slice(prefix.length)))
     .filter(Number.isInteger);
   return prefix + (taken.length ? Math.max(...taken) + 1 : 0);
+}
+
+// A beta leaves the changelog alone, the final release lists everything
+// since the last one. Betas are not counted by nextVersion, "3-beta.0" is
+// not a number, so the beta and the release after it share the version.
+export function nextBeta(date, tags) {
+  const base = `${nextVersion(date, tags)}-beta.`;
+  const taken = tags
+    .map((tag) => tag.replace(/^v/, ""))
+    .filter((v) => v.startsWith(base))
+    .map((v) => Number(v.slice(base.length)))
+    .filter(Number.isInteger);
+  return base + (taken.length ? Math.max(...taken) + 1 : 0);
 }
 
 export function previousRelease(tags) {
@@ -105,13 +119,17 @@ function releaseCommits(previous) {
 
 function main() {
   const dryRun = process.argv.includes("--dry-run");
+  const beta = process.argv.includes("--beta");
 
   git("fetch", "--quiet", "--tags", "origin");
   if (git("remote").split("\n").includes("upstream")) {
     git("fetch", "--quiet", "upstream");
   }
   const tags = git("tag", "--list", "--merged", "HEAD").split("\n");
-  const version = nextVersion(new Date(), git("tag", "--list").split("\n"));
+  const allTags = git("tag", "--list").split("\n");
+  const version = beta
+    ? nextBeta(new Date(), allTags)
+    : nextVersion(new Date(), allTags);
   const previous = previousRelease(tags);
   const section = changelogSection({
     version,
@@ -134,13 +152,15 @@ function main() {
       { cwd: dir, stdio: "inherit" },
     );
   }
-  let changelog = "";
-  try {
-    changelog = fs.readFileSync("CHANGELOG.md", "utf8");
-  } catch (e) {
-    if (e.code !== "ENOENT") throw e;
+  if (!beta) {
+    let changelog = "";
+    try {
+      changelog = fs.readFileSync("CHANGELOG.md", "utf8");
+    } catch (e) {
+      if (e.code !== "ENOENT") throw e;
+    }
+    fs.writeFileSync("CHANGELOG.md", `${section}\n${changelog}`);
   }
-  fs.writeFileSync("CHANGELOG.md", `${section}\n${changelog}`);
 
   git(
     "add",
@@ -159,7 +179,7 @@ function main() {
 
   git push origin HEAD
   git push origin v${version}
-  gh release create v${version} --repo ${REPOSITORY} --generate-notes
+  gh release create v${version} --repo ${REPOSITORY} --generate-notes${beta ? " --prerelease" : ""}
 
 Publishing the GitHub release is what the admin update check looks at.`);
 }
