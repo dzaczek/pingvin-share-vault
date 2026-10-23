@@ -271,11 +271,13 @@ const Dropzone = ({
         ? { openRef: openRef as ForwardedRef<() => void> }
         : {
             activateOnClick: false,
-            onClick: () => folderInputRef.current?.click(),
-            // the dropzone's own key handler would open the file picker
-            onKeyDown: (event: React.KeyboardEvent) => {
+            // Mantine sets the dropzone's own click and key handlers after
+            // ours, so catch them first; its key handler opens the file picker
+            onClickCapture: () => folderInputRef.current?.click(),
+            onKeyDownCapture: (event: React.KeyboardEvent) => {
               if (event.key !== "Enter" && event.key !== " ") return;
               event.preventDefault();
+              event.stopPropagation();
               folderInputRef.current?.click();
             },
           })}
@@ -338,10 +340,11 @@ const Dropzone = ({
         ? { openRef: openRef as ForwardedRef<() => void> }
         : {
             activateOnClick: false,
-            onClick: () => folderInputRef.current?.click(),
-            onKeyDown: (event: React.KeyboardEvent) => {
+            onClickCapture: () => folderInputRef.current?.click(),
+            onKeyDownCapture: (event: React.KeyboardEvent) => {
               if (event.key !== "Enter" && event.key !== " ") return;
               event.preventDefault();
+              event.stopPropagation();
               folderInputRef.current?.click();
             },
           })}
