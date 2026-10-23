@@ -35,6 +35,7 @@ const service = (prisma: unknown, reverseShareService: unknown) => {
     unused,
     { log: jest.fn() } as any,
     i18n,
+    unused,
   );
 };
 

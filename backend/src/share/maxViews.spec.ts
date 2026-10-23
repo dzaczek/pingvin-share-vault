@@ -35,6 +35,7 @@ const service = (prisma: unknown, accessLog = { log: jest.fn() }) => {
     unused,
     accessLog as any,
     i18n,
+    unused,
   );
 };
 

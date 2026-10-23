@@ -15,6 +15,7 @@ import * as fs from "fs";
 import * as moment from "moment";
 import { resolve, sep } from "path";
 import { I18nService } from "nestjs-i18n";
+import { AuditLogService } from "src/auditLog/auditLog.service";
 import { ClamScanService } from "src/clamscan/clamscan.service";
 import { ConfigService } from "src/config/config.service";
 import { EmailService } from "src/email/email.service";
@@ -48,6 +49,7 @@ export class ShareService {
     private systemService: SystemService,
     private shareAccessLogService: ShareAccessLogService,
     private readonly i18n: I18nService,
+    private auditLog: AuditLogService,
   ) {}
 
   async create(
@@ -424,6 +426,16 @@ export class ShareService {
     const updatedShare = await this.prisma.share.update({
       where: { id },
       data: { uploadLocked: true },
+    });
+
+    this.auditLog.log("SHARE_CREATE", {
+      resourceId: id,
+      resourceName: share.name ?? id,
+      metadata: {
+        files: share.files.length,
+        size: share.files.reduce((n, f) => n + parseInt(f.size), 0),
+        reverseShareId: share.reverseShare?.id,
+      },
     });
 
     return {
