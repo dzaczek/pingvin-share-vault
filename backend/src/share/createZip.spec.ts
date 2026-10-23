@@ -43,6 +43,7 @@ const construct = (prisma: unknown, config: unknown) => {
     unused,
     unused,
     unused,
+    unused,
   );
 };
 

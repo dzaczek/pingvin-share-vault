@@ -24,6 +24,7 @@ const service = () => {
     unused,
     unused,
     { t: (key: string) => key } as any,
+    unused,
   ) as any;
 };
 
