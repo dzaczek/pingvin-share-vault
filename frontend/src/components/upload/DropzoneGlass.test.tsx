@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import { UiStyleContext } from "../../hooks/uiStyle.hook";
 import { renderWithProviders } from "../../test/renderWithProviders";
 import Dropzone from "./Dropzone";
@@ -21,12 +21,12 @@ const glass = {
   uploadPanel: false,
 } as const;
 
-const render = (withGlass = true) =>
+const render = (withGlass = true, uploadPanel = false) =>
   renderWithProviders(
     <UiStyleContext.Provider
       value={{
         name: withGlass ? "glass" : "standard",
-        glass: withGlass ? glass : null,
+        glass: withGlass ? { ...glass, uploadPanel } : null,
         preference: "default",
         setPreference: jest.fn(),
         glassPreferences: {},
@@ -77,4 +77,37 @@ describe("Dropzone in the glass style", () => {
       expect(screen.queryByText("Files")).not.toBeInTheDocument();
       expect(screen.getByText("Upload files")).toBeInTheDocument();
     }));
+});
+
+// Mantine puts the dropzone's own click and key handlers after ours, so the
+// folder tile has to catch them first or nothing opens.
+describe("the folder tile", () => {
+  const picked = () => {
+    const click = jest
+      .spyOn(HTMLInputElement.prototype, "click")
+      .mockImplementation(() => {});
+    return () => {
+      const inputs = click.mock.contexts as HTMLInputElement[];
+      click.mockRestore();
+      return inputs.map((input) => input.hasAttribute("webkitdirectory"));
+    };
+  };
+
+  it.each([
+    ["the glass cards", false, "Folder"],
+    ["the upload panel", true, "Add a folder"],
+  ])("opens the folder picker in %s", (_, uploadPanel, label) =>
+    withFolderPicker(() => {
+      render(true, uploadPanel);
+      const tile = screen.getByText(label).closest('[role="presentation"]')!;
+
+      let done = picked();
+      fireEvent.click(tile);
+      expect(done()).toEqual([true]);
+
+      done = picked();
+      fireEvent.keyDown(tile, { key: "Enter" });
+      expect(done()).toEqual([true]);
+    }),
+  );
 });
