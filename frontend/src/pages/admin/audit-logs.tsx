@@ -30,6 +30,7 @@ const ACTIONS = [
   "FILE_UPLOAD",
   "FILE_DOWNLOAD",
   "FILE_PREVIEW",
+  "SHARE_CREATE",
   "SHARE_VIEW",
 ];
 

@@ -299,6 +299,7 @@ export default {
   "admin.button.shares": "Share management",
   "admin.button.config": "Configuration",
   "admin.button.auditLogs": "Audit log",
+  "admin.button.stats": "Statistics",
   "admin.version": "Version",
   // END /admin
 
@@ -482,6 +483,60 @@ export default {
   "admin.userOverview.sessions.revoke.done":
     "{count, plural, one {# session ended} other {# sessions ended}}",
   // END /admin/users/[id]
+
+  // /admin/stats
+  "admin.stats.title": "Statistics",
+  "admin.stats.period": "{days} days",
+  "admin.stats.history":
+    "The history comes from the audit log, which {retention}. Its oldest entry is from {oldest}. Days are in UTC.",
+  "admin.stats.history.retention": "keeps entries for {days} days",
+  "admin.stats.history.forever": "keeps entries forever",
+  "admin.stats.history.disabled":
+    "The audit log is turned off, so there is no history. Only what is stored right now is shown.",
+  "admin.stats.now": "Right now",
+  "admin.stats.in-period": "Last {days} days",
+  "admin.stats.users": "Users",
+  "admin.stats.users.hint": "{admins} admins, {new} new",
+  "admin.stats.shares": "Active shares",
+  "admin.stats.shares.hint": "{new} new in this period",
+  "admin.stats.files": "Files",
+  "admin.stats.storage": "Storage used",
+  "admin.stats.uploads": "Uploads",
+  "admin.stats.downloads": "Downloads",
+  "admin.stats.views": "Share views",
+  "admin.stats.logins": "Logins",
+  "admin.stats.logins.hint": "{failed} failed",
+  "admin.stats.chart.activity": "Activity per day",
+  "admin.stats.chart.volume": "Uploaded per day",
+  "admin.stats.chart.logins": "Logins and sign ups per day",
+  "admin.stats.chart.storage": "Storage by user",
+  "admin.stats.series.uploads": "Uploads",
+  "admin.stats.series.downloads": "Downloads",
+  "admin.stats.series.views": "Views",
+  "admin.stats.series.shares": "New shares",
+  "admin.stats.series.uploadBytes": "Uploaded",
+  "admin.stats.series.logins": "Logins",
+  "admin.stats.series.failedLogins": "Failed logins",
+  "admin.stats.series.users": "New users",
+  "admin.stats.series.storage": "Storage",
+  "admin.stats.top": "Top users",
+  "admin.stats.top.storage": "Storage",
+  "admin.stats.top.storage.hint": "What their active shares hold right now.",
+  "admin.stats.top.shares": "Shares",
+  "admin.stats.top.shares.hint": "Active shares right now.",
+  "admin.stats.top.files": "Files",
+  "admin.stats.top.files.hint": "Files in their active shares right now.",
+  "admin.stats.top.uploads": "Uploaded",
+  "admin.stats.top.uploads.hint": "What they uploaded in this period.",
+  "admin.stats.top.downloads": "Downloads",
+  "admin.stats.top.downloads.hint":
+    "How often their files were downloaded in this period. Shares that are already deleted do not count.",
+  "admin.stats.top.files-count": "{count, plural, one {# file} other {# files}}",
+  "admin.stats.shards": "Shards",
+  "admin.stats.shards.shard": "Shard",
+  "admin.stats.shards.bytes": "Uploaded",
+  "admin.stats.shards.last-seen": "Last activity",
+  "admin.stats.empty": "Nothing yet",
 
   // /admin/auditLogs
   "admin.auditLogs.title": "Audit log",

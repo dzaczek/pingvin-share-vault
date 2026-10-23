@@ -70,7 +70,9 @@ const actionColor = (action: string) => {
 
 // share views and zips log the share itself as their resource
 const resourceKind = (entry: AuditLogEntry): IdentityKind =>
-  entry.action === "SHARE_VIEW" || entry.metadata?.zip
+  entry.action === "SHARE_VIEW" ||
+  entry.action === "SHARE_CREATE" ||
+  entry.metadata?.zip
     ? "shareId"
     : "resourceId";
 

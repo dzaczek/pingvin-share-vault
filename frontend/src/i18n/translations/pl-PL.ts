@@ -272,6 +272,7 @@ export default {
   "admin.button.shares": "Zarządzanie udostępnieniami",
   "admin.button.config": "Konfiguracja",
   "admin.button.auditLogs": "Dziennik zdarzeń",
+  "admin.button.stats": "Statystyki",
   "admin.version": "Wersja",
   // END /admin
 
@@ -449,6 +450,61 @@ export default {
   "admin.userOverview.sessions.revoke.done":
     "{count, plural, one {Zakończono # sesję} few {Zakończono # sesje} other {Zakończono # sesji}}",
   // END /admin/users/[id]
+
+  // /admin/stats
+  "admin.stats.title": "Statystyki",
+  "admin.stats.period": "{days} dni",
+  "admin.stats.history":
+    "Historia pochodzi z dziennika zdarzeń, który {retention}. Najstarszy wpis jest z {oldest}. Dni liczone są w UTC.",
+  "admin.stats.history.retention": "przechowuje wpisy przez {days} dni",
+  "admin.stats.history.forever": "przechowuje wpisy bez limitu",
+  "admin.stats.history.disabled":
+    "Dziennik zdarzeń jest wyłączony, więc nie ma historii. Widać tylko to, co jest zapisane teraz.",
+  "admin.stats.now": "Teraz",
+  "admin.stats.in-period": "Ostatnie {days} dni",
+  "admin.stats.users": "Użytkownicy",
+  "admin.stats.users.hint": "administratorzy: {admins}, nowi: {new}",
+  "admin.stats.shares": "Aktywne udostępnienia",
+  "admin.stats.shares.hint": "nowe w tym okresie: {new}",
+  "admin.stats.files": "Pliki",
+  "admin.stats.storage": "Zajęte miejsce",
+  "admin.stats.uploads": "Wgrane pliki",
+  "admin.stats.downloads": "Pobrania",
+  "admin.stats.views": "Wyświetlenia",
+  "admin.stats.logins": "Logowania",
+  "admin.stats.logins.hint": "nieudane: {failed}",
+  "admin.stats.chart.activity": "Aktywność dziennie",
+  "admin.stats.chart.volume": "Wgrane dane dziennie",
+  "admin.stats.chart.logins": "Logowania i rejestracje dziennie",
+  "admin.stats.chart.storage": "Miejsce według użytkownika",
+  "admin.stats.series.uploads": "Wgrane",
+  "admin.stats.series.downloads": "Pobrania",
+  "admin.stats.series.views": "Wyświetlenia",
+  "admin.stats.series.shares": "Nowe udostępnienia",
+  "admin.stats.series.uploadBytes": "Wgrane",
+  "admin.stats.series.logins": "Logowania",
+  "admin.stats.series.failedLogins": "Nieudane logowania",
+  "admin.stats.series.users": "Nowi użytkownicy",
+  "admin.stats.series.storage": "Miejsce",
+  "admin.stats.top": "Najaktywniejsi użytkownicy",
+  "admin.stats.top.storage": "Miejsce",
+  "admin.stats.top.storage.hint": "Ile teraz zajmują ich aktywne udostępnienia.",
+  "admin.stats.top.shares": "Udostępnienia",
+  "admin.stats.top.shares.hint": "Aktywne udostępnienia w tej chwili.",
+  "admin.stats.top.files": "Pliki",
+  "admin.stats.top.files.hint": "Pliki w ich aktywnych udostępnieniach.",
+  "admin.stats.top.uploads": "Wgrane",
+  "admin.stats.top.uploads.hint": "Ile wgrali w tym okresie.",
+  "admin.stats.top.downloads": "Pobrania",
+  "admin.stats.top.downloads.hint":
+    "Ile razy pobrano ich pliki w tym okresie. Usunięte udostępnienia się nie liczą.",
+  "admin.stats.top.files-count":
+    "{count, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}",
+  "admin.stats.shards": "Shardy",
+  "admin.stats.shards.shard": "Shard",
+  "admin.stats.shards.bytes": "Wgrane dane",
+  "admin.stats.shards.last-seen": "Ostatnia aktywność",
+  "admin.stats.empty": "Na razie brak danych",
 
   // /admin/auditLogs
   "admin.auditLogs.title": "Dziennik zdarzeń",
