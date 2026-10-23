@@ -16,6 +16,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { EmailService } from "src/email/email.service";
 import { I18nService } from "nestjs-i18n";
 import { AuditLogService } from "src/auditLog/auditLog.service";
+import { safeFileName } from "src/utils/fileName.util";
 
 const UPDATED_AT_THROTTLE_MS = 5 * 60 * 1000;
 const DOWNLOAD_NOTIFICATION_COOLDOWN_MS = 15 * 60 * 1000;
@@ -49,6 +50,12 @@ export class FileService {
       : this.localFileService;
   }
 
+  private cleanName(name: string) {
+    const clean = safeFileName(name);
+    if (!clean) throw new BadRequestException(this.i18n.t("file.invalidName"));
+    return clean;
+  }
+
   async create(
     data: string,
     chunk: { index: number; total: number },
@@ -60,7 +67,12 @@ export class FileService {
   ) {
     await this.touchShare(shareId);
     const storageService = this.getStorageService();
-    const created = await storageService.create(data, chunk, file, shareId);
+    const created = await storageService.create(
+      data,
+      chunk,
+      { ...file, name: this.cleanName(file.name) },
+      shareId,
+    );
     if (chunk.index == chunk.total - 1)
       void this.auditUpload(shareId, created.id);
     return created;
@@ -123,7 +135,7 @@ export class FileService {
     }
     const res = await this.s3FileService.createPreSignedUploadUrls(
       shareId,
-      fileName,
+      this.cleanName(fileName),
       totalChunks,
     );
     return { directToS3: true, ...res };
@@ -147,7 +159,7 @@ export class FileService {
     const completed = await this.s3FileService.completePreSignedUpload(
       shareId,
       fileId,
-      fileName,
+      this.cleanName(fileName),
       uploadId,
       parts,
     );
@@ -167,7 +179,11 @@ export class FileService {
     if (share?.storageProvider !== "S3") {
       throw new BadRequestException(this.i18n.t("file.s3NotSupported"));
     }
-    return this.s3FileService.abortPreSignedUpload(shareId, fileName, uploadId);
+    return this.s3FileService.abortPreSignedUpload(
+      shareId,
+      this.cleanName(fileName),
+      uploadId,
+    );
   }
 
   async getPreSignedDownloadUrl(

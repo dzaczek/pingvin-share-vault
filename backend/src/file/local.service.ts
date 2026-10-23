@@ -26,6 +26,7 @@ import { Readable } from "stream";
 import * as rangeParser from "range-parser";
 import { File } from "./file.service";
 import { streamedZipLevel } from "./zipLevel";
+import { safeFileName } from "src/utils/fileName.util";
 
 @Injectable()
 export class LocalFileService {
@@ -277,7 +278,10 @@ export class LocalFileService {
       archive.on("warning", () =>
         archive.destroy(new Error("A file of the share could not be read")),
       );
-      files.forEach((file, i) => archive.file(paths[i], { name: file.name }));
+      // names stored before they were cleaned on upload
+      files.forEach((file, i) =>
+        archive.file(paths[i], { name: safeFileName(file.name) || file.id }),
+      );
       archive.finalize().catch(() => undefined);
       return archive;
     }
