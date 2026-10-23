@@ -1,3 +1,18 @@
+## [2026.10.10](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.9...v2026.10.10) (2026-10-23)
+
+### Features
+
+* **admin:** add a statistics page ([cbfe3e1](https://github.com/dzaczek/pingvin-share-vault/commit/cbfe3e1e6cdd19c0fe8968970e6f77eaceffd89d))
+* **stats:** add an admin stats endpoint ([e359d32](https://github.com/dzaczek/pingvin-share-vault/commit/e359d325d7fa9b32f05d3bf6207866874c5a1d8a))
+* **release:** add a beta mode ([3214be6](https://github.com/dzaczek/pingvin-share-vault/commit/3214be612c1d67f63fc5daad47aab3ab2ebd90e7))
+
+### Bug Fixes
+
+* **i18n:** use a plural for the admin count in Polish too ([f643191](https://github.com/dzaczek/pingvin-share-vault/commit/f64319137e5a0ae73dbf0b0832c5262d870eca63))
+* **admin:** keep two stat columns on phones and values on one line ([4664f78](https://github.com/dzaczek/pingvin-share-vault/commit/4664f786a2c5959b628c54453ae00935e3f57ea6))
+* **upload:** open the folder picker from the folder tile ([0b4e219](https://github.com/dzaczek/pingvin-share-vault/commit/0b4e2193ead06507850ae382480a1346437dbf0b))
+* **file:** keep file names inside the share ([c5d125c](https://github.com/dzaczek/pingvin-share-vault/commit/c5d125c05c447a9fb3c04ab78d13a4aa0566d739))
+
 ## [2026.10.9](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.8...v2026.10.9) (2026-10-22)
 
 ### Bug Fixes
