@@ -463,7 +463,7 @@ export default {
   "admin.stats.now": "Teraz",
   "admin.stats.in-period": "Ostatnie {days} dni",
   "admin.stats.users": "Użytkownicy",
-  "admin.stats.users.hint": "administratorzy: {admins}, nowi: {new}",
+  "admin.stats.users.hint": "{admins, plural, one {# administrator} few {# administratorów} many {# administratorów} other {# administratora}}, nowi: {new}",
   "admin.stats.shares": "Aktywne udostępnienia",
   "admin.stats.shares.hint": "nowe w tym okresie: {new}",
   "admin.stats.files": "Pliki",
