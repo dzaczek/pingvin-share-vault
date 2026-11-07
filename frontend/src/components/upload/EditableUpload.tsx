@@ -14,6 +14,11 @@ import shareService from "../../services/share.service";
 import { FileListItem, FileMetaData, FileUpload } from "../../types/File.type";
 import toast from "../../utils/toast.util";
 import {
+  CHUNK_RETRY_DELAY_MS,
+  isRetryableUploadError,
+  MAX_CHUNK_UPLOAD_RETRIES,
+} from "../../utils/upload.util";
+import {
   getNormalizedFileName,
   filterDuplicateFiles,
 } from "../../utils/file.util";
@@ -102,6 +107,7 @@ const EditableUpload = ({
         // If the file is 0 bytes, we still need to upload 1 chunk
         if (chunks == 0) chunks++;
 
+        let retries = 0;
         for (let chunkIndex = 0; chunkIndex < chunks; chunkIndex++) {
           const from = chunkIndex * chunkSize.current;
           const to = from + chunkSize.current;
@@ -123,6 +129,7 @@ const EditableUpload = ({
               });
 
             setFileProgress(((chunkIndex + 1) / chunks) * 100);
+            retries = 0;
           } catch (e) {
             if (
               e instanceof AxiosError &&
@@ -131,13 +138,22 @@ const EditableUpload = ({
               // Retry with the expected chunk index
               chunkIndex = e.response!.data!.expectedChunkIndex - 1;
               continue;
-            } else {
-              setFileProgress(-1);
-              // Retry after 5 seconds
-              await new Promise((resolve) => setTimeout(resolve, 5000));
-              chunkIndex = -1;
-
+            } else if (
+              isRetryableUploadError(e) &&
+              retries < MAX_CHUNK_UPLOAD_RETRIES
+            ) {
+              // Transient failure: send the same chunk again after a pause
+              retries++;
+              await new Promise((resolve) =>
+                setTimeout(resolve, CHUNK_RETRY_DELAY_MS),
+              );
+              chunkIndex--;
               continue;
+            } else {
+              // Permanent failure (quota, locked share, rejected file) or
+              // retries used up: stop this file instead of looping forever
+              setFileProgress(-1);
+              break;
             }
           }
         }

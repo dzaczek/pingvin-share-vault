@@ -9,7 +9,11 @@ const construct = (local: unknown, s3: unknown, provider = "LOCAL") => {
   const unused = {} as any;
   const prisma = {
     share: {
-      findUnique: async () => null,
+      findUnique: async () => ({
+        uploadLocked: false,
+        files: [],
+        updatedAt: new Date(),
+      }),
       findFirst: async () => ({ storageProvider: provider }),
     },
   };

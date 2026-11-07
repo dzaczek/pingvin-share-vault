@@ -21,6 +21,8 @@ import { safeFileName } from "src/utils/fileName.util";
 const UPDATED_AT_THROTTLE_MS = 5 * 60 * 1000;
 const DOWNLOAD_NOTIFICATION_COOLDOWN_MS = 15 * 60 * 1000;
 const FILE_HASH_CACHE_MS = 24 * 60 * 60 * 1000;
+// the S3 multipart limit
+const MAX_PRESIGNED_PARTS = 10_000;
 
 @Injectable()
 export class FileService {
@@ -133,9 +135,21 @@ export class FileService {
     if (share?.storageProvider !== "S3") {
       return { directToS3: false };
     }
+    // S3 allows at most 10000 parts. The value comes straight from the body,
+    // and each part costs a signature, so an unchecked number ties up the
+    // server for as long as it takes to sign them.
+    if (
+      !Number.isInteger(totalChunks) ||
+      totalChunks < 1 ||
+      totalChunks > MAX_PRESIGNED_PARTS
+    ) {
+      throw new BadRequestException(this.i18n.t("file.s3UploadFailed"));
+    }
+    const name = this.cleanName(fileName);
+    await this.assertPresignedUploadAllowed(shareId, name);
     const res = await this.s3FileService.createPreSignedUploadUrls(
       shareId,
-      this.cleanName(fileName),
+      name,
       totalChunks,
     );
     return { directToS3: true, ...res };
@@ -156,15 +170,32 @@ export class FileService {
     if (share?.storageProvider !== "S3") {
       throw new BadRequestException(this.i18n.t("file.s3NotSupported"));
     }
+    const name = this.cleanName(fileName);
+    await this.assertPresignedUploadAllowed(shareId, name);
     const completed = await this.s3FileService.completePreSignedUpload(
       shareId,
       fileId,
-      this.cleanName(fileName),
+      name,
       uploadId,
       parts,
     );
     void this.auditUpload(shareId, completed.id);
     return completed;
+  }
+
+  // The chunked S3 path refuses a completed share and a name already in use
+  // (the object key is the name). The presigned path has to as well, or a
+  // creator could add or replace objects in a share that was already scanned.
+  private async assertPresignedUploadAllowed(shareId: string, name: string) {
+    const share = await this.prisma.share.findUnique({
+      where: { id: shareId },
+      select: { uploadLocked: true, files: { select: { name: true } } },
+    });
+    if (!share) throw new NotFoundException(this.i18n.t("share.notFound"));
+    if (share.uploadLocked)
+      throw new BadRequestException(this.i18n.t("file.alreadyCompleted"));
+    if (share.files.some((f) => f.name === name))
+      throw new BadRequestException(this.i18n.t("file.nameInUse"));
   }
 
   async abortPreSignedUpload(
