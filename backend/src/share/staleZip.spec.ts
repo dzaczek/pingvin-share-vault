@@ -54,7 +54,7 @@ describe("reopening a completed share", () => {
           uploadLocked: true,
           reverseShare: null,
         })),
-        update: jest.fn(async () => ({})),
+        updateMany: jest.fn(async () => ({ count: 1 })),
       },
     };
 
@@ -63,8 +63,8 @@ describe("reopening a completed share", () => {
     expect(fs.existsSync(zip)).toBe(false);
     expect(fs.existsSync(`${zip}.part`)).toBe(false);
     expect(fs.existsSync(path.join(root, SHARE_ID, "file-1"))).toBe(true);
-    expect(prisma.share.update).toHaveBeenCalledWith({
-      where: { id: SHARE_ID },
+    expect(prisma.share.updateMany).toHaveBeenCalledWith({
+      where: { id: SHARE_ID, uploadLocked: true },
       data: { uploadLocked: false, isZipReady: false },
     });
   });
