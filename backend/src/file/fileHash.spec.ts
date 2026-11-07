@@ -42,8 +42,10 @@ const memoryCache = () => {
   };
 };
 
+let fileRow = { size: "7", createdAt: new Date(1) };
 const prismaReturningLocalShare = {
   share: { findFirst: async () => ({ storageProvider: "LOCAL" }) },
+  file: { findFirst: async () => fileRow },
 };
 
 describe("computeSha256", () => {
@@ -109,6 +111,26 @@ describe("computeSha256", () => {
     const second = await service.computeSha256("share", "two");
 
     expect(first).not.toBe(second);
+  });
+
+  // ids come from the client and a share id can be used again, so the same
+  // pair of ids can stand for other bytes later
+  it("does not answer for an earlier file under the same ids", async () => {
+    let reads = 0;
+    const local = {
+      get: async () => {
+        reads++;
+        return { file: Readable.from([Buffer.from(`content ${reads}`)]) };
+      },
+    };
+    const service = construct(prismaReturningLocalShare, local, memoryCache());
+
+    const before = await service.computeSha256("share", "file");
+    fileRow = { size: "9", createdAt: new Date(2) };
+    const after = await service.computeSha256("share", "file");
+
+    expect(reads).toBe(2);
+    expect(after).not.toBe(before);
   });
 
   it("says the file is not there rather than hashing nothing", async () => {

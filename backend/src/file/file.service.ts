@@ -259,7 +259,15 @@ export class FileService {
   // the disk entirely. On S3 it also pulls the object back through the
   // server, which costs egress, so the cache matters more there.
   async computeSha256(shareId: string, fileId: string): Promise<string> {
-    const cacheKey = `file-sha256:${shareId}:${fileId}`;
+    // Both ids come from the client and a share id can be taken again after
+    // the share is gone, so the key also names the File row it was computed
+    // for. Other bytes under the same ids get a fresh hash.
+    const row = await this.prisma.file.findFirst({
+      where: { id: fileId, shareId },
+      select: { size: true, createdAt: true },
+    });
+    if (!row) throw new NotFoundException(this.i18n.t("file.notFound"));
+    const cacheKey = `file-sha256:${shareId}:${fileId}:${row.size}:${row.createdAt.getTime()}`;
     const cached = await this.cache.get<string>(cacheKey);
     if (cached) return cached;
 
