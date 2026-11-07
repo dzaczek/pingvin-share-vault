@@ -280,16 +280,25 @@ export class JobsService {
       where: {
         isActivated: false,
         createdAt: { lt: cutoff },
+        // a resent activation mail is good for another day, the account
+        // stays until that link has run out too
+        OR: [
+          { activationTokenExpiresAt: { lt: new Date() } },
+          { activationTokenExpiresAt: null },
+        ],
       },
       include: { shares: true },
     });
 
     const isAbandoned = (user: (typeof unactivatedUsers)[number]) => {
       const createdAt = user.createdAt?.getTime();
+      const linkExpiresAt = user.activationTokenExpiresAt?.getTime();
       return (
         user.isActivated === false &&
         Number.isFinite(createdAt) &&
-        createdAt < cutoff.getTime()
+        createdAt < cutoff.getTime() &&
+        (user.activationTokenExpiresAt == null ||
+          (Number.isFinite(linkExpiresAt) && linkExpiresAt < Date.now()))
       );
     };
 
