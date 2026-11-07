@@ -100,10 +100,11 @@ const Body = ({
       sendEmailNotification: false,
       expiration_num: defaultTimespan.value,
       expiration_unit: `-${defaultTimespan.unit}` as string,
-      simplified: !reverseShareSimpleOnly
-        ? false
-        : !!(getCookie("reverse-share.simplified") ?? false),
-      publicAccess: !!(getCookie("reverse-share.public-access") ?? true),
+      // the cookies hold the text "true" or "false"
+      simplified: reverseShareSimpleOnly
+        ? true
+        : getCookie("reverse-share.simplified") === "true",
+      publicAccess: getCookie("reverse-share.public-access") !== "false",
     },
     validate: yupResolver(
       yup.object().shape({
