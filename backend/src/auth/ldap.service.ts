@@ -43,6 +43,14 @@ export class LdapService {
     username: string,
     password: string,
   ): Promise<Entry | null> {
+    // A simple bind with a DN and an empty password is an unauthenticated
+    // bind (RFC 4513 5.1.2), which many directories answer with success.
+    // It proves nothing about the user, so it never counts as a login.
+    if (typeof password !== "string" || password.length === 0) {
+      this.logger.verbose("Empty password. Authentication failed.");
+      return null;
+    }
+
     if (!username.match(/^[a-zA-Z0-9-_.@]+$/)) {
       this.logger.verbose(
         `Username ${username} does not match username pattern. Authentication failed.`,

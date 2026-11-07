@@ -188,8 +188,23 @@ export class UserSevice {
       }
     }
 
+    // A blocked share is kept for an admin to look into, and its owner must not
+    // be able to destroy it. Deleting the account would otherwise remove its
+    // files and, through the cascades on Share.creator and Share.reverseShare,
+    // the share rows and their access logs. Blocked shares are detached first
+    // so they survive the account.
+    await this.prisma.share.updateMany({
+      where: {
+        blockedAt: { not: null },
+        OR: [{ creatorId: id }, { reverseShare: { creatorId: id } }],
+      },
+      data: { creatorId: null, reverseShareId: null },
+    });
+
     await Promise.all(
-      user.shares.map((share) => this.fileService.deleteAllFiles(share.id)),
+      user.shares
+        .filter((share) => !share.blockedAt)
+        .map((share) => this.fileService.deleteAllFiles(share.id)),
     );
 
     return await this.prisma.user.delete({ where: { id } });

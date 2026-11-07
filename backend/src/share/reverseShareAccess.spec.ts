@@ -244,3 +244,60 @@ describe("ShareOwnerGuard and reverse shares", () => {
     await expect(run(StrictShareOwnerGuard, undefined)).resolves.toBe(false);
   });
 });
+
+// A user barred from sharing (allowShare false) or capped by maxShares could
+// create a reverse share and upload into it with their own token. The limits
+// were skipped whenever a reverse share was attached, yet the user still
+// became the owner of an ordinary share.
+describe("uploading into one's own reverse share", () => {
+  beforeAll(() => {
+    root = fs.mkdtempSync(path.join(os.tmpdir(), "own-reverse-share-spec-"));
+  });
+
+  afterAll(() => fs.rmSync(root, { recursive: true, force: true }));
+
+  const reverseShares = (creatorId: string) => ({
+    isValid: jest.fn(async () => true),
+    getByToken: jest.fn(async () => ({
+      id: "rs1",
+      token: "t",
+      creator: { id: creatorId },
+      shareExpiration: new Date(0),
+    })),
+  });
+
+  const prisma = () => ({
+    share: {
+      findUnique: jest.fn(async () => null),
+      create: jest.fn(async ({ data }) => ({ id: "s1", ...data })),
+    },
+    reverseShare: { update: jest.fn(async () => ({})) },
+  });
+
+  it("still applies allowShare when the reverse share is the uploader's own", async () => {
+    const barred = { id: "u1", isAdmin: false, allowShare: false };
+
+    await expect(
+      service(prisma(), reverseShares("u1")).create(
+        { id: "s1", expiration: "never" } as any,
+        barred as any,
+        "t",
+      ),
+    ).rejects.toMatchObject({
+      response: { message: "share.notAllowedToShare" },
+    });
+  });
+
+  it("lets a barred user upload into someone else's reverse share", async () => {
+    const barred = { id: "u1", isAdmin: false, allowShare: false };
+    const db = prisma();
+
+    await service(db, reverseShares("someone-else")).create(
+      { id: "s1", expiration: "never" } as any,
+      barred as any,
+      "t",
+    );
+
+    expect(db.share.create).toHaveBeenCalled();
+  });
+});
