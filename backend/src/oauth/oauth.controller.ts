@@ -48,15 +48,15 @@ export class OAuthController {
     const host = request.get("host")?.toLowerCase();
     if (!host) return appUrl;
 
+    // the primary host keeps the app URL as it is, its scheme included
+    if (host === new URL(appUrl).host.toLowerCase()) return appUrl;
+
     const allowedHosts: string = this.config.get("oauth.allowedHosts") || "";
-    const allowed = [
-      new URL(appUrl).host.toLowerCase(),
-      ...allowedHosts
-        .toLowerCase()
-        .split(",")
-        .map((h) => h.trim())
-        .filter(Boolean),
-    ];
+    const allowed = allowedHosts
+      .toLowerCase()
+      .split(",")
+      .map((h) => h.trim())
+      .filter(Boolean);
 
     return allowed.includes(host) ? `${request.protocol}://${host}` : appUrl;
   }

@@ -61,6 +61,14 @@ describe("OAuthController redirect URI", () => {
     );
   });
 
+  // behind a proxy that terminates TLS without TRUST_PROXY the request looks
+  // like plain http, the app URL knows better
+  it("keeps the app URL's scheme on the primary host", async () => {
+    expect(await redirectUriFor("share.example.com", "", "http")).toBe(
+      "https://share.example.com/api/oauth/callback/oidc",
+    );
+  });
+
   it("keeps an allowed alternative host", async () => {
     expect(
       await redirectUriFor(
