@@ -84,3 +84,55 @@ describe("the last chunk of a local upload", () => {
     );
   });
 });
+
+// The size checks counted the stored files and the current file's own
+// partial upload. Several files uploading at once each saw room for itself
+// and together went past the share limit.
+describe("several local uploads at once", () => {
+  beforeEach(() => {
+    root = fs.mkdtempSync(path.join(os.tmpdir(), "parallel-upload-"));
+    fs.mkdirSync(path.join(root, SHARE));
+  });
+
+  afterEach(() => fs.rmSync(root, { recursive: true, force: true }));
+
+  it("count each other's partial files against the share limit", async () => {
+    // another file is halfway through
+    fs.writeFileSync(
+      path.join(root, SHARE, "11111111-2222-4333-8444-555555555555.tmp-chunk"),
+      Buffer.alloc(900),
+    );
+    const prisma = {
+      share: {
+        findUnique: jest.fn(async () => ({
+          id: SHARE,
+          uploadLocked: false,
+          files: [],
+          creator: null,
+          reverseShare: null,
+        })),
+      },
+      file: { create: jest.fn(async () => ({})) },
+    };
+    const config = {
+      get: (key: string) =>
+        ({ "share.maxSize": 1_000, "share.chunkSize": 10_000 })[key] ?? "",
+    };
+    const service = new LocalFileService(
+      prisma as any,
+      config as any,
+      {
+        t: (key: string) => key,
+      } as any,
+    );
+
+    await expect(
+      service.create(
+        Buffer.alloc(200).toString("base64"),
+        { index: 0, total: 1 },
+        { id: FILE_ID, name: "b.bin" },
+        SHARE,
+      ),
+    ).rejects.toMatchObject({ status: 413 });
+  });
+});

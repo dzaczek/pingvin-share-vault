@@ -97,7 +97,11 @@ export class LocalFileService {
       0,
     );
 
-    const shareSizeSum = fileSizeSum + diskFileSize + buffer.byteLength;
+    // partial uploads of the share's other files count too, otherwise files
+    // uploading at the same time each see room for themselves
+    const otherPartials = await this.otherPartialUploadsSize(shareId, file.id);
+    const shareSizeSum =
+      fileSizeSum + otherPartials + diskFileSize + buffer.byteLength;
 
     const limit = getShareSizeLimit(share, this.config.get("share.maxSize"));
     if (shareSizeSum > limit) {
@@ -121,7 +125,7 @@ export class LocalFileService {
         quotaOwnerId,
       );
       const projectedUsage =
-        activeStorageUsage + diskFileSize + buffer.byteLength;
+        activeStorageUsage + otherPartials + diskFileSize + buffer.byteLength;
 
       if (projectedUsage > quotaLimit) {
         const exceededBytes = projectedUsage - quotaLimit;
@@ -249,6 +253,24 @@ export class LocalFileService {
     await fs.unlink(filePath);
 
     await this.prisma.file.delete({ where: { id: fileId } });
+  }
+
+  private async otherPartialUploadsSize(shareId: string, fileId: string) {
+    const shareRoot = resolve(SHARE_DIRECTORY);
+    const dir = resolve(shareRoot, shareId);
+    if (!dir.startsWith(shareRoot + sep)) return 0;
+    const names = await fs.readdir(dir).catch(() => [] as string[]);
+    const sizes = await Promise.all(
+      names
+        .filter((n) => n.endsWith(".tmp-chunk") && n !== `${fileId}.tmp-chunk`)
+        .map((n) =>
+          fs
+            .stat(this.getSafeFilePath(shareId, n))
+            .then((s) => s.size)
+            .catch(() => 0),
+        ),
+    );
+    return sizes.reduce((a, b) => a + b, 0);
   }
 
   private getSafeFilePath(shareId: string, fileId: string): string {

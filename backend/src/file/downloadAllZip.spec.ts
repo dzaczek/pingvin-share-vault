@@ -181,3 +181,61 @@ describe("the zip route", () => {
     },
   );
 });
+
+// A zip that was given up on kept being built: nothing tied it to the
+// response, so a client that disconnected left the archive, and on S3 one
+// bucket download per file, running to the end.
+describe("a zip download the client gives up on", () => {
+  it("is destroyed when the response closes early", async () => {
+    const { EventEmitter } = await import("events");
+    const { FileController } = await import("./file.controller");
+    const zip = new Readable({ read() {} });
+    const res = Object.assign(new EventEmitter(), {
+      set: jest.fn(),
+      writableFinished: false,
+    });
+    const controller = new FileController(
+      {
+        getZip: async () => zip,
+        notifyRecipientDownload: async () => undefined,
+      } as any,
+      { log: jest.fn() } as any,
+    );
+
+    await controller.getZip(res as any, SHARE_ID);
+    res.emit("close");
+
+    expect(zip.destroyed).toBe(true);
+  });
+
+  it("stops fetching from the bucket once the zip is gone", async () => {
+    const { S3FileService } = await import("./s3.service");
+    const bodies: Readable[] = [];
+    const send = jest.fn(async () => {
+      const body = new Readable({ read() {} });
+      bodies.push(body);
+      return { Body: body };
+    });
+    const s3 = new S3FileService(
+      {
+        file: {
+          findMany: async () => [
+            { id: "1", name: "a.bin" },
+            { id: "2", name: "b.bin" },
+          ],
+        },
+      } as any,
+      { get: () => "" } as any,
+      { t: (key: string) => key } as any,
+    );
+    jest.spyOn(s3, "getS3Instance").mockReturnValue({ send } as never);
+
+    const archive = await s3.getZip(SHARE_ID);
+    await new Promise((r) => setImmediate(r));
+    archive.destroy();
+    await new Promise((r) => setImmediate(r));
+
+    expect(send).toHaveBeenCalledTimes(1);
+    expect(bodies[0].destroyed).toBe(true);
+  });
+});
