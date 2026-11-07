@@ -2,7 +2,9 @@ import { randomBytes } from "crypto";
 import {
   Jar,
   RUN_ID,
+  TEST_PASSWORD,
   api,
+  confirmEmail,
   createShareWithFile,
   deleteAccount,
   removeShare,
@@ -26,7 +28,11 @@ const SMTP_PORT = process.env.INTEGRATION_SMTP_PORT ?? "1025";
 // The update endpoint wants real booleans and numbers, not strings.
 async function withConfig(adminJar: Jar, values: Record<string, string>) {
   const typed = (type: string, value: string) =>
-    type === "boolean" ? value === "true" : type === "number" ? Number(value) : value;
+    type === "boolean"
+      ? value === "true"
+      : type === "number"
+        ? Number(value)
+        : value;
 
   const next: { key: string; value: unknown }[] = [];
   const previous: { key: string; value: unknown }[] = [];
@@ -129,9 +135,8 @@ describeAdmin("with an administrator", () => {
     let restore: () => Promise<void>;
 
     beforeAll(async () => {
-      // Recipients are only matched by a confirmed address. Accounts made
-      // before verification was switched on count as confirmed, which is the
-      // only way to get one here without following a mail link.
+      // Recipients are only matched by an address someone confirmed, so the
+      // recipient follows the verification mail once verification is on.
       owner = await signUp("sender");
       recipient = await signUp("receiver");
       stranger = await signUp("stranger");
@@ -144,6 +149,7 @@ describeAdmin("with an administrator", () => {
         "smtp.port": SMTP_PORT,
         "smtp.email": "noreply@integration.invalid",
       });
+      await confirmEmail(recipient.email);
       await createShareWithFile(owner.jar, shareId, randomBytes(512), {
         recipients: [recipient.email],
         security: { password: "share password" },
@@ -174,7 +180,8 @@ describeAdmin("with an administrator", () => {
       const renamed = await api("/users/me", {
         method: "PATCH",
         jar: stranger.jar,
-        body: { email: unclaimed },
+        // changing the address takes the current password
+        body: { email: unclaimed, currentPassword: TEST_PASSWORD },
       });
       expect(renamed.status).toBe(200);
 
@@ -265,10 +272,16 @@ describeAdmin("with an administrator", () => {
         },
       });
       if (reverse.status !== 201) {
-        throw new Error(`reverse share failed: ${reverse.status} ${reverse.body}`);
+        throw new Error(
+          `reverse share failed: ${reverse.status} ${reverse.body}`,
+        );
       }
       const uploader: Jar = { reverse_share_token: reverse.data.token };
-      ({ fileId } = await createShareWithFile(uploader, shareId, randomBytes(512)));
+      ({ fileId } = await createShareWithFile(
+        uploader,
+        shareId,
+        randomBytes(512),
+      ));
     });
 
     afterAll(async () => {
