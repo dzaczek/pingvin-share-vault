@@ -10,6 +10,7 @@ export default {
   "navbar.avatar.account": "Minha conta",
   "navbar.avatar.admin": "Administração",
   "navbar.avatar.signout": "Terminar sessão",
+  "footer.poweredBy": "Desenvolvido com",
   // END navbar
 
   // /
@@ -536,6 +537,8 @@ export default {
   "admin.config.oauth.ignore-totp.description": "Ignorar o TOTP quando usuário usando login social",
   "admin.config.oauth.disable-password": "Desativar login por senha",
   "admin.config.oauth.disable-password.description": "Se deseja desativar o login por senha\nCertifique-se de que um provedor OAuth está configurado corretamente antes de ativar essa configuração para evitar ser bloqueado.",
+  "admin.config.oauth.allowed-hosts": "Hosts OAuth permitidos",
+  "admin.config.oauth.allowed-hosts.description": "Lista separada por vírgulas de nomes de host adicionais permitidos para login via OAuth (ex.: share.internal.example.com).",
   "admin.config.oauth.github-enabled": "GitHub",
   "admin.config.oauth.github-enabled.description": "Se o login GitHub está habilitado",
   "admin.config.oauth.github-client-id": "Client ID do GitHub",

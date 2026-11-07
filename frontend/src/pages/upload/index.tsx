@@ -243,63 +243,6 @@ const Upload = ({
   };
 
   useEffect(() => {
-    const handlePaste = (e: ClipboardEvent) => {
-      if (modals.modals.length > 0) {
-        return;
-      }
-
-      const clipboardData = e.clipboardData;
-
-      if (!clipboardData) {
-        return;
-      }
-
-      if (clipboardData?.getData("text/plain")) {
-        const pastedText = clipboardData.getData("text/plain");
-        if (!pastedText) {
-          return;
-        }
-
-        // Create a sanitised file name from the pasted text
-        const safeName = pastedText
-          .substring(0, 50)
-          .replace(/[^a-zA-Z0-9 ]/g, "")
-          .trim();
-        const fileName = `${safeName || "clipboard_paste"}.txt`;
-
-        const file = new File([pastedText], fileName, {
-          type: "text/plain",
-        });
-        const fileUpload = file as FileUpload;
-        fileUpload.uploadingProgress = 0;
-
-        const filtered = filterDuplicateFiles(
-          [fileUpload],
-          files,
-          (normalizedName) =>
-            toast.error(
-              t("upload.notify.duplicate-skipped", { name: normalizedName }),
-            ),
-        );
-        if (filtered.length === 0) return;
-
-        if (autoOpenCreateUploadModal && !uploadPanel) {
-          setFiles(filtered);
-          showCreateUploadModalCallback(filtered);
-        } else {
-          setFiles((oldArr) => [...oldArr, ...filtered]);
-        }
-      }
-    };
-
-    window.addEventListener("paste", handlePaste);
-
-    return () => {
-      window.removeEventListener("paste", handlePaste);
-    };
-  }, [autoOpenCreateUploadModal, modals.modals.length, uploadPanel]);
-
-  useEffect(() => {
     // Check if there are any files that failed to upload
     const fileErrorCount = files.filter(
       (file) => file.uploadingProgress == -1,

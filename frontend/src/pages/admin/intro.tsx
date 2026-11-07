@@ -10,8 +10,11 @@ import {
 import Link from "next/link";
 import Logo from "../../components/Logo";
 import Meta from "../../components/Meta";
+import useHomeHref from "../../hooks/homeHref.hook";
 
 const Intro = () => {
+  const homeHref = useHomeHref();
+
   return (
     <>
       <Meta title="Intro" />
@@ -44,7 +47,7 @@ const Intro = () => {
             <Button href="/admin/config/general" component={Link}>
               Customize configuration
             </Button>
-            <Button href="/" component={Link} variant="light">
+            <Button href={homeHref} component={Link} variant="light">
               Explore Pingvin Share Vault
             </Button>
           </Stack>

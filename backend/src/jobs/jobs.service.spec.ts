@@ -24,7 +24,7 @@ const build = () => {
       delete: async ({ where }: any) => void deletedShares.push(where.id),
     },
     user: {
-      findMany: async () => users,
+      findMany: jest.fn(async (_args: any) => users),
       delete: async ({ where }: any) => void deletedUsers.push(where.id),
     },
   };
@@ -48,6 +48,7 @@ const build = () => {
 
   return {
     service,
+    prisma,
     shares,
     users,
     deletedFiles,
@@ -195,6 +196,32 @@ describe("deleteUnactivatedUsers", () => {
 
     expect(deletedUsers).toEqual([]);
     expect(errors[0]).toContain("active");
+  });
+
+  it("only asks for accounts whose activation link has run out", async () => {
+    const { service, prisma } = build();
+
+    await service.deleteUnactivatedUsers();
+
+    expect(prisma.user.findMany.mock.calls[0][0].where.OR).toEqual([
+      { activationTokenExpiresAt: { lt: expect.any(Date) } },
+      { activationTokenExpiresAt: null },
+    ]);
+  });
+
+  it("deletes nothing when the query returns an account with a live activation link", async () => {
+    const { service, users, deletedUsers, errors } = build();
+    users.push(unactivated("stale", Date.now() - 48 * HOUR));
+    users.push(
+      unactivated("resent", Date.now() - 48 * HOUR, {
+        activationTokenExpiresAt: new Date(Date.now() + 12 * HOUR),
+      }),
+    );
+
+    await service.deleteUnactivatedUsers();
+
+    expect(deletedUsers).toEqual([]);
+    expect(errors[0]).toContain("resent");
   });
 
   it("deletes nothing when a created date is not a usable one", async () => {

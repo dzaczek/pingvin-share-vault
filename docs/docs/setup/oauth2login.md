@@ -48,6 +48,27 @@ Redirect URI: `https://<your-domain>/api/oauth/callback/oidc`
 
 Post Logout Redirect URI: `https://<your-domain>`
 
+## Alternative Hostnames
+
+If you reach the app through more than one hostname (for example an internal `share.internal.example.com` next to the public `share.example.com` in `general.appUrl`), list the extra hostnames in `oauth.allowedHosts`. Sign in started on one of them then stays on that host.
+
+Set it in `config.yaml` or under **Settings -> OAuth -> Allowed OAuth Hosts**. Hostnames are separated by commas, without protocol or path:
+
+```yaml
+oauth:
+  allowedHosts: "share.internal.example.com"
+```
+
+The backend builds the callback URL from the `Host` header of the request, but only when that host is on the list. Any other host gets `general.appUrl`, as before. The protocol comes from the request, so behind a reverse proxy that terminates TLS set `TRUST_PROXY=true` and pass `Host` and `X-Forwarded-Proto` through.
+
+This works with OpenID Connect, Google and Microsoft. Register the callback URL for every allowed hostname with your identity provider:
+
+- OpenID Connect: `https://<hostname>/api/oauth/callback/oidc`
+- Google: `https://<hostname>/api/oauth/callback/google`
+- Microsoft: `https://<hostname>/api/oauth/callback/microsoft`
+
+GitHub and Discord accept only one callback URL, so their sign in always runs on `general.appUrl`.
+
 ## Custom your OAuth 2 Provider
 
 If our built-in providers don't meet your needs, you can create your own OAuth 2 provider.

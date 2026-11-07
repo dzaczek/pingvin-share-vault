@@ -22,5 +22,6 @@
   "colorValidation": "{key} must be a hex color like #4c6ef5",
   "languageValidation": "The language must be a code like en-US",
   "appUrlValidation": "The app URL must start with http:// or https://",
+  "oauthAllowedHostsValidation": "Allowed hosts must be a comma-separated list of hostnames without protocol or paths (e.g. share.internal.example.com)",
   "minValidation": "{key} must be a whole number of at least {min}"
 }

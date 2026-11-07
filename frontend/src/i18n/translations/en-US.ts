@@ -663,9 +663,9 @@ export default {
   "upload.dropzone.description.mobile.no-folder":
     "Tap here to select individual files, photos, or videos. Maximum total upload size: {maxSize}.",
   "upload.dropzone.description.desktop":
-    "Click here or drag and drop individual files, photos, or videos. Use the button below to upload a folder, or press {shortcut} to upload text from your clipboard. Maximum total upload size: {maxSize}.",
+    "Click here or drag and drop individual files, photos, or videos. Use the button below to upload a folder, or press {shortcut} to upload from your clipboard. Maximum total upload size: {maxSize}.",
   "upload.dropzone.description.desktop.no-folder":
-    "Click here or drag and drop individual files, photos, or videos, or press {shortcut} to upload text from your clipboard. Maximum total upload size: {maxSize}.",
+    "Click here or drag and drop individual files, photos, or videos, or press {shortcut} to upload from your clipboard. Maximum total upload size: {maxSize}.",
   "upload.dropzone.notify.file-too-big":
     "Your files exceed the maximum share size of {maxSize}.",
   "upload.dropzone.glass.files.title": "Files",
@@ -689,7 +689,7 @@ export default {
   "upload.precision.progress": "{done} of {total}",
   "upload.precision.done": "You're done!",
   "upload.dropzone.glass.hint":
-    "Press {shortcut} to upload text from your clipboard. Maximum total upload size: {maxSize}.",
+    "Press {shortcut} to upload from your clipboard. Maximum total upload size: {maxSize}.",
   "upload.dropzone.glass.hint.mobile": "Maximum total upload size: {maxSize}.",
   "upload.button.folder": "Upload folder",
   "upload.button.folder.append": "Append folder",
@@ -1194,6 +1194,9 @@ export default {
   "admin.config.oauth.disable-password": "Disable password login",
   "admin.config.oauth.disable-password.description":
     "Whether to disable password login.\nMake sure an OAuth provider is configured correctly before enabling this option to avoid being locked out.",
+  "admin.config.oauth.allowed-hosts": "Allowed OAuth Hosts",
+  "admin.config.oauth.allowed-hosts.description":
+    "Comma-separated list of additional hostnames allowed for OAuth sign-in (e.g. share.internal.example.com).",
   "admin.config.oauth.github-enabled": "GitHub",
   "admin.config.oauth.github-enabled.description":
     "Whether GitHub login is enabled",

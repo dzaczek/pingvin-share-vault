@@ -10,6 +10,7 @@ export default {
   "navbar.avatar.account": "Mein Konto",
   "navbar.avatar.admin": "Verwaltung",
   "navbar.avatar.signout": "Abmelden",
+  "footer.poweredBy": "Bereitgestellt von",
   // END navbar
 
   // /
@@ -576,6 +577,8 @@ export default {
   "admin.config.oauth.ignore-totp.description": "Gibt an, ob TOTP ignoriert werden soll, wenn sich der Benutzer über soziale Netzwerke anmeldet",
   "admin.config.oauth.disable-password": "Anmelden mit Passwort deaktivieren",
   "admin.config.oauth.disable-password.description": "Deaktiviert das Anmelden mit Passwort\nStelle vor Aktivierung dieser Konfiguration sicher, dass ein OAuth-Provider korrekt konfiguriert ist, um nicht ausgesperrt zu werden.",
+  "admin.config.oauth.allowed-hosts": "Erlaubte OAuth-Hosts",
+  "admin.config.oauth.allowed-hosts.description": "Kommagetrennte Liste zusätzlicher Hostnamen, die für die OAuth-Anmeldung erlaubt sind (z. B. share.internal.example.com).",
   "admin.config.oauth.github-enabled": "GitHub",
   "admin.config.oauth.github-enabled.description": "Anmeldung mit GitHub erlauben",
   "admin.config.oauth.github-client-id": "GitHub Client-ID",
