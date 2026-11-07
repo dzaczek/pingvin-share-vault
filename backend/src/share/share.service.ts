@@ -67,7 +67,12 @@ export class ShareService {
         : null;
     const quotaOwner = reverseShare ? reverseShare.creator : user;
 
-    if (!reverseShare && user) {
+    // an upload into someone else's reverse share is their inbound share and
+    // is not limited by the uploader's sharing rights. Uploading into one's
+    // own reverse share is just sharing, so the limits apply.
+    const ownReverseShare =
+      !!reverseShare && reverseShare.creator?.id === user?.id;
+    if (user && (!reverseShare || ownReverseShare)) {
       if (user.allowShare === false) {
         throw new ForbiddenException(this.i18n.t("share.notAllowedToShare"));
       }
@@ -305,7 +310,11 @@ export class ShareService {
         this.i18n.t("share.completionRequiresFile"),
       );
 
-    if (!share.reverseShare && share.creator) {
+    if (
+      share.creator &&
+      (!share.reverseShare ||
+        share.reverseShare.creator?.id === share.creator.id)
+    ) {
       if (share.creator.allowShare === false) {
         throw new ForbiddenException(this.i18n.t("share.notAllowedToShare"));
       }
@@ -460,10 +469,23 @@ export class ShareService {
       });
     }
 
+    // the prebuilt zip is a copy of the files as they were. Once the share is
+    // reopened files can be removed, and the old zip would keep serving them.
+    await this.discardPrebuiltZip(id);
+
     return this.prisma.share.update({
       where: { id },
       data: { uploadLocked: false, isZipReady: false },
     });
+  }
+
+  private async discardPrebuiltZip(shareId: string) {
+    const shareRoot = resolve(SHARE_DIRECTORY);
+    const path = resolve(shareRoot, shareId);
+    if (!path.startsWith(shareRoot + sep)) return;
+    const zipPath = resolve(path, "archive.zip");
+    await fs.promises.rm(zipPath, { force: true });
+    await fs.promises.rm(`${zipPath}.part`, { force: true });
   }
 
   async getShares() {
@@ -683,7 +705,13 @@ export class ShareService {
         ? body.security.maxViews
         : currentSecurity?.maxViews;
 
-    if (!nextPassword && !nextMaxViews) {
+    // restrictToRecipients lives in the same row, so the row only goes away
+    // when nothing in it is still in force
+    if (
+      !nextPassword &&
+      !nextMaxViews &&
+      !currentSecurity?.restrictToRecipients
+    ) {
       if (currentSecurity) {
         await this.prisma.shareSecurity.delete({ where: { shareId } });
       }
