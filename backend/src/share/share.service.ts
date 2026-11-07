@@ -664,6 +664,11 @@ export class ShareService {
       expirationDate = this.parseExpiration(body.expiration);
       if (!user?.isAdmin) {
         this.validateExpiration(expirationDate);
+        await this.validateReverseShareExpiration(
+          currentShare.reverseShareId,
+          expirationDate,
+          user,
+        );
       }
     }
 
@@ -689,6 +694,27 @@ export class ShareService {
     });
 
     return this.transformShare(updatedShare);
+  }
+
+  // A share made through a reverse share gets that reverse share's
+  // expiration on creation, and its files count against the reverse share
+  // owner's quota. The uploader may shorten it, not keep the files longer.
+  private async validateReverseShareExpiration(
+    reverseShareId: string | null,
+    expiration: Date,
+    user?: User,
+  ) {
+    if (!reverseShareId) return;
+    const reverseShare = await this.prisma.reverseShare.findUnique({
+      where: { id: reverseShareId },
+      select: { creatorId: true, shareExpiration: true },
+    });
+    if (!reverseShare || reverseShare.creatorId === user?.id) return;
+
+    const never = expiration.getTime() === 0;
+    if (never || expiration > reverseShare.shareExpiration) {
+      throw new BadRequestException(this.i18n.t("share.maxExpirationExceeded"));
+    }
   }
 
   private async updateSecurity(

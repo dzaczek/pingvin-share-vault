@@ -55,6 +55,19 @@ describe("safeRedirectPath", () => {
     expect(safeRedirectPath("\t/\\evil.invalid")).toBe("/");
     expect(safeRedirectPath("\n\rhttps://evil.invalid")).toBe("/");
   });
+
+  // dot segments stay on the base origin but resolve to a path that starts
+  // with two slashes, which names another host once it is navigated to
+  it("refuses dot segment spellings that resolve to //host", () => {
+    for (const path of [
+      "/.//evil.invalid",
+      "/..//evil.invalid",
+      "/./\\evil.invalid",
+      "/%2e//evil.invalid",
+    ]) {
+      expect(safeRedirectPath(path)).toBe("/");
+    }
+  });
 });
 
 describe("getQueryString", () => {
