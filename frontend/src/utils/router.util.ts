@@ -21,6 +21,8 @@ export function safeRedirectPath(path: string | undefined) {
   try {
     const url = new URL(cleaned, REDIRECT_BASE);
     if (url.origin !== REDIRECT_BASE) return "/";
+    // dot segments like "/.//host" stay on the base but resolve to "//host"
+    if (url.pathname.startsWith("//")) return "/";
 
     return `${url.pathname}${url.search}${url.hash}`;
   } catch {
