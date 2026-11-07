@@ -211,8 +211,13 @@ export class ShareService {
         creator: { connect: user ? { id: user.id } : undefined },
         security: { create: share.security },
         recipients: {
+          // one row, and so one mail, per address however often it is listed
           create: share.recipients
-            ? share.recipients.map((email) => ({ email }))
+            ? [
+                ...new Set(
+                  share.recipients.map((email) => email.toLowerCase().trim()),
+                ),
+              ].map((email) => ({ email }))
             : [],
         },
         storageProvider: this.configService.get("s3.enabled") ? "S3" : "LOCAL",
@@ -360,15 +365,61 @@ export class ShareService {
       }
     }
 
-    // A use is taken before anything else happens, in one conditional write,
-    // so two uploads finishing at the same time cannot both get the last one
+    // The share is claimed in one conditional write before anything else
+    // happens. Two completions at once used to both pass the checks above
+    // and mail every recipient twice. Locking it here also keeps late upload
+    // chunks out before the virus scan lists the files.
+    const { count: claimed } = await this.prisma.share.updateMany({
+      where: { id, uploadLocked: false },
+      data: { uploadLocked: true },
+    });
+    if (claimed === 0)
+      throw new BadRequestException(this.i18n.t("share.alreadyCompleted"));
+    const giveBack = () =>
+      this.prisma.share.updateMany({
+        where: { id },
+        data: { uploadLocked: false },
+      });
+
+    // counted again now that this share is one of them, two completions at
+    // once both saw room for one more
+    const maxShares = share.creator?.maxShares;
+    if (
+      maxShares != null &&
+      maxShares > 0 &&
+      share.creator &&
+      (!share.reverseShare ||
+        share.reverseShare.creator?.id === share.creator.id)
+    ) {
+      const active = await this.prisma.share.count({
+        where: {
+          creatorId: share.creator.id,
+          uploadLocked: true,
+          OR: [
+            { expiration: { gt: new Date() } },
+            { expiration: { equals: moment(0).toDate() } },
+          ],
+        },
+      });
+      if (active > maxShares) {
+        await giveBack();
+        throw new BadRequestException(
+          this.i18n.t("share.maxSharesExceeded", { args: { max: maxShares } }),
+        );
+      }
+    }
+
+    // A use is taken in one conditional write, so two uploads finishing at
+    // the same time cannot both get the last one
     if (share.reverseShare) {
       const { count } = await this.prisma.reverseShare.updateMany({
         where: { id: share.reverseShare.id, remainingUses: { gt: 0 } },
         data: { remainingUses: { decrement: 1 } },
       });
-      if (count === 0)
+      if (count === 0) {
+        await giveBack();
         throw new BadRequestException(this.i18n.t("reverseShare.usedUp"));
+      }
     }
 
     // Asynchronously create a zip of all files
@@ -450,12 +501,9 @@ export class ShareService {
       );
     }
 
-    // locked before the scan lists the files, the upload paths check the
-    // lock again before a file lands, so nothing arrives after the snapshot
-    const updatedShare = await this.prisma.share.update({
-      where: { id },
-      data: { uploadLocked: true },
-    });
+    // locked above, before the scan lists the files. The upload paths check
+    // the lock again before a file lands, so nothing arrives after it.
+    const updatedShare = await this.prisma.share.findUnique({ where: { id } });
 
     // Check if any file is malicious with ClamAV
     void this.clamScanService.checkAndRemove(share.id);
@@ -484,8 +532,14 @@ export class ShareService {
 
     if (!share) throw new NotFoundException(this.i18n.t("share.notFound"));
 
-    // completing took a use, reopening gives it back
-    if (share.uploadLocked && share.reverseShare) {
+    // Reopened in one conditional write, and only the request that actually
+    // turned the lock off gives back the reverse share use completing took.
+    // Two reopenings at once used to both refund it.
+    const { count: reopened } = await this.prisma.share.updateMany({
+      where: { id, uploadLocked: true },
+      data: { uploadLocked: false, isZipReady: false },
+    });
+    if (reopened === 1 && share.reverseShare) {
       await this.prisma.reverseShare.update({
         where: { id: share.reverseShare.id },
         data: { remainingUses: { increment: 1 } },
@@ -496,10 +550,7 @@ export class ShareService {
     // reopened files can be removed, and the old zip would keep serving them.
     await this.discardPrebuiltZip(id);
 
-    return this.prisma.share.update({
-      where: { id },
-      data: { uploadLocked: false, isZipReady: false },
-    });
+    return this.prisma.share.findUnique({ where: { id } });
   }
 
   private async discardPrebuiltZip(shareId: string) {

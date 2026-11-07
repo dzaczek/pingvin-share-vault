@@ -1,5 +1,6 @@
 import { Type } from "class-transformer";
 import {
+  ArrayMaxSize,
   IsEmail,
   IsNumber,
   IsOptional,
@@ -31,6 +32,8 @@ export class CreateShareDTO {
   @IsOptional()
   description: string;
 
+  // every recipient is mailed through the instance's SMTP on completion
+  @ArrayMaxSize(100)
   @IsEmail({}, { each: true })
   recipients: string[];
 
