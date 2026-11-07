@@ -67,4 +67,23 @@ describe("S3FileService share limits", () => {
     await expect(upload(10)).rejects.toBeInstanceOf(BadRequestException);
     expect(send).not.toHaveBeenCalled();
   });
+
+  // completing the share locks it before the virus scan lists the files, a
+  // last chunk already on its way must not finish the object after that
+  it("does not finish an object once the share got locked meanwhile", async () => {
+    const { CompleteMultipartUploadCommand } =
+      await import("@aws-sdk/client-s3");
+    send.mockImplementation(async () => ({ UploadId: "up1", ETag: "e1" }));
+    const prisma = (service as any).prisma;
+    prisma.share.findUnique
+      .mockResolvedValueOnce(share)
+      .mockResolvedValueOnce({ ...share, uploadLocked: true });
+
+    await expect(upload(10)).rejects.toThrow();
+    expect(
+      send.mock.calls.some(
+        ([command]) => command instanceof CompleteMultipartUploadCommand,
+      ),
+    ).toBe(false);
+  });
 });
