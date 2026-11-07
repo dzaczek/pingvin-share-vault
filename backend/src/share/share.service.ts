@@ -24,7 +24,10 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { ReverseShareService } from "src/reverseShare/reverseShare.service";
 import { ShareAccessLogService } from "src/shareAccessLog/shareAccessLog.service";
 import { SystemService } from "src/system/system.service";
-import { parseRelativeDateToAbsolute } from "src/utils/date.util";
+import {
+  isStorableDate,
+  parseRelativeDateToAbsolute,
+} from "src/utils/date.util";
 import { byteToHumanSizeString } from "src/utils/fileSize.util";
 import { getUserActiveStorageUsage } from "src/utils/storageQuota.util";
 import { SHARE_DIRECTORY } from "../constants";
@@ -803,11 +806,16 @@ export class ShareService {
         expiration,
       )
     ) {
-      return parseRelativeDateToAbsolute(expiration);
+      const relative = parseRelativeDateToAbsolute(expiration);
+      if (isStorableDate(relative)) return relative;
+    } else {
+      const absoluteExpiration = moment(expiration, moment.ISO_8601, true);
+      if (
+        absoluteExpiration.isValid() &&
+        isStorableDate(absoluteExpiration.toDate())
+      )
+        return absoluteExpiration.toDate();
     }
-
-    const absoluteExpiration = moment(expiration, moment.ISO_8601, true);
-    if (absoluteExpiration.isValid()) return absoluteExpiration.toDate();
 
     throw new BadRequestException(this.i18n.t("share.invalidExpiration"));
   }

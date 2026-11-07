@@ -16,6 +16,13 @@ export function parseRelativeDateToAbsolute(relativeDate: string) {
     .toDate();
 }
 
+// SQLite stores dates as ISO text and compares them as text, which only
+// agrees with the real order for four digit years. "+010026-..." sorts before
+// "2026-...", so a share expiring then looks expired to every query.
+export function isStorableDate(date: Date) {
+  return !isNaN(date.getTime()) && date.getUTCFullYear() <= 9999;
+}
+
 type Timespan = {
   value: number;
   unit: "minutes" | "hours" | "days" | "weeks" | "months" | "years";

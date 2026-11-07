@@ -390,6 +390,11 @@ export class AuthService {
   }
 
   async updatePassword(user: User, newPassword: string, oldPassword?: string) {
+    // like a reset, so an account the identity provider governs cannot pick
+    // up a local password the provider knows nothing about
+    if (this.config.get("oauth.disablePassword"))
+      throw new ForbiddenException(this.i18n.t("auth.passwordSignInDisabled"));
+
     const isPasswordValid =
       !user.password || (await argon.verify(user.password, oldPassword));
 
