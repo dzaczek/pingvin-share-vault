@@ -49,6 +49,7 @@ export type UpdateCurrentUser = {
   displayName?: string | null;
   username?: string;
   email?: string;
+  currentPassword?: string;
 };
 
 export type CurrentUser = User & {};
