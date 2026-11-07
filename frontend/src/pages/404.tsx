@@ -3,6 +3,7 @@ import Link from "next/link";
 import { FormattedMessage } from "react-intl";
 import ErrorTetris from "../components/error/ErrorTetris";
 import Meta from "../components/Meta";
+import useHomeHref from "../hooks/homeHref.hook";
 
 const useStyles = createStyles((theme) => ({
   root: {
@@ -26,6 +27,7 @@ const useStyles = createStyles((theme) => ({
 
 const ErrorNotFound = () => {
   const { classes } = useStyles();
+  const homeHref = useHomeHref();
 
   return (
     <>
@@ -39,7 +41,7 @@ const ErrorNotFound = () => {
         <ErrorTetris digits={["4", "0", "4"]} />
 
         <Group position="center" mt="xl">
-          <Button component={Link} href="/" variant="light">
+          <Button component={Link} href={homeHref} variant="light">
             <FormattedMessage id="404.button.home" />
           </Button>
         </Group>
