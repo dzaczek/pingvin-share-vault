@@ -10,6 +10,7 @@ export default {
   "navbar.avatar.account": "Fiókom",
   "navbar.avatar.admin": "Admin ügyek",
   "navbar.avatar.signout": "Kijelentkezés",
+  "footer.poweredBy": "Működteti:",
   // END navbar
 
   // /
@@ -536,6 +537,8 @@ export default {
   "admin.config.oauth.ignore-totp.description": "TOTP mellőzése a közösségi bejelentkezést használó felhasználónál",
   "admin.config.oauth.disable-password": "Jelszavas bejelentkezés letiltása",
   "admin.config.oauth.disable-password.description": "A jelszavas bejelentkezés be- és kikapcsolása\nA letiltás előtt a kizáródás elkerülésére mindenképpen ellenőrizendő az OAuth szolgáltató megfelelő konfigurációja.",
+  "admin.config.oauth.allowed-hosts": "Engedélyezett OAuth kiszolgálók",
+  "admin.config.oauth.allowed-hosts.description": "OAuth-bejelentkezéshez engedélyezett további kiszolgálónevek vesszővel elválasztott listája (pl. share.internal.example.com).",
   "admin.config.oauth.github-enabled": "GitHub",
   "admin.config.oauth.github-enabled.description": "GitHub bejelentkezés engedélyezése",
   "admin.config.oauth.github-client-id": "GitHub ügyfél ID",

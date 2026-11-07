@@ -10,6 +10,7 @@ export default {
   "navbar.avatar.account": "حساب من",
   "navbar.avatar.admin": "مدیریت",
   "navbar.avatar.signout": "خروج",
+  "footer.poweredBy": "قدرت‌گرفته از",
   // END navbar
 
   // /
@@ -536,6 +537,8 @@ export default {
   "admin.config.oauth.ignore-totp.description": "آیا هنگام استفاده از ورود اجتماعی TOTP نادیده گرفته شود.",
   "admin.config.oauth.disable-password": "غیرفعال کردن ورود با رمز عبور",
   "admin.config.oauth.disable-password.description": "آیا ورود با رمز عبور غیرفعال شود\nمطمئن شوید که قبل از فعال کردن این پیکربندی، یک ارائه‌دهنده OAuth به درستی پیکربندی شده باشد تا از قفل شدن جلوگیری شود.",
+  "admin.config.oauth.allowed-hosts": "میزبان‌های مجاز OAuth",
+  "admin.config.oauth.allowed-hosts.description": "فهرستی از نام‌های میزبان اضافی که برای ورود با OAuth مجاز هستند، جداشده با ویرگول (برای مثال share.internal.example.com).",
   "admin.config.oauth.github-enabled": "GitHub",
   "admin.config.oauth.github-enabled.description": "آیا ورود GitHub فعال است",
   "admin.config.oauth.github-client-id": "شناسه مشتری GitHub",
