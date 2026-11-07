@@ -119,8 +119,8 @@ describe('ShareService Optimization', () => {
       (prismaService.share.findUnique as jest.Mock).mockResolvedValue(shareMock);
 
       const matchedUsers = [
-        { id: 'u1', email: 'user1@example.com', isActivated: true, activationToken: null },
-        { id: 'u2', email: 'user2@example.com', isActivated: true, activationToken: null },
+        { id: 'u1', email: 'user1@example.com', isActivated: true, activationToken: null, confirmedEmail: 'user1@example.com' },
+        { id: 'u2', email: 'user2@example.com', isActivated: true, activationToken: null, confirmedEmail: 'user2@example.com' },
       ];
       (prismaService.user.findMany as jest.Mock).mockResolvedValue(matchedUsers);
 

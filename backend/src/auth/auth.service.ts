@@ -45,6 +45,8 @@ export class AuthService {
     ip: string,
     isAdmin?: boolean,
     skipVerification?: boolean,
+    // set when a sign in provider vouches for the address
+    emailConfirmedByProvider?: boolean,
   ) {
     const enableEmailVerification = this.config.get(
       "security.enableEmailVerification",
@@ -79,6 +81,9 @@ export class AuthService {
             activationTokenExpiresAt: needsVerification
               ? moment().add(1, "day").toDate()
               : null,
+            // nobody checked the address unless a provider vouches for it,
+            // a verification mail confirms it later
+            confirmedEmail: emailConfirmedByProvider ? email : null,
           },
         });
 
@@ -326,14 +331,19 @@ export class AuthService {
       throw new BadRequestException(this.i18n.t("auth.tokenInvalidOrExpired"));
     }
 
-    await this.prisma.user.update({
-      where: { id: user.id },
+    // the token is replaced whenever the address changes, so matching on it
+    // confirms the address it was mailed to and no other
+    const { count } = await this.prisma.user.updateMany({
+      where: { id: user.id, activationToken: token, email: user.email },
       data: {
         isActivated: true,
         activationToken: null,
         activationTokenExpiresAt: null,
+        confirmedEmail: user.email,
       },
     });
+    if (count === 0)
+      throw new BadRequestException(this.i18n.t("auth.tokenInvalidOrExpired"));
   }
 
   async resendVerification(emailInput: string) {
@@ -344,8 +354,14 @@ export class AuthService {
 
     if (!user) return;
 
-    // an activated account with a token is confirming a changed address
-    if (user.isActivated && !user.activationToken) {
+    // an activated account with a token is confirming a changed address, one
+    // without a confirmed address (made while verification was off) may ask
+    // to confirm the one it has
+    if (
+      user.isActivated &&
+      !user.activationToken &&
+      user.confirmedEmail === user.email
+    ) {
       throw new BadRequestException(this.i18n.t("auth.userAlreadyActivated"));
     }
 
@@ -353,13 +369,17 @@ export class AuthService {
     const activationTokenExpiresAt = moment().add(1, "day").toDate();
 
     await this.prisma.$transaction(async (tx) => {
-      await tx.user.update({
-        where: { id: user.id },
+      // only while the address is still the one the token is mailed to, an
+      // address change in between would otherwise get confirmed by a token
+      // that went to the old one
+      const { count } = await tx.user.updateMany({
+        where: { id: user.id, email: user.email },
         data: {
           activationToken,
           activationTokenExpiresAt,
         },
       });
+      if (count === 0) return;
 
       await this.emailService.sendVerificationEmail(
         user.email,

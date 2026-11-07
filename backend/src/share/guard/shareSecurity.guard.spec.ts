@@ -12,6 +12,7 @@ describe("ShareSecurityGuard and recipients", () => {
     email: "anna@example.com",
     isActivated: true,
     activationToken: null as string | null,
+    confirmedEmail: "anna@example.com" as string | null,
   };
 
   let share: any;

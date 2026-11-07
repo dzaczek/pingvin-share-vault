@@ -183,6 +183,7 @@ export class OAuthService {
       ip,
       user.isAdmin,
       true,
+      user.emailVerified,
     );
 
     await this.prisma.oAuthUser.create({
