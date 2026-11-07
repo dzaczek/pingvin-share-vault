@@ -18,17 +18,19 @@ import Meta from "../../components/Meta";
 import CenterLoader from "../../components/core/CenterLoader";
 import useConfig from "../../hooks/config.hook";
 import useTranslate from "../../hooks/useTranslate.hook";
+import useHomeHref from "../../hooks/homeHref.hook";
 import shareService from "../../services/share.service";
 
 const ReceivedShares = () => {
   const t = useTranslate();
   const router = useRouter();
   const config = useConfig();
+  const homeHref = useHomeHref();
   const [receivedShares, setReceivedShares] = useState<any[]>();
 
   useEffect(() => {
     if (!config.get("share.enableUserRecipients")) {
-      router.replace("/");
+      router.replace(homeHref);
       return;
     }
     shareService.getReceivedShares().then((data) => setReceivedShares(data));

@@ -172,6 +172,12 @@ export function getDefaultConfig(): Config[] {
       type: "boolean",
     },
     {
+      key: "oauth.allowedHosts",
+      value: "",
+      defaultValue: "",
+      type: "string",
+    },
+    {
       key: "share.anonymousWarningMessagePl",
       value: "",
       defaultValue: "",

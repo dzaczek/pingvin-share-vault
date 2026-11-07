@@ -419,6 +419,21 @@ export class ConfigService extends EventEmitter {
         ),
       },
       {
+        // only bare hostnames, an optional port is part of the host
+        key: "oauth.allowedHosts",
+        condition: (value: string | null) =>
+          !value ||
+          value
+            .split(",")
+            .map((host) => host.trim())
+            .filter(Boolean)
+            .every((host) => /^[a-zA-Z0-9.-]+(:\d{1,5})?$/.test(host)),
+        message: this.t(
+          "config.oauthAllowedHostsValidation",
+          "Allowed hosts must be a comma-separated list of hostnames without protocol or paths (e.g. share.internal.example.com)",
+        ),
+      },
+      {
         key: "share.zipCompressionLevel",
         condition: (value: number) => value >= 0 && value <= 9,
         message: this.t(

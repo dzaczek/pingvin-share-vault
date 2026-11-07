@@ -10,6 +10,7 @@ export default {
   "navbar.avatar.account": "Moj račun",
   "navbar.avatar.admin": "Administracija",
   "navbar.avatar.signout": "Odjavi se",
+  "footer.poweredBy": "Pokreće",
   // END navbar
 
   // /
@@ -536,6 +537,8 @@ export default {
   "admin.config.oauth.ignore-totp.description": "Želite li zanemariti TOTP kada korisnik koristi društvenu prijavu",
   "admin.config.oauth.disable-password": "Onemogućite prijavu lozinkom",
   "admin.config.oauth.disable-password.description": "Omogućiti prijavu lozinkom ili ne.\nProvjerite je li OAuth pružatelj usluga ispravno konfiguriran prije aktiviranja ove opcije kako biste izbjegli zaključavanje računa.",
+  "admin.config.oauth.allowed-hosts": "Dopušteni OAuth hostovi",
+  "admin.config.oauth.allowed-hosts.description": "Zarezima odvojen popis dodatnih naziva hostova dopuštenih za prijavu putem OAuth-a (npr. share.internal.example.com).",
   "admin.config.oauth.github-enabled": "GitHub",
   "admin.config.oauth.github-enabled.description": "Je li omogućena prijava putem GitHuba",
   "admin.config.oauth.github-client-id": "GitHub ID klijenta",

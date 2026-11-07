@@ -17,6 +17,7 @@ import Logo from "../components/Logo";
 import Meta from "../components/Meta";
 import useUser from "../hooks/user.hook";
 import useConfig from "../hooks/config.hook";
+import useHomeHref from "../hooks/homeHref.hook";
 
 const useStyles = createStyles((theme) => ({
   inner: {
@@ -75,15 +76,20 @@ export default function Home() {
   const { refreshUser } = useUser();
   const router = useRouter();
   const config = useConfig();
+  const homeHref = useHomeHref();
 
-  // If user is already authenticated, redirect to the upload page
+  // Someone signed in, or a visitor while the start page is off, never gets
+  // to see it: render nothing and go straight to where they belong, instead
+  // of flashing the page before the redirect.
+  const redirectTarget = homeHref !== "/" ? homeHref : null;
+
   useEffect(() => {
-    refreshUser().then((user) => {
-      if (user) {
-        router.replace("/upload");
-      }
-    });
-  }, [config]);
+    if (redirectTarget) {
+      router.replace(redirectTarget);
+    } else {
+      refreshUser();
+    }
+  }, [redirectTarget]);
 
   // If registration is disabled, get started button should redirect to the
   // sign in page. This follows from config, so it is worked out while
@@ -99,6 +105,8 @@ export default function Home() {
   const getButtonHref = () => {
     return signupEnabled ? "/auth/signUp" : "/auth/signIn";
   };
+
+  if (redirectTarget) return null;
 
   return (
     <>

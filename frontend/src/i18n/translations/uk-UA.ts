@@ -10,6 +10,7 @@ export default {
   "navbar.avatar.account": "Мій аккаунт",
   "navbar.avatar.admin": "Адміністрування",
   "navbar.avatar.signout": "Вийти",
+  "footer.poweredBy": "Працює на",
   // END navbar
 
   // /
@@ -536,6 +537,8 @@ export default {
   "admin.config.oauth.ignore-totp.description": "Ігнорувати TOTP при використанні соціальної авторизації",
   "admin.config.oauth.disable-password": "Вимкнути вхід за паролем",
   "admin.config.oauth.disable-password.description": "Чи вимкнути вхід за паролем. \nПереконайтеся, що постачальник OAuth налаштований правильно, перед активацією цієї конфігурації, щоб уникнути блокування доступу.",
+  "admin.config.oauth.allowed-hosts": "Дозволені хости OAuth",
+  "admin.config.oauth.allowed-hosts.description": "Список додаткових імен хостів через кому, з яких дозволено вхід через OAuth (наприклад, share.internal.example.com).",
   "admin.config.oauth.github-enabled": "GitHub",
   "admin.config.oauth.github-enabled.description": "Чи ввімкнено логін на GitHub",
   "admin.config.oauth.github-client-id": "ID клієнта GitHub",

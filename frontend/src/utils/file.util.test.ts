@@ -1,4 +1,8 @@
-import { filterDuplicateFiles, getNormalizedFileName } from "./file.util";
+import {
+  filterDuplicateFiles,
+  getFilesFromEvent,
+  getNormalizedFileName,
+} from "./file.util";
 
 // A folder upload carries a path rather than a name, and a browser on windows
 // spells that path with backslashes. Everything downstream compares these as
@@ -122,5 +126,59 @@ describe("filterDuplicateFiles", () => {
 
     expect(kept).toHaveLength(2);
     expect(reported).toEqual([]);
+  });
+});
+
+// Pasting files copied in the file manager hands over clipboardData instead
+// of dataTransfer. A copied folder has to keep its structure like a dropped
+// one, and an entry that cannot be read must not hang the whole paste.
+describe("getFilesFromEvent from the clipboard", () => {
+  const fileEntry = (file: File) => ({
+    isFile: true,
+    isDirectory: false,
+    file: (ok: (f: File) => void) => ok(file),
+  });
+  const folderEntry = (name: string, children: any[]) => {
+    let read = false;
+    return {
+      isFile: false,
+      isDirectory: true,
+      name,
+      createReader: () => ({
+        readEntries: (ok: (e: any[]) => void) => {
+          ok(read ? [] : children);
+          read = true;
+        },
+      }),
+    };
+  };
+  const brokenEntry = {
+    isFile: true,
+    isDirectory: false,
+    file: (_ok: unknown, fail: (e: Error) => void) => fail(new Error("gone")),
+  };
+  const item = (file: File | null, entry: unknown) => ({
+    kind: "file",
+    getAsFile: () => file,
+    webkitGetAsEntry: () => entry,
+  });
+
+  it("reads pasted files and folders", async () => {
+    const loose = new File(["a"], "loose.txt");
+    const nested = new File(["b"], "nested.txt");
+    const files = await getFilesFromEvent({
+      clipboardData: {
+        items: [
+          item(loose, fileEntry(loose)),
+          item(null, folderEntry("docs", [fileEntry(nested), brokenEntry])),
+          { kind: "string", getAsFile: () => null },
+        ],
+      },
+    });
+
+    expect(files.map(getNormalizedFileName)).toEqual([
+      "loose.txt",
+      "docs/nested.txt",
+    ]);
   });
 });

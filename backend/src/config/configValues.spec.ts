@@ -53,6 +53,13 @@ describe("validateConfigVariable, numbers and choices", () => {
     rejects("general.appUrl", "share.example.com");
     rejects("general.appUrl", "javascript:alert(1)");
   });
+
+  it("wants bare hostnames as allowed OAuth hosts", () => {
+    accepts("oauth.allowedHosts", "");
+    accepts("oauth.allowedHosts", "share.internal.example.com, 10.0.0.5:3000");
+    rejects("oauth.allowedHosts", "https://share.example.com");
+    rejects("oauth.allowedHosts", "share.example.com/path");
+  });
 });
 
 describe("the config update body", () => {

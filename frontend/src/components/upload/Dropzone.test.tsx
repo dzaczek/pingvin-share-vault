@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import { renderWithProviders } from "../../test/renderWithProviders";
 import Dropzone from "./Dropzone";
 
@@ -14,7 +14,11 @@ jest.mock("./modals/showTextEditorModal", () => ({
 
 const render = () =>
   renderWithProviders(
-    <Dropzone isUploading={false} maxShareSize={2_000_000_000} onFilesChanged={jest.fn()} />,
+    <Dropzone
+      isUploading={false}
+      maxShareSize={2_000_000_000}
+      onFilesChanged={jest.fn()}
+    />,
   );
 
 const userAgent = jest.spyOn(window.navigator, "userAgent", "get");
@@ -44,9 +48,9 @@ describe("Dropzone guidance", () => {
   it("leaves the folder button out where the browser has none", () => {
     userAgent.mockReturnValue("Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
     render();
-    expect(screen.getByText(/Click here or drag and drop/).textContent).not.toMatch(
-      /folder/,
-    );
+    expect(
+      screen.getByText(/Click here or drag and drop/).textContent,
+    ).not.toMatch(/folder/);
   });
 
   it("shows the Mac paste shortcut on a Mac", () => {
@@ -59,5 +63,43 @@ describe("Dropzone guidance", () => {
     userAgent.mockReturnValue("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0)");
     render();
     expect(screen.getByText(/Tap here to select/)).toBeInTheDocument();
+  });
+});
+
+// A paste goes through the same size limit as a drop
+describe("Dropzone paste", () => {
+  const pasteText = (text: string) => {
+    const event = new Event("paste", { bubbles: true, cancelable: true });
+    Object.defineProperty(event, "clipboardData", {
+      value: { items: [], getData: () => text },
+    });
+    window.dispatchEvent(event);
+  };
+
+  it("adds pasted text that fits", async () => {
+    const onFilesChanged = jest.fn();
+    renderWithProviders(
+      <Dropzone
+        isUploading={false}
+        maxShareSize={100}
+        onFilesChanged={onFilesChanged}
+      />,
+    );
+    pasteText("short");
+    await waitFor(() => expect(onFilesChanged).toHaveBeenCalled());
+  });
+
+  it("refuses a paste over the share size", () => {
+    const onFilesChanged = jest.fn();
+    renderWithProviders(
+      <Dropzone
+        isUploading={false}
+        maxShareSize={10}
+        currentFilesSize={8}
+        onFilesChanged={onFilesChanged}
+      />,
+    );
+    pasteText("more than two bytes");
+    expect(onFilesChanged).not.toHaveBeenCalled();
   });
 });

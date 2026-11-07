@@ -10,6 +10,7 @@ export default {
   "navbar.avatar.account": "บัญชีของฉัน",
   "navbar.avatar.admin": "แผงควบคุมระบบ",
   "navbar.avatar.signout": "ออกจากระบบ",
+  "footer.poweredBy": "ขับเคลื่อนโดย",
   // END navbar
 
   // /
@@ -536,6 +537,8 @@ export default {
   "admin.config.oauth.ignore-totp.description": "เพิกเฉยต่อ TOTP หรือไม่เมื่อผู้ใช้เข้าสู่ระบบด้วยบัญชีโซเชียล",
   "admin.config.oauth.disable-password": "ปิดใช้งานการเข้าสู่ระบบด้วยรหัสผ่าน",
   "admin.config.oauth.disable-password.description": "กำหนดว่าจะปิดใช้งานการเข้าสู่ระบบด้วยรหัสผ่านหรือไม่\nตรวจสอบให้แน่ใจว่าได้กำหนดค่าผู้ให้บริการ OAuth อย่างถูกต้องแล้วก่อนที่จะเปิดใช้งานการกำหนดค่านี้ เพื่อหลีกเลี่ยงการถูกล็อคไม่ให้เข้าสู่ระบบ",
+  "admin.config.oauth.allowed-hosts": "โฮสต์ OAuth ที่อนุญาต",
+  "admin.config.oauth.allowed-hosts.description": "รายชื่อโฮสต์เนมเพิ่มเติมที่อนุญาตให้เข้าสู่ระบบด้วย OAuth คั่นด้วยเครื่องหมายจุลภาค (เช่น share.internal.example.com)",
   "admin.config.oauth.github-enabled": "GitHub",
   "admin.config.oauth.github-enabled.description": "เปิดใช้งานการเข้าสู่ระบบด้วย GitHub หรือไม่",
   "admin.config.oauth.github-client-id": "GitHub Client ID",
