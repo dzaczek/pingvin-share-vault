@@ -208,6 +208,10 @@ export abstract class GenericOidcProvider implements OAuthProvider<OidcToken> {
     return {
       provider: this.name as any,
       email: idTokenData.email,
+      // Entra ID never sends email_verified, the address comes from the
+      // tenant's directory
+      emailVerified:
+        idTokenData.email_verified === true || this.name === "microsoft",
       providerId: idTokenData.sub,
       providerUsername: username,
       ...(isAdmin !== undefined && { isAdmin }),

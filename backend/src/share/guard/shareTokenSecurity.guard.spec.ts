@@ -79,6 +79,7 @@ describe("ShareTokenSecurity", () => {
         email: "anna@example.com",
         isActivated: true,
         activationToken: null,
+        confirmedEmail: "anna@example.com",
       }),
     ).resolves.toBe(true);
   });

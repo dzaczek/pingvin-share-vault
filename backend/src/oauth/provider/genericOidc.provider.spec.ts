@@ -6,8 +6,13 @@ import { GenericOidcProvider, OidcIdToken } from "./genericOidc.provider";
 
 // Minimal concrete provider so the abstract base can be driven directly.
 class TestProvider extends GenericOidcProvider {
-  constructor(config: ConfigService, jwt: JwtService, cache: Cache) {
-    super("test", [], config, jwt, cache);
+  constructor(
+    config: ConfigService,
+    jwt: JwtService,
+    cache: Cache,
+    name = "test",
+  ) {
+    super(name, [], config, jwt, cache);
   }
   protected getDiscoveryUri(): string {
     return "https://example.invalid/.well-known/openid-configuration";
@@ -16,7 +21,7 @@ class TestProvider extends GenericOidcProvider {
 
 const NONCE = "nonce-value";
 
-const buildProvider = (idToken: Partial<OidcIdToken>) => {
+const buildProvider = (idToken: Partial<OidcIdToken>, name?: string) => {
   const config = {
     get: jest.fn().mockReturnValue(""),
     addListener: jest.fn(),
@@ -36,11 +41,11 @@ const buildProvider = (idToken: Partial<OidcIdToken>) => {
     del: jest.fn().mockResolvedValue(undefined),
   } as unknown as Cache;
 
-  return new TestProvider(config, jwt, cache);
+  return new TestProvider(config, jwt, cache, name);
 };
 
-const signIn = (idToken: Partial<OidcIdToken>) =>
-  buildProvider(idToken).getUserInfo(
+const signIn = (idToken: Partial<OidcIdToken>, name?: string) =>
+  buildProvider(idToken, name).getUserInfo(
     { idToken: "stub", accessToken: "a", tokenType: "Bearer" } as any,
     { state: "state-1" } as OAuthCallbackDto,
   );
@@ -70,5 +75,22 @@ describe("GenericOidcProvider email verification", () => {
   it("does not care about the claim when no email is sent at all", async () => {
     const user = await signIn({ email: undefined });
     expect(user.providerId).toBe("subject-1");
+  });
+
+  // A missing claim still lets the user in, but only an address the provider
+  // vouches for counts as confirmed for share recipients
+  it("vouches for an address only when the provider says it is verified", async () => {
+    expect((await signIn({ email: "a@example.com" })).emailVerified).toBe(
+      false,
+    );
+    expect(
+      (await signIn({ email: "a@example.com", email_verified: true }))
+        .emailVerified,
+    ).toBe(true);
+  });
+
+  it("vouches for Microsoft addresses, which come from the tenant directory", async () => {
+    const user = await signIn({ email: "a@example.com" }, "microsoft");
+    expect(user.emailVerified).toBe(true);
   });
 });

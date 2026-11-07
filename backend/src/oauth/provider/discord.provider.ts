@@ -91,6 +91,7 @@ export class DiscordProvider implements OAuthProvider<DiscordToken> {
       providerId: user.id,
       providerUsername: user.global_name ?? user.username,
       email: user.email,
+      emailVerified: user.verified === true,
       idToken: `discord:${token.idToken}`,
     };
   }
