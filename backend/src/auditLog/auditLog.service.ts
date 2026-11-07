@@ -226,5 +226,15 @@ export class AuditLogService {
     });
     if (count)
       this.logger.log(`Deleted ${count} audit entries older than ${days} days`);
+
+    // the share access log holds visitor addresses and is switched on with
+    // the audit log, so it ages out on the same schedule
+    const { count: visits } = await this.prisma.shareAccessLog.deleteMany({
+      where: { createdAt: { lt: cutoff } },
+    });
+    if (visits)
+      this.logger.log(
+        `Deleted ${visits} share access entries older than ${days} days`,
+      );
   }
 }

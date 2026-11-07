@@ -742,6 +742,7 @@ export class ShareService {
           expirationDate,
           user,
         );
+        await this.validateReactivation(currentShare, expirationDate);
       }
     }
 
@@ -787,6 +788,66 @@ export class ShareService {
     const never = expiration.getTime() === 0;
     if (never || expiration > reverseShare.shareExpiration) {
       throw new BadRequestException(this.i18n.t("share.maxExpirationExceeded"));
+    }
+  }
+
+  // Quota and maxShares only count shares that have not expired, so an
+  // expired share that keeps its files falls out of both. Moving its
+  // expiration back has to pass the same limits as completing it did.
+  private async validateReactivation(current: Share, expiration: Date) {
+    const now = new Date();
+    const wasExpired =
+      current.uploadLocked &&
+      current.expiration.getTime() !== 0 &&
+      current.expiration < now;
+    const becomesActive = expiration.getTime() === 0 || expiration > now;
+    if (!wasExpired || !becomesActive) return;
+
+    const share = await this.prisma.share.findUnique({
+      where: { id: current.id },
+      include: {
+        files: true,
+        creator: true,
+        reverseShare: { include: { creator: true } },
+      },
+    });
+
+    const ownShare =
+      share.creator &&
+      (!share.reverseShare || share.reverseShare.creatorId === share.creatorId);
+    const maxShares = share.creator?.maxShares;
+    if (ownShare && maxShares != null && maxShares > 0) {
+      const active = await this.prisma.share.count({
+        where: {
+          creatorId: share.creatorId,
+          uploadLocked: true,
+          OR: [
+            { expiration: { gt: now } },
+            { expiration: { equals: moment(0).toDate() } },
+          ],
+        },
+      });
+      if (active >= maxShares)
+        throw new BadRequestException(
+          this.i18n.t("share.maxSharesExceeded", { args: { max: maxShares } }),
+        );
+    }
+
+    const quotaOwner = share.reverseShare
+      ? share.reverseShare.creator
+      : share.creator;
+    if (quotaOwner?.storageQuotaLimit) {
+      const size = share.files.reduce((n, f) => n + parseInt(f.size), 0);
+      const exceededBytes =
+        (await getUserActiveStorageUsage(this.prisma, quotaOwner.id)) +
+        size -
+        parseInt(quotaOwner.storageQuotaLimit);
+      if (exceededBytes > 0)
+        throw new BadRequestException(
+          this.i18n.t("file.storageQuotaExceeded", {
+            args: { exceededSize: byteToHumanSizeString(exceededBytes) },
+          }),
+        );
     }
   }
 
