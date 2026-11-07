@@ -515,6 +515,73 @@ export class S3FileService {
     }
   }
 
+  // The parts of a presigned upload went straight to the bucket, so its size
+  // is only known once it is complete. The same share size limit and storage
+  // quota as a chunked upload apply, an object over either is removed again.
+  private async assertPresignedUploadFits(
+    shareId: string,
+    size: number,
+    key: string,
+  ) {
+    const share = await this.prisma.share.findUnique({
+      where: { id: shareId },
+      include: {
+        files: true,
+        creator: true,
+        reverseShare: { include: { creator: true } },
+      },
+    });
+    const shareSize =
+      share.files.reduce((n, file) => n + parseInt(file.size), 0) + size;
+
+    let error: HttpException | undefined;
+    if (
+      shareSize > getShareSizeLimit(share, this.config.get("share.maxSize"))
+    ) {
+      error = new HttpException(
+        this.i18n.t("file.maxSizeExceeded"),
+        HttpStatus.PAYLOAD_TOO_LARGE,
+      );
+    } else {
+      const quotaOwner = share.reverseShare
+        ? share.reverseShare.creator
+        : share.creator;
+      const quotaOwnerId = share.reverseShare
+        ? share.reverseShare.creatorId
+        : share.creatorId;
+      if (quotaOwnerId && quotaOwner?.storageQuotaLimit) {
+        const exceededBytes =
+          (await getUserActiveStorageUsage(this.prisma, quotaOwnerId)) +
+          size -
+          parseInt(quotaOwner.storageQuotaLimit);
+        if (exceededBytes > 0) {
+          const exceededSize = byteToHumanSizeString(exceededBytes);
+          error = new BadRequestException(
+            this.i18n.t(
+              share.reverseShare
+                ? "file.reverseShareQuotaExceeded"
+                : "file.storageQuotaExceeded",
+              { args: { exceededSize } },
+            ),
+          );
+        }
+      }
+    }
+    if (!error) return;
+
+    await this.getS3Instance()
+      .send(
+        new DeleteObjectCommand({
+          Bucket: this.config.get("s3.bucketName"),
+          Key: key,
+        }),
+      )
+      .catch((e) =>
+        this.logger.error("Failed to remove an S3 upload over the limit:", e),
+      );
+    throw error;
+  }
+
   async completePreSignedUpload(
     shareId: string,
     fileId: string,
@@ -550,9 +617,18 @@ export class S3FileService {
       throw new BadRequestException(this.i18n.t("file.s3UploadFailed"));
     }
 
+    let fileSize: number;
     try {
-      const fileSize = await this.getFileSize(shareId, fileName);
+      fileSize = await this.getFileSize(shareId, fileName);
+    } catch (error) {
+      this.logger.error("Failed to read the size of an S3 upload:", error);
+      throw new InternalServerErrorException(
+        this.i18n.t("file.s3UploadFailed"),
+      );
+    }
+    await this.assertPresignedUploadFits(shareId, fileSize, key);
 
+    try {
       const existingFile = await this.prisma.file.findUnique({
         where: { id: fileId },
       });
