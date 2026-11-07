@@ -46,11 +46,20 @@ export class S3FileService {
   private multipartUploads: Record<
     string,
     {
+      shareId: string;
       uploadId: string;
       parts: Array<{ ETag: string | undefined; PartNumber: number }>;
       uploadedBytes: number;
     }
   > = {};
+
+  // bytes the share's other files have sent so far, uploads running at the
+  // same time each saw room for themselves otherwise
+  private otherUploadsBytes(shareId: string, fileId: string) {
+    return Object.entries(this.multipartUploads)
+      .filter(([id, upload]) => id !== fileId && upload.shareId === shareId)
+      .reduce((n, [, upload]) => n + upload.uploadedBytes, 0);
+  }
 
   constructor(
     private prisma: PrismaService,
@@ -92,8 +101,10 @@ export class S3FileService {
       throw new BadRequestException(this.i18n.t("file.nameInUse"));
 
     // same limit as a local upload, checked before anything goes to the bucket
+    const otherUploads = this.otherUploadsBytes(shareId, file.id);
     const shareSizeSum =
       share.files.reduce((n, { size }) => n + parseInt(size), 0) +
+      otherUploads +
       (chunk.index === 0
         ? 0
         : (this.multipartUploads[file.id]?.uploadedBytes ?? 0)) +
@@ -110,6 +121,24 @@ export class S3FileService {
     try {
       // Initialize multipart upload if it's the first chunk
       if (chunk.index === 0) {
+        // a first chunk sent again starts over, the upload it replaces would
+        // otherwise stay open in the bucket and keep its parts
+        const replaced = this.multipartUploads[file.id];
+        if (replaced) {
+          delete this.multipartUploads[file.id];
+          await s3Instance
+            .send(
+              new AbortMultipartUploadCommand({
+                Bucket: bucketName,
+                Key: key,
+                UploadId: replaced.uploadId,
+              }),
+            )
+            .catch((e) =>
+              this.logger.warn(`Could not abort a replaced upload: ${e}`),
+            );
+        }
+
         const multipartInitResponse = await s3Instance.send(
           new CreateMultipartUploadCommand({
             Bucket: bucketName,
@@ -124,6 +153,7 @@ export class S3FileService {
 
         // Store the uploadId and parts list in memory
         this.multipartUploads[file.id] = {
+          shareId,
           uploadId,
           parts: [],
           uploadedBytes: 0,
@@ -153,6 +183,7 @@ export class S3FileService {
         );
         const projectedUsage =
           activeStorageUsage +
+          otherUploads +
           multipartUpload.uploadedBytes +
           buffer.byteLength;
 
@@ -452,6 +483,8 @@ export class S3FileService {
 
     const processFiles = async () => {
       for (const file of files) {
+        // the download was given up on, stop asking the bucket for more
+        if (archive.destroyed) return;
         const key = `${s3Path}${shareId}/${file.name}`;
         try {
           const response = await s3Instance.send(
@@ -465,19 +498,23 @@ export class S3FileService {
             const body = response.Body as Readable;
             archive.append(body, { name: safeFileName(file.name) || file.id });
             // Wait for this file to be fully appended before moving to the next one to avoid overwhelming memory/connections
-            await new Promise((resolve, reject) => {
+            // a destroyed archive never reads the rest of this body
+            const onArchiveClose = () => body.destroy();
+            archive.once("close", onArchiveClose);
+            await new Promise<void>((resolve, reject) => {
               body.on("end", resolve);
               body.on("error", reject);
-            });
+              body.on("close", resolve);
+            }).finally(() => archive.off("close", onArchiveClose));
           }
         } catch (error) {
           this.logger.error(`Error processing file ${file.name}`, error);
         }
       }
-      archive.finalize();
+      if (!archive.destroyed) archive.finalize();
     };
 
-    processFiles();
+    void processFiles();
 
     return archive;
   }
