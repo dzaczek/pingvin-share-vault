@@ -20,7 +20,6 @@ import {
   TbPlus,
 } from "react-icons/tb";
 import { FormattedMessage } from "react-intl";
-import { fromEvent } from "file-selector";
 import useUiStyle, {
   GlassSettings,
   useUploadPanel,
@@ -30,6 +29,8 @@ import useTranslate from "../../hooks/useTranslate.hook";
 import { FileUpload } from "../../types/File.type";
 import { byteToHumanSizeString } from "../../utils/fileSize.util";
 import toast from "../../utils/toast.util";
+import { getFilesFromEvent } from "../../utils/file.util";
+import useClipboardPaste from "../../hooks/useClipboardPaste.hook";
 import { glassSurface } from "../../styles/glass.style";
 import { precisionTokens } from "../../styles/precision.style";
 
@@ -99,89 +100,6 @@ const useStyles = createStyles((theme, glass: GlassSettings | null) => ({
     },
   },
 }));
-
-const traverseDirectory = async (entry: any, path = ""): Promise<File[]> => {
-  if (entry.isFile) {
-    return new Promise((resolve) => {
-      entry.file((file: File) => {
-        const relativePath = path ? `${path}/${file.name}` : file.name;
-        Object.defineProperty(file, "webkitRelativePath", {
-          value: relativePath,
-          writable: true,
-          configurable: true,
-        });
-        resolve([file]);
-      });
-    });
-  } else if (entry.isDirectory) {
-    const dirReader = entry.createReader();
-    const readEntries = (): Promise<any[]> => {
-      return new Promise((resolve) => {
-        dirReader.readEntries(
-          (entries: any[]) => resolve(entries),
-          () => resolve([]),
-        );
-      });
-    };
-
-    let entries: any[] = [];
-    let readBatch = await readEntries();
-    while (readBatch.length > 0) {
-      entries = entries.concat(readBatch);
-      readBatch = await readEntries();
-    }
-
-    const promises = entries.map((e) =>
-      traverseDirectory(e, path ? `${path}/${entry.name}` : entry.name),
-    );
-    const results = await Promise.all(promises);
-    return results.flat();
-  }
-  return [];
-};
-
-const getFilesFromEvent = async (event: any): Promise<any[]> => {
-  // Chrome opens the file picker through the File System Access API, which
-  // hands back FileSystemFileHandle[] instead of a change/drop event
-  if (Array.isArray(event)) {
-    const filePromises = event.map(async (item: any) => {
-      if (item && typeof item.getFile === "function") {
-        return await item.getFile();
-      }
-      return item;
-    });
-    return await Promise.all(filePromises);
-  }
-
-  if (event?.dataTransfer) {
-    const items = event.dataTransfer.items;
-    if (!items) return [];
-
-    const filePromises: Promise<File[]>[] = [];
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      if (item.kind === "file") {
-        const entry = item.webkitGetAsEntry ? item.webkitGetAsEntry() : null;
-        if (entry) {
-          filePromises.push(traverseDirectory(entry));
-        } else {
-          const file = item.getAsFile();
-          if (file) {
-            filePromises.push(Promise.resolve([file]));
-          }
-        }
-      }
-    }
-    const fileArrays = await Promise.all(filePromises);
-    return fileArrays.flat();
-  }
-
-  if (event?.target?.files) {
-    return Array.from(event.target.files) as File[];
-  }
-
-  return await fromEvent(event);
-};
 
 const Dropzone = ({
   title,
@@ -257,6 +175,9 @@ const Dropzone = ({
       onFilesChanged(files);
     }
   };
+
+  // pasted files go through the same size check as dropped ones
+  useClipboardPaste({ onFiles: handleDrop, disabled: isUploading });
 
   const card = (kind: "files" | "folder") => (
     <MantineDropzone

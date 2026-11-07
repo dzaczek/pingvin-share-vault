@@ -663,9 +663,9 @@ export default {
   "upload.dropzone.description.mobile.no-folder":
     "Tap here to select individual files, photos, or videos. Maximum total upload size: {maxSize}.",
   "upload.dropzone.description.desktop":
-    "Click here or drag and drop individual files, photos, or videos. Use the button below to upload a folder, or press {shortcut} to upload text from your clipboard. Maximum total upload size: {maxSize}.",
+    "Click here or drag and drop individual files, photos, or videos. Use the button below to upload a folder, or press {shortcut} to upload from your clipboard. Maximum total upload size: {maxSize}.",
   "upload.dropzone.description.desktop.no-folder":
-    "Click here or drag and drop individual files, photos, or videos, or press {shortcut} to upload text from your clipboard. Maximum total upload size: {maxSize}.",
+    "Click here or drag and drop individual files, photos, or videos, or press {shortcut} to upload from your clipboard. Maximum total upload size: {maxSize}.",
   "upload.dropzone.notify.file-too-big":
     "Your files exceed the maximum share size of {maxSize}.",
   "upload.dropzone.glass.files.title": "Files",
@@ -689,7 +689,7 @@ export default {
   "upload.precision.progress": "{done} of {total}",
   "upload.precision.done": "You're done!",
   "upload.dropzone.glass.hint":
-    "Press {shortcut} to upload text from your clipboard. Maximum total upload size: {maxSize}.",
+    "Press {shortcut} to upload from your clipboard. Maximum total upload size: {maxSize}.",
   "upload.dropzone.glass.hint.mobile": "Maximum total upload size: {maxSize}.",
   "upload.button.folder": "Upload folder",
   "upload.button.folder.append": "Append folder",
