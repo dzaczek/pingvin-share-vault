@@ -101,9 +101,18 @@ describe("creating a share with a reverse share cookie", () => {
 });
 
 describe("reopening a completed share", () => {
-  const run = async (share: unknown) => {
+  const run = async (share: {
+    uploadLocked: boolean;
+    [key: string]: unknown;
+  }) => {
     const prisma = {
-      share: { findUnique: jest.fn(async () => share), update: jest.fn() },
+      share: {
+        findUnique: jest.fn(async () => share),
+        // the conditional write only changes a share that is still locked
+        updateMany: jest.fn(async () => ({
+          count: share.uploadLocked ? 1 : 0,
+        })),
+      },
       reverseShare: { update: jest.fn() },
     };
     await service(prisma, {}).revertComplete("s1");
@@ -120,7 +129,7 @@ describe("reopening a completed share", () => {
       where: { id: "rs1" },
       data: { remainingUses: { increment: 1 } },
     });
-    expect(prisma.share.update).toHaveBeenCalled();
+    expect(prisma.share.updateMany).toHaveBeenCalled();
   });
 
   it("gives nothing back for a share that was not completed", async () => {

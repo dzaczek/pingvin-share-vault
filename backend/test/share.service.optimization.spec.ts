@@ -37,6 +37,8 @@ describe('ShareService Optimization', () => {
             share: {
               findUnique: jest.fn(),
               update: jest.fn(),
+              // complete() claims the share in one conditional write
+              updateMany: jest.fn().mockResolvedValue({ count: 1 }),
             },
             $transaction: jest.fn(),
           },
@@ -194,7 +196,11 @@ describe('ShareService Optimization', () => {
         where: { id: 'rs1', remainingUses: { gt: 0 } },
         data: { remainingUses: { decrement: 1 } },
       });
-      expect(prismaService.share.update).not.toHaveBeenCalled();
+      // the claim is given back, the share stays open
+      expect(prismaService.share.updateMany).toHaveBeenLastCalledWith({
+        where: { id: 'share1' },
+        data: { uploadLocked: false },
+      });
     });
   });
 });
