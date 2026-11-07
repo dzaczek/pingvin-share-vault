@@ -46,7 +46,7 @@
     "@types/range-parser": "^1.2.7",
     "archiver": "^7.0.1",
     "argon2": "^0.45.1",
-    "body-parser": "^2.2.0",
+    "body-parser": "^2.4.0",
     "cache-manager": "^7.2.9",
     "cacheable": "^1.9.0",
     "check-disk-space": "^3.4.0",
