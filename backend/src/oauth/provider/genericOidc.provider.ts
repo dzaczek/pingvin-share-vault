@@ -2,6 +2,12 @@ import { InternalServerErrorException, Logger } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Cache } from "cache-manager";
 import * as jmespath from "jmespath";
+import {
+  createRemoteJWKSet,
+  decodeJwt,
+  jwtVerify,
+  JWTVerifyGetKey,
+} from "jose";
 import { nanoid } from "nanoid";
 import { ConfigService } from "../../config/config.service";
 import { OAuthCallbackDto } from "../dto/oauthCallback.dto";
@@ -12,7 +18,7 @@ import { OAuthProvider, OAuthToken } from "./oauthProvider.interface";
 export abstract class GenericOidcProvider implements OAuthProvider<OidcToken> {
   protected discoveryUri: string;
   private configuration: OidcConfigurationCache;
-  private jwk: OidcJwkCache;
+  private jwks: JWTVerifyGetKey;
   private logger: Logger = new Logger(
     Object.getPrototypeOf(this).constructor.name,
   );
@@ -44,13 +50,6 @@ export abstract class GenericOidcProvider implements OAuthProvider<OidcToken> {
       await this.fetchConfiguration();
     }
     return this.configuration.data;
-  }
-
-  async getJwk(): Promise<OidcJwk[]> {
-    if (!this.jwk || this.jwk.expires < Date.now()) {
-      await this.fetchJwk();
-    }
-    return this.jwk.data;
   }
 
   async getAuthEndpoint(state: string, redirectUri?: string) {
@@ -127,17 +126,18 @@ export abstract class GenericOidcProvider implements OAuthProvider<OidcToken> {
       adminAccess?: string;
     },
   ): Promise<OAuthSignInDto> {
-    const idTokenData = this.decodeIdToken(token.idToken);
-
-    if (!idTokenData) {
+    if (!token.idToken) {
       this.logger.error("Can not get ID Token from response");
       throw new InternalServerErrorException();
     }
 
+    const idTokenData = await this.verifyIdToken(token.idToken);
+
+    // without a cached nonce a token without one would match it
     const key = `oauth-${this.name}-nonce-${query.state}`;
     const nonce = await this.cache.get(key);
     await this.cache.del(key);
-    if (nonce !== idTokenData.nonce) {
+    if (!nonce || nonce !== idTokenData.nonce) {
       this.logger.error(
         `Invalid nonce. Expected ${nonce}, but got ${idTokenData.nonce}`,
       );
@@ -224,6 +224,15 @@ export abstract class GenericOidcProvider implements OAuthProvider<OidcToken> {
 
   protected abstract getDiscoveryUri(): string;
 
+  // the issuer the ID token has to name, providers with a templated or
+  // fixed issuer override it
+  protected getExpectedIssuer(
+    configuration: OidcConfiguration,
+    _idToken: OidcIdToken,
+  ): string | string[] {
+    return configuration.issuer;
+  }
+
   private async fetchConfiguration(): Promise<void> {
     try {
       const res = await fetch(this.discoveryUri);
@@ -248,26 +257,70 @@ export abstract class GenericOidcProvider implements OAuthProvider<OidcToken> {
     }
   }
 
-  private async fetchJwk(): Promise<void> {
-    const configuration = await this.getConfiguration();
-    const res = await fetch(configuration.jwks_uri);
-    const expires = res.headers.has("expires")
-      ? new Date(res.headers.get("expires")).getTime()
-      : Date.now() + 1000 * 60 * 60 * 24;
-    this.jwk = {
-      expires,
-      data: (await res.json())["keys"],
-    };
-  }
-
   private deinit() {
     this.discoveryUri = undefined;
     this.configuration = undefined;
-    this.jwk = undefined;
+    this.jwks = undefined;
   }
 
-  private decodeIdToken(idToken: string): OidcIdToken {
-    return this.jwtService.decode(idToken) as OidcIdToken;
+  // OpenID Connect Core 3.1.3.7: signed by the provider with an algorithm it
+  // advertises, issued by it, for this client, not expired, about a subject.
+  private async verifyIdToken(idToken: string): Promise<OidcIdToken> {
+    const configuration = await this.getConfiguration();
+    const clientId = this.config.get(`oauth.${this.name}-clientId`);
+    const algorithms = configuration.id_token_signing_alg_values_supported;
+
+    try {
+      const issuer = this.getExpectedIssuer(
+        configuration,
+        decodeJwt(idToken) as unknown as OidcIdToken,
+      );
+      if (!issuer?.length) throw new Error("the provider names no issuer");
+
+      const { payload } = await jwtVerify(
+        idToken,
+        (header, token) => {
+          // HS* tokens are signed with the client secret, but only accepted
+          // when the provider says it signs that way. Otherwise anyone who
+          // knows the secret could make up tokens for any user.
+          if (header.alg.startsWith("HS")) {
+            if (!algorithms?.includes(header.alg)) {
+              throw new Error(`unexpected algorithm ${header.alg}`);
+            }
+            return new TextEncoder().encode(
+              this.config.get(`oauth.${this.name}-clientSecret`),
+            );
+          }
+          if (!configuration.jwks_uri) {
+            throw new Error(`no jwks_uri to verify a ${header.alg} token`);
+          }
+          this.jwks ??= createRemoteJWKSet(new URL(configuration.jwks_uri));
+          return this.jwks(header, token);
+        },
+        {
+          issuer,
+          audience: clientId,
+          algorithms,
+          clockTolerance: 60,
+        },
+      );
+      const claims = payload as unknown as OidcIdToken;
+
+      if (claims.azp && claims.azp !== clientId) {
+        throw new Error(`unexpected azp ${claims.azp}`);
+      }
+      if (!claims.sub) throw new Error("the token has no sub claim");
+
+      for (const claim of ["exp", "iat"]) {
+        if (payload[claim] === undefined) {
+          this.logger.warn(`The ID token has no ${claim} claim`);
+        }
+      }
+      return claims;
+    } catch (e) {
+      this.logger.error(`Invalid ID token: ${e.message}`);
+      throw new ErrorPageException("invalid_token");
+    }
   }
 }
 
@@ -290,18 +343,7 @@ export interface OidcConfiguration {
   end_session_endpoint?: string;
 }
 
-export interface OidcJwk {
-  e: string;
-  alg: string;
-  kid: string;
-  use: string;
-  kty: string;
-  n: string;
-}
-
 export type OidcConfigurationCache = OidcCache<OidcConfiguration>;
-
-export type OidcJwkCache = OidcCache<OidcJwk[]>;
 
 export interface OidcToken {
   access_token: string;
@@ -314,6 +356,7 @@ export interface OidcToken {
 export interface OidcIdToken {
   iss: string;
   sub: string;
+  azp?: string;
   exp: number;
   iat: number;
   email: string;

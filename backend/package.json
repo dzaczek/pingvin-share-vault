@@ -56,6 +56,7 @@
     "content-disposition": "^0.5.4",
     "cookie-parser": "^1.4.7",
     "jmespath": "^0.16.0",
+    "jose": "^5.10.0",
     "ldapts": "^7.4.0",
     "mime-types": "^3.0.1",
     "moment": "^2.30.1",
