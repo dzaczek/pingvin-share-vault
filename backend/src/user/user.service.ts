@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger } from "@nestjs/common";
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  Logger,
+} from "@nestjs/common";
 import { Prisma, User } from "@prisma/client";
 import * as argon from "argon2";
 import * as crypto from "crypto";
@@ -146,11 +151,28 @@ export class UserSevice {
   // A new address has to be confirmed before it counts as the user's, see
   // hasConfirmedEmail. The token is set together with the address, so a mail
   // that fails to go out leaves it unconfirmed rather than trusted.
-  async updateOwn(current: User, dto: UpdateOwnUserDTO) {
+  //
+  // Password resets are mailed to the address, so changing it takes the
+  // current password, like PATCH /auth/password does. Without it a stolen
+  // session was enough to take the account over for good.
+  async updateOwn(
+    current: User,
+    { currentPassword, ...dto }: UpdateOwnUserDTO,
+  ) {
     const email = dto.email?.toLowerCase().trim();
+    const emailChanges = !!email && email !== current.email;
+    if (
+      emailChanges &&
+      current.password &&
+      !(
+        currentPassword &&
+        (await argon.verify(current.password, currentPassword))
+      )
+    )
+      throw new ForbiddenException(this.i18n.t("auth.invalidPassword"));
+
     const needsConfirmation =
-      !!email &&
-      email !== current.email &&
+      emailChanges &&
       this.configService.get("security.enableEmailVerification");
     if (!needsConfirmation) return this.update(current.id, dto);
 

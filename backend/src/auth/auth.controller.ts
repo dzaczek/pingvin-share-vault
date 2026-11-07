@@ -31,6 +31,7 @@ import { UpdatePasswordDTO } from "./dto/updatePassword.dto";
 import { VerifyTotpDTO } from "./dto/verifyTotp.dto";
 import { JwtGuard } from "./guard/jwt.guard";
 import { DemoModeGuard } from "./guard/demoMode.guard";
+import { JsonBodyGuard } from "./guard/jsonBody.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -42,6 +43,7 @@ export class AuthController {
   ) {}
 
   @Post("signUp")
+  @UseGuards(JsonBodyGuard)
   @Throttle({
     default: {
       limit: 20,
@@ -68,6 +70,7 @@ export class AuthController {
   }
 
   @Post("signIn")
+  @UseGuards(JsonBodyGuard)
   @Throttle({
     default: {
       limit: 20,
@@ -94,6 +97,7 @@ export class AuthController {
   }
 
   @Post("signIn/totp")
+  @UseGuards(JsonBodyGuard)
   @Throttle({
     default: {
       limit: 20,
