@@ -11,6 +11,7 @@ import { AppModule } from "./app.module";
 import { auditRequestMiddleware } from "./auditLog/auditLog.context";
 import { ConfigService } from "./config/config.service";
 import { anonymizeIpMiddleware } from "./utils/anonymizeIp.util";
+import { trustProxySetting } from "./utils/trustProxy.util";
 import {
   ANONYMIZE_IP,
   DATA_DIRECTORY,
@@ -67,7 +68,7 @@ async function bootstrap() {
 
   app.use(cookieParser());
   app.use(auditRequestMiddleware);
-  app.set("trust proxy", process.env.TRUST_PROXY === "true");
+  app.set("trust proxy", trustProxySetting(process.env));
   const anonymize = anonymizeIpMiddleware(ANONYMIZE_IP);
   if (anonymize) {
     Logger.log(`ANONYMIZE_IP=${ANONYMIZE_IP}, no full visitor address is kept`);

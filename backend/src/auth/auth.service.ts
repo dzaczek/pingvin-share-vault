@@ -235,7 +235,14 @@ export class AuthService {
       include: { resetPasswordToken: true },
     });
 
-    if (!user) return;
+    // an address that is not confirmed yet may not be the user's, a reset
+    // mailed there would hand the account to whoever typed it in
+    if (
+      !user ||
+      (this.config.get("security.enableEmailVerification") &&
+        user.activationToken)
+    )
+      return;
 
     if (user.ldapDN) {
       this.logger.log(

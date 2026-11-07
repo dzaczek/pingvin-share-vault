@@ -55,6 +55,7 @@ const Account = () => {
       displayName: user?.displayName ?? "",
       username: user?.username,
       email: user?.email,
+      currentPassword: "",
     },
     validate: yupResolver(
       yup.object().shape({
@@ -68,6 +69,11 @@ const Account = () => {
       }),
     ),
   });
+
+  // password resets go to the address, so changing it asks for the password
+  const emailChanges =
+    (accountForm.values.email ?? "").toLowerCase().trim() !== user?.email;
+  const askCurrentPassword = !!user?.hasPassword && emailChanges;
 
   const passwordForm = useForm({
     initialValues: {
@@ -156,8 +162,12 @@ const Account = () => {
                   displayName: values.displayName,
                   username: values.username,
                   email: values.email,
+                  ...(askCurrentPassword && {
+                    currentPassword: values.currentPassword,
+                  }),
                 })
-                .then(() =>
+                .then(() => {
+                  accountForm.setFieldValue("currentPassword", "");
                   toast.success(
                     t(
                       values.email !== user?.email &&
@@ -165,8 +175,8 @@ const Account = () => {
                         ? "account.notify.info.confirm-email"
                         : "account.notify.info.success",
                     ),
-                  ),
-                )
+                  );
+                })
                 .catch(toast.axiosError),
             )}
           >
@@ -185,6 +195,14 @@ const Account = () => {
                 disabled={user?.isLdap}
                 {...accountForm.getInputProps("email")}
               />
+              {askCurrentPassword && (
+                <PasswordInput
+                  label={t("account.card.password.title")}
+                  autoComplete="current-password"
+                  required
+                  {...accountForm.getInputProps("currentPassword")}
+                />
+              )}
               {!user?.isLdap && (
                 <Group position="right">
                   <Button type="submit">
