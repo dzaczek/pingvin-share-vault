@@ -223,10 +223,17 @@ export class UserSevice {
       data: { creatorId: null, reverseShareId: null },
     });
 
+    // Shares uploaded through the user's reverse shares go too, through the
+    // cascade on Share.reverseShare, which removes the rows but not the files
+    const received = await this.prisma.share.findMany({
+      where: { reverseShare: { creatorId: id }, blockedAt: null },
+      select: { id: true },
+    });
+
     await Promise.all(
-      user.shares
-        .filter((share) => !share.blockedAt)
-        .map((share) => this.fileService.deleteAllFiles(share.id)),
+      [...user.shares.filter((share) => !share.blockedAt), ...received].map(
+        (share) => this.fileService.deleteAllFiles(share.id),
+      ),
     );
 
     return await this.prisma.user.delete({ where: { id } });
