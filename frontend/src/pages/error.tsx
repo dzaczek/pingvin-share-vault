@@ -2,6 +2,7 @@ import React from "react";
 import { Button, createStyles, Stack, Text, Title } from "@mantine/core";
 import Meta from "../components/Meta";
 import useTranslate from "../hooks/useTranslate.hook";
+import useHomeHref from "../hooks/homeHref.hook";
 import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
 
@@ -15,6 +16,7 @@ export default function Error() {
   const { classes } = useStyle();
   const t = useTranslate();
   const router = useRouter();
+  const homeHref = useHomeHref();
 
   const params = router.query.params
     ? (router.query.params as string).split(",").map((param) => {
@@ -37,7 +39,7 @@ export default function Error() {
             )}
           />
         </Text>
-        <Button mt="xl" onClick={() => router.push("/")}>
+        <Button mt="xl" onClick={() => router.push(homeHref)}>
           {"Go Home"}
         </Button>
       </Stack>

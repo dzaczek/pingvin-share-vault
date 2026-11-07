@@ -10,6 +10,7 @@ export default {
   "navbar.avatar.account": "帳號設定",
   "navbar.avatar.admin": "管理",
   "navbar.avatar.signout": "登出",
+  "footer.poweredBy": "技術支援：",
   // END navbar
 
   // /
@@ -536,6 +537,8 @@ export default {
   "admin.config.oauth.ignore-totp.description": "當使用者使用第三方登入時，略過 TOTP 驗證",
   "admin.config.oauth.disable-password": "停用密碼登入",
   "admin.config.oauth.disable-password.description": "當你停用密碼登入時，確保你有啟用任意 OAuth 服務以避免無法存取",
+  "admin.config.oauth.allowed-hosts": "允許的 OAuth 主機",
+  "admin.config.oauth.allowed-hosts.description": "允許用於 OAuth 登入的其他主機名稱清單，以逗號分隔（例如 share.internal.example.com）。",
   "admin.config.oauth.github-enabled": "GitHub",
   "admin.config.oauth.github-enabled.description": "啟用 Github 登入",
   "admin.config.oauth.github-client-id": "Github 的客戶端 ID",

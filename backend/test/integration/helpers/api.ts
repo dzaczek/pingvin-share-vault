@@ -41,7 +41,8 @@ export async function api<T = any>(
   const finalHeaders: Record<string, string> = { ...headers };
   if (jar) finalHeaders.Cookie = cookieHeader(jar);
   if (raw) finalHeaders["Content-Type"] = "application/octet-stream";
-  else if (body !== undefined) finalHeaders["Content-Type"] = "application/json";
+  else if (body !== undefined)
+    finalHeaders["Content-Type"] = "application/json";
 
   const res = await fetch(`${BASE_URL}${path}`, {
     method,
@@ -211,4 +212,48 @@ export async function waitForScanStatus(
   }
 
   return last ?? "PENDING";
+}
+
+// The mailpit web API of the local stack, which holds every mail it sent.
+const MAILPIT_URL =
+  process.env.INTEGRATION_MAILPIT_URL ?? "http://localhost:8025";
+
+// Only an address someone actually confirmed counts for share recipients.
+// Asks for a verification mail, reads its link from mailpit and follows it.
+// Email verification has to be switched on, with SMTP pointed at mailpit.
+export async function confirmEmail(email: string) {
+  const resend = await api("/auth/verify/resend", {
+    method: "POST",
+    body: { email },
+  });
+  if (resend.status >= 300) {
+    throw new Error(`verification resend failed: ${resend.status}`);
+  }
+
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const search = await fetch(
+      `${MAILPIT_URL}/api/v1/search?query=${encodeURIComponent(`to:"${email}"`)}`,
+    );
+    const { messages = [] } = (await search.json()) as {
+      messages?: { ID: string }[];
+    };
+    for (const { ID } of messages) {
+      const message = (await (
+        await fetch(`${MAILPIT_URL}/api/v1/message/${ID}`)
+      ).json()) as { Text?: string; HTML?: string };
+      const token = `${message.Text ?? ""} ${message.HTML ?? ""}`.match(
+        /\/auth\/verify\/([A-Za-z0-9-]+)/,
+      )?.[1];
+      if (!token) continue;
+      const verified = await api("/auth/verify", {
+        method: "POST",
+        body: { token },
+      });
+      if (verified.status < 300) return;
+    }
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  throw new Error(
+    `no working verification mail for ${email} in mailpit at ${MAILPIT_URL}`,
+  );
 }

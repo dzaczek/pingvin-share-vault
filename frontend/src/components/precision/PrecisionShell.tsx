@@ -44,6 +44,7 @@ import userPreferences from "../../utils/userPreferences.util";
 import Footer from "../footer/Footer";
 import ActionAvatar from "../header/ActionAvatar";
 import Logo from "../Logo";
+import useHomeHref from "../../hooks/homeHref.hook";
 
 type Item = { link: string; label: string; icon: IconType };
 
@@ -65,6 +66,7 @@ const PrecisionShell = ({ children }: { children: ReactNode }) => {
   const config = useConfig();
   const router = useRouter();
   const { user } = useUser();
+  const homeHref = useHomeHref();
   const { toggleColorScheme } = useMantineColorScheme();
   const tokens = precisionTokens(theme);
 
@@ -212,7 +214,7 @@ const PrecisionShell = ({ children }: { children: ReactNode }) => {
                   aria-label={t("precision.nav.menu")}
                 />
               </MediaQuery>
-              <Link href="/" passHref>
+              <Link href={homeHref} passHref>
                 <Group spacing="sm" noWrap>
                   <Logo height={30} width={30} />
                   <Text weight={650} size="md" lineClamp={1}>

@@ -65,7 +65,11 @@ const Share = ({ shareId }: { shareId: string }) => {
 
   const handleEditClick = async () => {
     try {
-      const myShares = await shareService.getMyShares();
+      // an admin editing someone else's share, or an anonymous one, only
+      // finds it in the list of all shares
+      const myShares = isOwner
+        ? await shareService.getMyShares()
+        : await shareService.list();
       const myShare = myShares.find((s) => s.id === shareId);
       if (!myShare) return;
       showShareInformationsModal(

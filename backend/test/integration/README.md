@@ -42,6 +42,11 @@ Against another instance set `INTEGRATION_SMTP_HOST` and
 `INTEGRATION_SMTP_PORT` to an SMTP server that instance can reach. The
 original settings are put back afterwards.
 
+The recipient has to confirm their address before shares sent to it show up,
+so the suite reads the verification mail from mailpit's web API, by default
+`http://localhost:8025`. Point `INTEGRATION_MAILPIT_URL` elsewhere when that
+port is mapped differently.
+
 ## Rate limits
 
 The auth endpoints allow 20 calls per 5 minutes per IP and the suite creates a
