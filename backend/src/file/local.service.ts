@@ -150,7 +150,7 @@ export class LocalFileService {
       // the meantime locks it before the virus scan lists the files, so a
       // file landing now would never be scanned. A file already at this id
       // was scanned, it must not be swapped for other bytes either.
-      const target = `${SHARE_DIRECTORY}/${shareId}/${file.id}`;
+      const target = this.getSafeFilePath(shareId, file.id);
       const current = await this.prisma.share.findUnique({
         where: { id: shareId },
         select: { uploadLocked: true },

@@ -36,9 +36,14 @@ import { UpdateShareDTO } from "./dto/updateShare.dto";
 import { hasConfirmedEmail } from "./recipientEmail.util";
 
 // existsSync follows the disk's own rules, so on a case-insensitive one it
-// also finds a folder whose name differs only in case
-const shareFolderExists = (id: string) =>
-  fs.existsSync(`${SHARE_DIRECTORY}/${id}`);
+// also finds a folder whose name differs only in case. An id that would
+// leave the shares folder counts as taken.
+const shareFolderExists = (id: string) => {
+  const shareRoot = resolve(SHARE_DIRECTORY);
+  const path = resolve(shareRoot, id);
+  if (!path.startsWith(shareRoot + sep)) return true;
+  return fs.existsSync(path);
+};
 
 @Injectable()
 export class ShareService {
