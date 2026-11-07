@@ -139,6 +139,11 @@ export class FileController {
     @Query("recipient") recipientId?: string,
   ) {
     const zipStream = await this.fileService.getZip(shareId);
+    // a client that goes away early leaves the zip unread, it has to stop
+    // building rather than run to the end with nobody listening
+    res.on("close", () => {
+      if (!res.writableFinished) zipStream.destroy();
+    });
 
     res.set({
       "Content-Type": "application/zip",
