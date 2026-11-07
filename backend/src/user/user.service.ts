@@ -261,7 +261,7 @@ export class UserSevice {
         ? ldapEntry[fieldNameEmail][0]
         : ldapEntry[fieldNameEmail];
       if (value) {
-        userEmail = value.toString();
+        userEmail = value.toString().toLowerCase().trim();
       }
     } else {
       this.logger.warn(
@@ -279,9 +279,12 @@ export class UserSevice {
       }
     }
 
-    if (providedCredentials.email) {
-      /* if LDAP does not provides an users email address, take the user provided email address instead */
-      userEmail = providedCredentials.email;
+    // The directory's address is the one the admin vouches for. The address
+    // typed at sign in is only a fallback when the directory has none, and
+    // nobody has checked it, so it does not count as confirmed.
+    const directoryEmail = userEmail;
+    if (!userEmail && providedCredentials.email) {
+      userEmail = providedCredentials.email.toLowerCase().trim();
     }
 
     const randomId = crypto.randomUUID();
@@ -298,6 +301,7 @@ export class UserSevice {
 
           isAdmin,
           ldapDN: ldapEntry.dn,
+          confirmedEmail: directoryEmail,
         },
         update: {
           isAdmin,
@@ -329,8 +333,11 @@ export class UserSevice {
           });
       }
 
-      if (userEmail && userEmail !== user.email) {
-        /* Sync users email if it has changed */
+      if (
+        userEmail &&
+        (userEmail !== user.email || user.confirmedEmail !== directoryEmail)
+      ) {
+        /* Sync users email if it has changed, and confirm the directory's */
         await this.prisma.user
           .update({
             where: {
@@ -338,6 +345,7 @@ export class UserSevice {
             },
             data: {
               email: userEmail,
+              confirmedEmail: directoryEmail,
             },
           })
           .then((newUser) => {

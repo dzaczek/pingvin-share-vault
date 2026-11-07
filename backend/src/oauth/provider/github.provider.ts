@@ -61,6 +61,8 @@ export class GitHubProvider implements OAuthProvider<GitHubToken> {
       providerId: user.id.toString(),
       providerUsername: user.name ?? user.login,
       email,
+      // getGitHubEmail only returns a verified address
+      emailVerified: true,
       idToken: `github:${token.idToken}`,
     };
   }

@@ -367,6 +367,7 @@ export class ShareService {
               username: true,
               isActivated: true,
               activationToken: true,
+              confirmedEmail: true,
             },
           })
         : [];

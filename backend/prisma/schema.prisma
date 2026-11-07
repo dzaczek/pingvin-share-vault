@@ -39,6 +39,8 @@ model User {
   isActivated              Boolean   @default(true)
   activationToken          String?   @unique
   activationTokenExpiresAt DateTime?
+  // the address the user proved they own, see hasConfirmedEmail
+  confirmedEmail           String?
 
   oAuthUsers OAuthUser[]
 }
