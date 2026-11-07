@@ -164,10 +164,19 @@ describe("AuthService and the confirmed address", () => {
 });
 
 describe("LDAP sign in and the account address", () => {
-  const signIn = async (directoryMail: string | undefined, typed?: string) => {
-    const prisma = {
+  let prisma: any;
+  const signIn = async (
+    directoryMail: string | undefined,
+    typed?: string,
+    existing?: object,
+  ) => {
+    prisma = {
       user: {
-        upsert: jest.fn(async ({ create }) => ({ id: "u1", ...create })),
+        upsert: jest.fn(async ({ create }) => ({
+          id: "u1",
+          ...create,
+          ...existing,
+        })),
         update: jest.fn(async ({ data }) => ({ id: "u1", ...data })),
       },
     };
@@ -207,5 +216,21 @@ describe("LDAP sign in and the account address", () => {
     const created = await signIn(undefined, "anna@home.example");
     expect(created.email).toBe("anna@home.example");
     expect(created.confirmedEmail).toBeNull();
+  });
+
+  // the migration leaves LDAP accounts unconfirmed, the directory decides
+  it("confirms the directory's address of an existing account", async () => {
+    await signIn("anna@corp.example", undefined, {
+      username: "anna",
+      email: "anna@corp.example",
+      confirmedEmail: null,
+    });
+    expect(prisma.user.update).toHaveBeenCalledWith({
+      where: { id: "u1" },
+      data: {
+        email: "anna@corp.example",
+        confirmedEmail: "anna@corp.example",
+      },
+    });
   });
 });

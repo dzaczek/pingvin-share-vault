@@ -333,8 +333,11 @@ export class UserSevice {
           });
       }
 
-      if (userEmail && userEmail !== user.email) {
-        /* Sync users email if it has changed */
+      if (
+        userEmail &&
+        (userEmail !== user.email || user.confirmedEmail !== directoryEmail)
+      ) {
+        /* Sync users email if it has changed, and confirm the directory's */
         await this.prisma.user
           .update({
             where: {
