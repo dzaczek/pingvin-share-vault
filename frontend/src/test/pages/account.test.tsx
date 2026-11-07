@@ -88,4 +88,17 @@ describe("account page", () => {
     });
     expect(passwordField()).not.toBeInTheDocument();
   });
+
+  it("offers no password change while password sign in is off", () => {
+    renderWithProviders(<Account />, {
+      user: anna,
+      config: { "oauth.disablePassword": "true" },
+    });
+    expect(screen.queryByLabelText(/new password/i)).not.toBeInTheDocument();
+  });
+
+  it("offers it otherwise", () => {
+    renderWithProviders(<Account />, { user: anna });
+    expect(screen.getByLabelText(/new password/i)).toBeInTheDocument();
+  });
 });

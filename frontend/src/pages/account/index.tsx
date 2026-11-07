@@ -213,7 +213,8 @@ const Account = () => {
             </Stack>
           </form>
         </Paper>
-        {user?.isLdap ? null : (
+        {/* the server refuses a password while password sign in is off */}
+        {user?.isLdap || config.get("oauth.disablePassword") ? null : (
           <Paper withBorder p="xl" mt="lg">
             <Title order={5} mb="xs">
               <FormattedMessage id="account.card.password.title" />

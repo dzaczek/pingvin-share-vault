@@ -694,12 +694,27 @@ export class S3FileService {
     const bucketName = this.config.get("s3.bucketName");
     const s3Instance = this.getS3Instance();
 
+    // The local preview sends the type, nosniff and a CSP sandbox, none of
+    // which a bucket redirect can carry. So the type is pinned here, and only
+    // what a browser shows without running anything is opened inline: passive
+    // media, plain text and PDF (the preview opens those). Pages, SVG and the
+    // rest are downloaded instead of rendering on the bucket's origin.
+    const mimeType = mime.lookup(fileRecord.name) || "application/octet-stream";
+    const showInline =
+      !isDownload &&
+      (mimeType.startsWith("video/") ||
+        mimeType.startsWith("audio/") ||
+        (mimeType.startsWith("image/") && mimeType !== "image/svg+xml") ||
+        mimeType === "text/plain" ||
+        mimeType === "application/pdf");
+
     const getObjectCommand = new GetObjectCommand({
       Bucket: bucketName,
       Key: key,
+      ResponseContentType: mimeType,
       ResponseContentDisposition: contentDisposition(
         fileRecord.name,
-        isDownload ? undefined : { type: "inline" },
+        showInline ? { type: "inline" } : undefined,
       ),
     });
 
