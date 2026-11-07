@@ -13,7 +13,10 @@ jest.mock("./authTotp.service", () => ({ AuthTotpService: class {} }));
 
 const PASSWORD = "correct horse battery";
 
-const build = async (user: Record<string, unknown>) => {
+const build = async (
+  user: Record<string, unknown>,
+  settings: Record<string, unknown> = {},
+) => {
   const prisma = {
     user: {
       findFirst: jest.fn().mockResolvedValue({
@@ -40,11 +43,13 @@ const build = async (user: Record<string, unknown>) => {
   };
   const config = {
     get: (key: string) =>
-      key === "security.sessionDuration"
-        ? { value: 1, unit: "days" }
-        : key === "internal.jwtSecret"
-          ? "secret"
-          : false,
+      key in settings
+        ? settings[key]
+        : key === "security.sessionDuration"
+          ? { value: 1, unit: "days" }
+          : key === "internal.jwtSecret"
+            ? "secret"
+            : false,
   };
   const auditLog = { log: jest.fn() };
   const jwt = {
@@ -155,6 +160,23 @@ describe("changing a password", () => {
       "access",
     );
     expect(body).toEqual({ accessToken: "access", refreshToken: "refresh" });
+  });
+});
+
+describe("setting a first password on an OAuth account", () => {
+  // with password sign in disabled the account has to stay governed by the
+  // identity provider, a reset is refused there and so is this
+  it("is refused while password sign in is disabled", async () => {
+    const { service, prisma } = await build(
+      { password: null },
+      { "oauth.disablePassword": true },
+    );
+    const user = await prisma.user.findFirst();
+
+    await expect(
+      service.updatePassword(user, "a new one"),
+    ).rejects.toMatchObject({ status: 403 });
+    expect(prisma.user.update).not.toHaveBeenCalled();
   });
 });
 
