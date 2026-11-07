@@ -44,11 +44,12 @@ describe("creating a share with a reverse share cookie", () => {
   let prisma: any;
   let reverseShares: any;
 
-  beforeAll(() => {
+  // a fresh folder each time, create refuses an id whose folder exists
+  beforeEach(() => {
     root = fs.mkdtempSync(path.join(os.tmpdir(), "reverse-share-spec-"));
   });
 
-  afterAll(() => fs.rmSync(root, { recursive: true, force: true }));
+  afterEach(() => fs.rmSync(root, { recursive: true, force: true }));
 
   beforeEach(() => {
     prisma = {

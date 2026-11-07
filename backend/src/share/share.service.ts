@@ -35,6 +35,11 @@ import { CreateShareDTO } from "./dto/createShare.dto";
 import { UpdateShareDTO } from "./dto/updateShare.dto";
 import { hasConfirmedEmail } from "./recipientEmail.util";
 
+// existsSync follows the disk's own rules, so on a case-insensitive one it
+// also finds a folder whose name differs only in case
+const shareFolderExists = (id: string) =>
+  fs.existsSync(`${SHARE_DIRECTORY}/${id}`);
+
 @Injectable()
 export class ShareService {
   private readonly logger = new Logger(ShareService.name);
@@ -175,6 +180,13 @@ export class ShareService {
       }
     }
 
+    // The id comes from the client. A folder already there belongs to
+    // another share: one whose rows are gone but whose files are not, or one
+    // whose id differs only in case on a case-insensitive disk. Reusing it
+    // would hand that share's files and zip to this one.
+    if (shareFolderExists(share.id)) {
+      throw new BadRequestException(this.i18n.t("share.idInUse"));
+    }
     fs.mkdirSync(`${SHARE_DIRECTORY}/${share.id}`, {
       recursive: true,
     });
@@ -433,13 +445,15 @@ export class ShareService {
       );
     }
 
-    // Check if any file is malicious with ClamAV
-    void this.clamScanService.checkAndRemove(share.id);
-
+    // locked before the scan lists the files, the upload paths check the
+    // lock again before a file lands, so nothing arrives after the snapshot
     const updatedShare = await this.prisma.share.update({
       where: { id },
       data: { uploadLocked: true },
     });
+
+    // Check if any file is malicious with ClamAV
+    void this.clamScanService.checkAndRemove(share.id);
 
     this.auditLog.log("SHARE_CREATE", {
       resourceId: id,
@@ -841,7 +855,7 @@ export class ShareService {
 
   async isShareIdAvailable(id: string) {
     const share = await this.prisma.share.findUnique({ where: { id } });
-    return { isAvailable: !share };
+    return { isAvailable: !share && !shareFolderExists(id) };
   }
 
   async getAccessLogs(shareId: string) {

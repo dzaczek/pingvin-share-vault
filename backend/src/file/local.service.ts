@@ -8,7 +8,7 @@ import {
 } from "@nestjs/common";
 import * as archiver from "archiver";
 import * as crypto from "crypto";
-import { createReadStream } from "fs";
+import { createReadStream, existsSync } from "fs";
 import * as fs from "fs/promises";
 import * as mime from "mime-types";
 import { I18nService } from "nestjs-i18n";
@@ -146,6 +146,24 @@ export class LocalFileService {
 
     const isLastChunk = chunk.index == chunk.total - 1;
     if (isLastChunk) {
+      // The lock was read when this chunk arrived. Completing the share in
+      // the meantime locks it before the virus scan lists the files, so a
+      // file landing now would never be scanned. A file already at this id
+      // was scanned, it must not be swapped for other bytes either.
+      const target = `${SHARE_DIRECTORY}/${shareId}/${file.id}`;
+      const current = await this.prisma.share.findUnique({
+        where: { id: shareId },
+        select: { uploadLocked: true },
+      });
+      if (current?.uploadLocked || existsSync(target)) {
+        await fs.rm(`${target}.tmp-chunk`, { force: true });
+        throw new BadRequestException(
+          this.i18n.t(
+            current?.uploadLocked ? "file.alreadyCompleted" : "file.nameInUse",
+          ),
+        );
+      }
+
       await fs.rename(
         `${SHARE_DIRECTORY}/${shareId}/${file.id}.tmp-chunk`,
         `${SHARE_DIRECTORY}/${shareId}/${file.id}`,

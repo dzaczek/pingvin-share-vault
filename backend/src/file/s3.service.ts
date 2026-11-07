@@ -195,6 +195,21 @@ export class S3FileService {
 
       // Complete the multipart upload if it's the last chunk
       if (chunk.index === chunk.total - 1) {
+        // The lock was read when this chunk arrived. Completing the share
+        // locks it before the virus scan lists the files, so an object
+        // finished now would never be scanned. Another upload of the same
+        // name may also have finished meanwhile, under the same key.
+        const current = await this.prisma.share.findUnique({
+          where: { id: shareId },
+          select: { uploadLocked: true, files: { select: { name: true } } },
+        });
+        if (
+          current?.uploadLocked ||
+          current?.files.some((f) => f.name === file.name)
+        ) {
+          throw new BadRequestException(this.i18n.t("file.alreadyCompleted"));
+        }
+
         await s3Instance.send(
           new CompleteMultipartUploadCommand({
             Bucket: bucketName,

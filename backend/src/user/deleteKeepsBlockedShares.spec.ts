@@ -18,7 +18,10 @@ describe("deleting an account with a blocked share", () => {
         })),
         delete: jest.fn(async () => ({ id: "u1" })),
       },
-      share: { updateMany: jest.fn(async () => ({ count: 1 })) },
+      share: {
+        updateMany: jest.fn(async () => ({ count: 1 })),
+        findMany: jest.fn(async () => [{ id: "received" }]),
+      },
     };
     const files = { deleteAllFiles: jest.fn(async () => undefined) };
     const service = new UserSevice(
@@ -31,8 +34,15 @@ describe("deleting an account with a blocked share", () => {
 
     await service.delete("u1");
 
-    expect(files.deleteAllFiles).toHaveBeenCalledTimes(1);
+    // the database drops shares received through the user's reverse shares
+    // too, their files have to go with them
+    expect(files.deleteAllFiles).toHaveBeenCalledTimes(2);
     expect(files.deleteAllFiles).toHaveBeenCalledWith("normal");
+    expect(files.deleteAllFiles).toHaveBeenCalledWith("received");
+    expect(prisma.share.findMany).toHaveBeenCalledWith({
+      where: { reverseShare: { creatorId: "u1" }, blockedAt: null },
+      select: { id: true },
+    });
     expect(prisma.share.updateMany).toHaveBeenCalledWith({
       where: {
         blockedAt: { not: null },
