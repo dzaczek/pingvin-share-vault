@@ -13,11 +13,18 @@ const config = {
   testEnvironment: "jest-environment-jsdom",
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
-    // jsdom picks jose's browser build, which is esm only, and jest does not
-    // transform node_modules. Its own commonjs build is the same library.
-    "^jose$": "<rootDir>/node_modules/jose/dist/node/cjs/index.js",
   },
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-export default createJestConfig(config);
+// jose 6 ships only esm, so jest has to transform it like our own code.
+export default async () => {
+  const resolved = await createJestConfig(config)();
+  resolved.transformIgnorePatterns = [
+    "/node_modules/(?!jose/)",
+    ...(resolved.transformIgnorePatterns ?? []).filter(
+      (pattern: string) => !pattern.startsWith("/node_modules/"),
+    ),
+  ];
+  return resolved;
+};
