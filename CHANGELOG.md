@@ -1,3 +1,38 @@
+## [2026.11.0](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.10...v2026.11.0) (2026-11-08)
+
+### Features
+
+* **upload:** paste files and folders from the clipboard into the upload ([7d2be96](https://github.com/dzaczek/pingvin-share-vault/commit/7d2be9676db01171257fce9bb27bdc5079c1fe0a))
+* **oauth:** allow alternative login hostnames ([900af1e](https://github.com/dzaczek/pingvin-share-vault/commit/900af1e345853b42c4460f2d5977afa4d7ba342d))
+
+### Bug Fixes
+
+* **security:** refuse an OAuth callback without state or state cookie ([990ab8d](https://github.com/dzaczek/pingvin-share-vault/commit/990ab8d05084d4b1a92190456fdd6ffab48cb5a7))
+* **auth:** refuse an empty password on sign in ([7093ca1](https://github.com/dzaczek/pingvin-share-vault/commit/7093ca172fa295c253f8abc97232cea6dfda89c5))
+* **oidc:** verify the ID token before trusting it ([8b2092c](https://github.com/dzaczek/pingvin-share-vault/commit/8b2092c5a6cd5b0493b8910eb4a73fb416cca925))
+* **reverse-share:** read the remembered modal choices correctly ([bdb0db5](https://github.com/dzaczek/pingvin-share-vault/commit/bdb0db539a50a95d6bf4e2d280779baa92e5fe83))
+* **oidc:** keep the app URL's scheme for the primary host ([55062b2](https://github.com/dzaczek/pingvin-share-vault/commit/55062b2392ed07499670d7366212e6a618f5a8c5))
+* **frontend:** avoid home page flash when start page is disabled ([b2c4c3c](https://github.com/dzaczek/pingvin-share-vault/commit/b2c4c3c4afa752dc0262fbe5875b96e7ca716336))
+* **deps:** bump root semver to 7.8.6 ([4d86b65](https://github.com/dzaczek/pingvin-share-vault/commit/4d86b65c0413156d2cae5d188d9de42879de8d5d))
+* **share:** let an admin edit an anonymous or foreign share ([a4065a6](https://github.com/dzaczek/pingvin-share-vault/commit/a4065a69250a4ad38ad72dd498e55032542c2510))
+* **deps:** update docs dependencies for security alerts ([4078718](https://github.com/dzaczek/pingvin-share-vault/commit/407871818fb3647c8221816005b6fa6e4521f80a))
+* **cron:** keep unactivated accounts while their activation link is live ([0e61128](https://github.com/dzaczek/pingvin-share-vault/commit/0e61128a3f14ccf7a813baabbbdfeab7db269859))
+* **deps:** update frontend dependencies for security alerts ([311a016](https://github.com/dzaczek/pingvin-share-vault/commit/311a016fb4c25c242098e3f6e7d67a0cb6fd3818))
+* **deps:** update backend dependencies for security alerts ([5401014](https://github.com/dzaczek/pingvin-share-vault/commit/540101410c2517d6a3f485e60f42929f6f702e29))
+* **security:** count parallel uploads against share limits, stop abandoned zips ([cfc06bb](https://github.com/dzaczek/pingvin-share-vault/commit/cfc06bb5084bd7376fdcab4f72755c3b242bbd7d))
+* **security:** age out visitor logs, bind cached hashes to the file, recheck limits on restore ([506a009](https://github.com/dzaczek/pingvin-share-vault/commit/506a009c0ad946b3e2c3875c2bce6706f9da249b))
+* **security:** claim share completion and reopening in one conditional write ([8ef2692](https://github.com/dzaczek/pingvin-share-vault/commit/8ef26923247f8367ce04dd63cdf83cc19fdca9dd))
+* **security:** resolve the new share and file paths inside the shares folder ([54dd1ef](https://github.com/dzaczek/pingvin-share-vault/commit/54dd1ef9af26007693a58664973597e9d651c67f))
+* **security:** never reuse another share's folder, keep late uploads out of a scanned share ([09398da](https://github.com/dzaczek/pingvin-share-vault/commit/09398da5295d32fa0aec73b0103f2fe126feba25))
+* **security:** pin S3 preview types, bound expiration years, honour disablePassword ([00907e1](https://github.com/dzaczek/pingvin-share-vault/commit/00907e1675b0da721daf7924668af0350e9632a5))
+* **security:** keep reverse share uploads within their expiration, refuse //host redirects ([139122b](https://github.com/dzaczek/pingvin-share-vault/commit/139122b56f3a412ae09b053ac3d63afc4279800f))
+* **security:** leave LDAP accounts out of the confirmed address backfill ([8397cf3](https://github.com/dzaczek/pingvin-share-vault/commit/8397cf3c54c76f067ccd5cd80b2b5b569e55207f))
+* **security:** count only addresses that were actually confirmed ([6bda2e8](https://github.com/dzaczek/pingvin-share-vault/commit/6bda2e81ea6cec205a06d5a5a86ac48e14ba6440))
+* **security:** apply share size limit and quota to presigned S3 uploads ([162409f](https://github.com/dzaczek/pingvin-share-vault/commit/162409f5b66e35e665fb37b70849b811708e437a))
+* **security:** trust only known proxies, block login CSRF, reauth email changes ([02be2cb](https://github.com/dzaczek/pingvin-share-vault/commit/02be2cb5d437db4defdef301d9e7e123e6edbead))
+* **security:** close access and lifecycle gaps found in the audit ([6ec890c](https://github.com/dzaczek/pingvin-share-vault/commit/6ec890c9aff80208febfdd6ec31c368ccebdb230))
+* **upload:** stop retrying a failed upload forever ([541092b](https://github.com/dzaczek/pingvin-share-vault/commit/541092b9d3f26b7b180194f36f6d3339677049ce))
+
 ## [2026.10.10](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.9...v2026.10.10) (2026-10-23)
 
 ### Features
