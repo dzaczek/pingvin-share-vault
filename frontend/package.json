@@ -44,7 +44,7 @@
     "@mantine/hooks": "6.0.21",
     "@mantine/modals": "6.0.21",
     "@mantine/next": "6.0.22",
-    "@mantine/notifications": "6.0.21",
+    "@mantine/notifications": "9.7.5",
     "@uiw/react-md-editor": "^4.2.3",
     "axios": "^1.21.0",
     "cookies-next": "^4.2.1",
