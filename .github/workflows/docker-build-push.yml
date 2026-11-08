@@ -4,35 +4,119 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to (re)build, e.g. v2026.11.0. Empty builds the selected branch as latest."
+        required: false
+        default: ""
 
 permissions:
   contents: read
   packages: write
 
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+  # the release being built, from the release event or the manual input
+  TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.tag }}
+  PRERELEASE: ${{ (github.event_name == 'release' && github.event.release.prerelease) || contains(inputs.tag, '-') }}
+
 jobs:
-  docker:
+  # Each platform builds on its own native runner. arm64 used to build under
+  # QEMU on the amd64 runner, where npm ci crashed ("qemu: uncaught target
+  # signal 11") and then hung until the 6 hour job limit.
+  build:
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    steps:
+      - name: checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ env.TAG || github.ref }}
+
+      - name: Commit being built
+        id: commit
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
+        with:
+          images: ${{ env.IMAGE }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
+
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          build-args: |
+            BUILD_COMMIT=${{ steps.commit.outputs.sha }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          no-cache: true
+
+      - name: Export digest
+        run: |
+          mkdir -p "$RUNNER_TEMP/digests"
+          digest="${{ steps.build.outputs.digest }}"
+          touch "$RUNNER_TEMP/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: digests-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  # Joins the per platform images into one multi arch image and tags it.
+  merge:
+    needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     # Docker Hub is only used when its credentials are set. Without them the
     # login failed and took the GitHub Container Registry push down with it.
     env:
       DOCKERHUB: ${{ secrets.DOCKER_USERNAME != '' }}
     steps:
-      - name: checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Download digests
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
 
       - name: Docker metadata
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
         with:
           images: |
-            ghcr.io/${{ github.repository }}
+            ${{ env.IMAGE }}
             name=${{ github.repository }},enable=${{ env.DOCKERHUB == 'true' }}
           tags: |
-            type=semver,pattern={{version}},prefix=v
-            type=semver,pattern={{major}}.{{minor}},prefix=v
-            type=semver,pattern={{major}},prefix=v
-            type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'release' && !github.event.release.prerelease) }}
-            type=raw,value=beta,enable=${{ github.event_name == 'release' && github.event.release.prerelease }}
+            type=semver,pattern={{version}},prefix=v,value=${{ env.TAG }}
+            type=semver,pattern={{major}}.{{minor}},prefix=v,value=${{ env.TAG }}
+            type=semver,pattern={{major}},prefix=v,value=${{ env.TAG }}
+            type=raw,value=latest,enable=${{ env.PRERELEASE != 'true' }}
+            type=raw,value=beta,enable=${{ env.PRERELEASE == 'true' }}
 
       - name: Login to Docker Hub
         if: env.DOCKERHUB == 'true'
@@ -48,19 +132,17 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
 
-      - name: Build and push
-        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
-        with:
-          platforms: linux/amd64,linux/arm64
-          push: true
-          build-args: |
-            BUILD_COMMIT=${{ github.sha }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          no-cache: true
+      - name: Create and push the multi arch image
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          # word splitting is wanted: one "-t tag" and one source per word
+          # shellcheck disable=SC2046
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ env.IMAGE }}@sha256:%s ' *)
+
+      - name: Inspect
+        run: docker buildx imagetools inspect "${{ env.IMAGE }}:${{ steps.meta.outputs.version }}"
