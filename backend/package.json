@@ -48,7 +48,8 @@
     },
     "@typescript-eslint/typescript-estree": {
       "minimatch": "^11.0.1"
-    }
+    },
+    "effect": "^3.22.1"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1162.0",
