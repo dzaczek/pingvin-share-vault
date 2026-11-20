@@ -1,3 +1,9 @@
+## [2026.11.1](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.11.0...v2026.11.1) (2026-11-20)
+
+### Bug Fixes
+
+* **deps:** patch effect ReDoS and minimatch DoS advisories ([4d94694](https://github.com/dzaczek/pingvin-share-vault/commit/4d94694fdfd8a15f566354dcdb402d42cb23c554))
+
 ## [2026.11.0](https://github.com/dzaczek/pingvin-share-vault/compare/v2026.10.10...v2026.11.0) (2026-11-08)
 
 ### Features
